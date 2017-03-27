@@ -24,7 +24,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
 import routing.Pipe.CommandMessage;
-
+import gash.router.server.*;
 /**
  * The message handler processes json messages that are delimited by a 'newline'
  * 
@@ -36,10 +36,11 @@ import routing.Pipe.CommandMessage;
 public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> {
 	protected static Logger logger = LoggerFactory.getLogger("cmd");
 	protected RoutingConf conf;
-
+	ServerState state;
 	public CommandHandler(RoutingConf conf) {
 		if (conf != null) {
 			this.conf = conf;
+
 		}
 	}
 
@@ -67,6 +68,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				logger.info(msg.getMessage());
 			} else {
 			}
+			
 
 		} catch (Exception e) {
 			// TODO add logging

@@ -63,7 +63,7 @@ public class CommConnection {
 	 * @param host
 	 * @param port
 	 */
-	protected CommConnection(String host, int port) {
+	public CommConnection(String host, int port) {
 		this.host = host;
 		this.port = port;
 
@@ -184,7 +184,7 @@ public class CommConnection {
 	 * 
 	 * @return
 	 */
-	protected Channel connect() {
+	public Channel connect() {
 		// Start the connection attempt.
 		if (channel == null) {
 			init();

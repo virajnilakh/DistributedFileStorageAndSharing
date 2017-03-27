@@ -18,6 +18,7 @@ package gash.router.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gash.router.server.edges.EdgeInfo;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -39,7 +40,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	protected static Logger logger = LoggerFactory.getLogger("work");
 	protected ServerState state;
 	protected boolean debug = false;
-
+	
 	public WorkHandler(ServerState state) {
 		if (state != null) {
 			this.state = state;
@@ -65,16 +66,17 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		try {
 			if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
-				logger.debug("heartbeat from " + msg.getHeader().getNodeId());
+				logger.info("heartbeat from " + msg.getHeader().getNodeId());
 			} else if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
 				boolean p = msg.getPing();
 				WorkMessage.Builder rb = WorkMessage.newBuilder();
 				rb.setPing(true);
+				//state.getEmon().sendData(msg);
 				channel.write(rb.build());
 			} else if (msg.hasErr()) {
 				Failure err = msg.getErr();
-				logger.error("failure from " + msg.getHeader().getNodeId());
+				logger.info("failure from " + msg.getHeader().getNodeId());
 				// PrintUtil.printFailure(err);
 			} else if (msg.hasTask()) {
 				Task t = msg.getTask();

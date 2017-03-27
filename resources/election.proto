@@ -1,3 +1,4 @@
+syntax = "proto2";
 option optimize_for = SPEED;
 option java_package = "pipe.election";
 

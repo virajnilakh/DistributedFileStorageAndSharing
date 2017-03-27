@@ -20,11 +20,12 @@ import routing.Pipe.CommandMessage;
 public class CommandInit extends ChannelInitializer<SocketChannel> {
 	boolean compress = false;
 	RoutingConf conf;
-
+	ServerState state;
 	public CommandInit(RoutingConf conf, boolean enableCompression) {
 		super();
 		compress = enableCompression;
 		this.conf = conf;
+		
 	}
 
 	@Override
