@@ -95,7 +95,7 @@ public class Server implements Runnable {
 		}
 	}
 
-	private static void writeToFile() {
+	private static void writeToFile() throws IOException {
 		BufferedWriter out = null;
 		
 		try {
@@ -110,7 +110,7 @@ public class Server implements Runnable {
 
 				JSONObject route = new JSONObject();
 
-				route.put("id", address.split('.')[3]);
+				route.put("id", address.split(".")[3]);
 				route.put("host", address);
 				route.put("port", 4567);
 
