@@ -17,7 +17,7 @@ message Heartbeat {
 /**
  * description of the work
  */
-message Task {  
+message Task {
     required int64 series_id = 1;
     required int32 seq_id = 2;
 }
@@ -30,11 +30,11 @@ message WorkMessage {
    /**
     * The actions (request or response) is
     * implicit through which data structure is in the payload.
-    */ 
+    */
 
    oneof payload {
       Failure err = 3;
-      
+
       // a sanity check for testing
       bool ping = 4;
 
@@ -44,5 +44,7 @@ message WorkMessage {
       Task task = 6;
       WorkState state = 7;
       LeaderStatus leader = 8;
+      ElectionMessage electionMessage= 9;
+
    }
 }

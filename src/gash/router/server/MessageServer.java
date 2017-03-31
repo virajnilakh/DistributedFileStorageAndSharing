@@ -129,7 +129,6 @@ public class MessageServer {
 	 */
 	private static class StartCommandCommunication implements Runnable {
 		RoutingConf conf;
-		ServerState state;
 
 		public StartCommandCommunication(RoutingConf conf) {
 			this.conf = conf;

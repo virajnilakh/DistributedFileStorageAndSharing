@@ -8,11 +8,12 @@ message LeaderStatus {
    optional LeaderState state = 2;
    optional string leader_host= 3;
    optional int32 leader_id = 4;
-   
+
    enum LeaderState {
       LEADERUNKNOWN = 1;
       LEADERALIVE = 2;
       LEADERDEAD = 3;
+      LEADERKNOWN = 4;
    }
 
    enum LeaderQuery {
@@ -20,3 +21,20 @@ message LeaderStatus {
       THELEADERIS = 2;
    }
 }
+//Type of election message and info
+message ElectionMessage{
+    required int32 term=1;
+    required ElectionMessageType type=2;
+    optional VotingInfo info=3;
+
+    enum ElectionMessageType{
+        VOTE=1;
+        LEADERRESPONSE=2;
+        ASKFORVOTE=3;
+    }
+}
+ message VotingInfo{
+     optional int32 candidateID=1;
+     optional int32 voterID=2;
+     optional bool isVoteGranted=3;
+ }
