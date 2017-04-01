@@ -29,11 +29,11 @@ import pipe.work.Work.WorkState;
 
 /**
  * The message handler processes json messages that are delimited by a 'newline'
- * 
+ *
  * TODO replace println with logging!
- * 
+ *
  * @author gash
- * 
+ *
  */
 public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	protected static Logger logger = LoggerFactory.getLogger("work");
@@ -48,7 +48,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 
 	/**
 	 * override this method to provide processing behavior. T
-	 * 
+	 *
 	 * @param msg
 	 */
 	public void handleMessage(WorkMessage msg, Channel channel) {
@@ -63,7 +63,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 
 		// TODO How can you implement this without if-else statements?
 		try {
-			if (msg.hasBeat()) {
+			if(msg.getHeader().hasElection()){
+				System.out.println("Processing the message:");
+				state.getElecHandler().handleMessage(channel,msg);
+			}else if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
 				logger.debug("heartbeat from " + msg.getHeader().getNodeId());
 			} else if (msg.hasPing()) {
@@ -100,7 +103,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	 * a message was received from the server. Here we dispatch the message to
 	 * the client's thread pool to minimize the time it takes to process other
 	 * messages.
-	 * 
+	 *
 	 * @param ctx
 	 *            The channel the message was received from
 	 * @param msg

@@ -2,6 +2,7 @@ public class ElectionHandler{
     private ServerState state;
     private Timer timer;
     private boolean hasVoted=false;
+    private HashMap<Integer,Boolean> vote2TermMap=new HashMap<Integer,Boolean>();
     public boolean getHasVoted(){
         return hasVoted;
     }
@@ -10,7 +11,40 @@ public class ElectionHandler{
     }
     public ElectionHandler(ServerState s){
         state=s;
+        state.setCurrentTerm(0);
         timer=new Timer();
+    }
+    public synchronized void handleMessage(Channel channel,WorkMessage wm){
+        ElectionMessage electionMessage = wm.getElectionMessage();
+        switch (electionMessage.getType()) {
+            case ASKFORVOTE:
+            if(electionMessage.getTerm()>state.getCurrentTerm()){
+                state.setCurrentTerm(electionMessage.getTerm());
+                vote2TermMap.put(electionMessage.getTerm(),false);
+            }
+            if(state.getState()==Follower){
+                if(vote2TermMap.get(sate.getCurrentTerm())){
+
+
+                }else{
+                    WorkMessage vote = ElectionHandler.buildVote(wm.getElectionMessage().getInfo().getCandidateID(),true,state.getCurrentTerm());
+                    vote2TermMap.put(electionMessage.getTerm(),true);
+                    hasVoted=true;
+                    System.out.println("Voted for "+wm.getElectionMessage().getInfo().getCandidateID());
+                    ChannelFuture cf= channel.writeAndFlush(vote);
+                    cf.awaitUninterruptibly();
+                }
+            }else if(state.getState()==Candidate){
+
+            }else{
+
+            }
+            case LEADERRESPONSE:
+            case VOTE:
+        }
+    }
+    public WorkMessage buildVote(int candidate,boolean isGranted,int term){
+
     }
     public WorkMessage createAskForVoteMessage(long timeout,int term){
         WorkMessage.Builder workMessage = WorkMessage.newBuilder();
