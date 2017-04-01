@@ -97,7 +97,16 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	public void createInboundIfNew(int ref, String host, int port) {
 		inboundEdges.createIfNew(ref, host, port);
 	}
+	public void broadcast(WorkMessage msg){
+			for (EdgeInfo ei : this.outboundEdges.map.values()){
+				Channel ch=ei.getChannel();
+				ChannelFuture cf = ch.writeAndFlush(msg);
+				if (cf.isDone() && !cf.isSuccess()) {
+					logger.error("failed to send vote to server");
 
+				}
+			}
+		}
 	private WorkMessage createHB(EdgeInfo ei) {
 		WorkState.Builder sb = WorkState.newBuilder();
 		sb.setEnqueued(-1);
@@ -120,13 +129,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			status.setState(LeaderState.LEADERUNKNOWN);
 			wb.setLeader(status);
 		} else if (state.getLeaderId() == this.state.getConf().getNodeId()) {
-			// Current Node is the leader
 			status.setState(LeaderState.LEADERALIVE);
-
 			wb.setLeader(status);
 		} else {
 			status.setState(LeaderState.LEADERKNOWN);
-
 			wb.setLeader(status);
 		}
 		return wb.build();

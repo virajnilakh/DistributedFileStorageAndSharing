@@ -1,20 +1,24 @@
 private static class ElectionTimer extends TimerTask{
-    private ServerState s;
-    private ElectionHandler e;
+    private ServerState state;
+    private ElectionHandler electionHandler;
     public ElectionTimer(ServerState s,ElectionHandler e){
         state=s;
         electionHandler=e;
     }
     @Ovveride
     public void run(){
-        if(){
+        if(e.getHasVoted()){
             timer.cancel();
         }
-        if(state.isFollower() && ){
+        if(state.isFollower() && !e.getHasVoted()){
             try{
                 state.becomeCandidate();
-
-            }catch(Exception e )
+                state.setTimeout(System.currentTimeMillis());
+                WorkMessage electionMessage = e.createAskForVoteMessage(state.getTimeout(), state.getCurrentTerm());
+                state.getEmon().broadcast(electionMessage);
+            }catch(Exception e){
+                System.out.println("Error occured in timer");
+            }
 
         }
     }
