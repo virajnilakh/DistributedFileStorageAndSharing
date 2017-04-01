@@ -15,15 +15,31 @@
  */
 package gash.router.server.edges;
 
+import java.util.HashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import gash.router.client.CommConnection;
 import gash.router.container.RoutingConf.RoutingEntry;
+import gash.router.election.ElectionHandler;
+import gash.router.server.CommandInit;
 import gash.router.server.ServerState;
+import gash.router.server.WorkInit;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import pipe.common.Common.Header;
+import pipe.election.Election.LeaderStatus;
+import pipe.election.Election.LeaderStatus.LeaderState;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkState;
+import routing.Pipe.CommandMessage;
 
 public class EdgeMonitor implements EdgeListener, Runnable {
 	protected static Logger logger = LoggerFactory.getLogger("edge monitor");
@@ -33,6 +49,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	private long dt = 2000;
 	private ServerState state;
 	private boolean forever = true;
+	private int activeOutboundEdges=0;
+	public HashMap<Integer,EdgeInfo> getOutboundEdges() {
+		return outboundEdges.getMap();
+	}
 
 	public EdgeMonitor(ServerState state) {
 		if (state == null)
@@ -53,7 +73,27 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		if (state.getConf().getHeartbeatDt() > this.dt)
 			this.dt = state.getConf().getHeartbeatDt();
 	}
+	public void broadcast(WorkMessage msg){
+		for (EdgeInfo ei : this.outboundEdges.map.values()){
+			Channel ch=ei.getChannel();
+			ChannelFuture cf = ch.writeAndFlush(msg);
+			if (cf.isDone() && !cf.isSuccess()) {
+				logger.error("failed to send vote to server");
 
+			}
+		}
+	}
+
+	public void sendData(CommandMessage msg){
+		for (EdgeInfo ei : this.outboundEdges.map.values()){
+			Channel ch=ei.getChannel();
+			ChannelFuture cf = ch.writeAndFlush(msg);
+			if (cf.isDone() && !cf.isSuccess()) {
+				logger.error("failed to send message to server");
+
+			}
+		}
+	}
 	public void createInboundIfNew(int ref, String host, int port) {
 		inboundEdges.createIfNew(ref, host, port);
 	}
@@ -70,11 +110,25 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		hb.setNodeId(state.getConf().getNodeId());
 		hb.setDestination(-1);
 		hb.setTime(System.currentTimeMillis());
+		LeaderStatus.Builder status=LeaderStatus.newBuilder();
 
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
 		wb.setHeader(hb);
+		wb.setSecret(0);
 		wb.setBeat(bb);
+		if (state.getLeaderId() == 0) {
+			status.setState(LeaderState.LEADERUNKNOWN);
+			wb.setLeader(status);
+		} else if (state.getLeaderId() == this.state.getConf().getNodeId()) {
+			// Current Node is the leader
+			status.setState(LeaderState.LEADERALIVE);
 
+			wb.setLeader(status);
+		} else {
+			status.setState(LeaderState.LEADERKNOWN);
+
+			wb.setLeader(status);
+		}
 		return wb.build();
 	}
 
@@ -87,12 +141,42 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		while (forever) {
 			try {
 				for (EdgeInfo ei : this.outboundEdges.map.values()) {
+					if(activeOutboundEdges==outboundEdges.map.size() && !state.isLeader()){
+						state.getElecHandler().startElection();
+					}else{
+						System.out.println("Leader selected?="+state.isLeader());
+					}
 					if (ei.isActive() && ei.getChannel() != null) {
+						if (state.getLeaderId() == this.state.getConf().getNodeId()) {
+
 						WorkMessage wm = createHB(ei);
 						ei.getChannel().writeAndFlush(wm);
+						}
 					} else {
 						// TODO create a client to the node
 						logger.info("trying to connect to node " + ei.getRef());
+						String host = ei.getHost();
+				        int port = ei.getPort();
+				        EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+				        try {
+				            Bootstrap b = new Bootstrap(); // (1)
+				            b.group(workerGroup); // (2)
+				            b.channel(NioSocketChannel.class); // (3)
+				            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+				            b.handler(new WorkInit(state,false));
+
+				            // Start the client.
+				            ChannelFuture f = b.connect(host, port).sync(); // (5)
+				            ei.setChannel(f.channel());
+				            ei.setActive(true);
+				            activeOutboundEdges++;
+				            // Wait until the connection is closed.
+				            //f.channel().closeFuture().sync();
+				        } finally {
+				            //workerGroup.shutdownGracefully();
+				        }
+
 					}
 				}
 
@@ -103,7 +187,6 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			}
 		}
 	}
-
 	@Override
 	public synchronized void onAdd(EdgeInfo ei) {
 		// TODO check connection
