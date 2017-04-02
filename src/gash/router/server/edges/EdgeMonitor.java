@@ -73,16 +73,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		if (state.getConf().getHeartbeatDt() > this.dt)
 			this.dt = state.getConf().getHeartbeatDt();
 	}
-	public void broadcast(WorkMessage msg){
-		for (EdgeInfo ei : this.outboundEdges.map.values()){
-			Channel ch=ei.getChannel();
-			ChannelFuture cf = ch.writeAndFlush(msg);
-			if (cf.isDone() && !cf.isSuccess()) {
-				logger.error("failed to send vote to server");
-
-			}
-		}
-	}
+	
 
 	public void sendData(CommandMessage msg){
 		for (EdgeInfo ei : this.outboundEdges.map.values()){
@@ -148,7 +139,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			try {
 				for (EdgeInfo ei : this.outboundEdges.map.values()) {
 					if(activeOutboundEdges==outboundEdges.map.size() && !state.isLeader()){
-						state.getElecHandler().startElection();
+						state.getElecHandler().initElection();
 					}else{
 						System.out.println("Leader selected?="+state.isLeader());
 					}

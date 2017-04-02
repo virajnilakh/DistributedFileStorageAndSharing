@@ -22,7 +22,9 @@ public class EdgeList {
 
 	public EdgeList() {
 	}
-
+	public HashMap<Integer, EdgeInfo> getMap(){
+		return map;
+	}
 	public EdgeInfo createIfNew(int ref, String host, int port) {
 		if (hasNode(ref))
 			return getNode(ref);
