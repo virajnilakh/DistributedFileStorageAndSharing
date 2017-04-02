@@ -43,7 +43,7 @@ public class ElectionHandler{
             switch(state.getState()){
             	case Follower:
             		if(vote2TermMap.get(state.getCurrentTerm())){
-
+    					
 
                     }else{
                         WorkMessage vote = buildVote(wm.getElectionMessage().getInfo().getCandidateID(),true,state.getCurrentTerm());
@@ -52,16 +52,57 @@ public class ElectionHandler{
                         System.out.println("Voted for "+wm.getElectionMessage().getInfo().getCandidateID());
                         ChannelFuture cf = channel.writeAndFlush(vote);
                         cf.awaitUninterruptibly();
+    					vote2TermMap.put(state.getCurrentTerm(), true);
+
                     }
+            		break;
             	case Candidate:
+            		if(state.getTimeout()<wm.getHeader().getTime()){
+            			
+            		}else{
+            			state.becomeFollower();
+            			WorkMessage vote = buildVote(wm.getElectionMessage().getInfo().getCandidateID(),true,state.getCurrentTerm());
+                        vote2TermMap.put(electionMessage.getTerm(),true);
+                        hasVoted=true;
+                        System.out.println("Voted for "+wm.getElectionMessage().getInfo().getCandidateID());
+                        ChannelFuture cf = channel.writeAndFlush(vote);
+                        cf.awaitUninterruptibly();
+    					vote2TermMap.put(state.getCurrentTerm(), true);
+            		}
+            		break;
             	case Leader:
+            		break;
             }
             
             case LEADERRESPONSE:
+            	
+            		System.out.println("New Leader elected is"+wm.getLeader().getLeaderId());
+            		state.setLeaderId(wm.getLeader().getLeaderId());
+            		state.setLeaderAddress(wm.getLeader().getLeaderHost());
+            	
             case VOTE:
+            	if(state.isCandidate()){
+            		System.out.println("Received Vote!!!");
+            		boolean leader=checkIfLeader(wm);
+            		if(leader){
+            			state.becomeLeader();
+                		System.out.println("NOde:"+state.getConf().getNodeId()+" is the Leader!!");
+						WorkMessage response = ElectionHandler.buildLeaderResponse(state.getConf().getNodeId(), state.getCurrentTerm());
+						state.getEmon().broadcast(response);
+						
+            		}
+            	}
         }
     }
-    public static WorkMessage buildVote(int candidate,boolean isGranted,int term){
+    private static WorkMessage buildLeaderResponse(int nodeId, int currentTerm) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	private boolean checkIfLeader(WorkMessage wm) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	public static WorkMessage buildVote(int candidate,boolean isGranted,int term){
     	WorkMessage.Builder workMessage = WorkMessage.newBuilder();
 		Header.Builder header = Header.newBuilder();
 		ElectionMessage.Builder electionMessage = ElectionMessage.newBuilder();
