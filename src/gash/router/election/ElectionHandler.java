@@ -21,6 +21,11 @@ public class ElectionHandler{
     private static Timer timer;
     private static boolean hasVoted=false;
     private HashMap<Integer,Boolean> vote2TermMap=new HashMap<Integer,Boolean>();
+    private static int voteCount = 0;
+
+    public static synchronized void incrementVoteCount() {
+        voteCount++;
+    }
     public static boolean getHasVoted(){
         return hasVoted;
     }
@@ -83,6 +88,9 @@ public class ElectionHandler{
             case VOTE:
             	if(state.isCandidate()){
             		System.out.println("Received Vote!!!");
+            		if(wm.getElectionMessage().getInfo().getIsVoteGranted()){
+            			incrementVoteCount();
+            		}
             		boolean leader=checkIfLeader(wm);
             		if(leader){
             			state.becomeLeader();
@@ -96,11 +104,39 @@ public class ElectionHandler{
     }
     private static WorkMessage buildLeaderResponse(int nodeId, int currentTerm) {
 		// TODO Auto-generated method stub
-		return null;
+    	WorkMessage.Builder workMessage = WorkMessage.newBuilder();
+		Header.Builder header = Header.newBuilder();
+		ElectionMessage.Builder electionMessage = ElectionMessage.newBuilder();
+		VotingInfo.Builder infoMsgBuilder = VotingInfo.newBuilder();
+		LeaderStatus.Builder status=LeaderStatus.newBuilder();
+
+		status.setState(LeaderState.LEADERALIVE);
+		status.setLeaderId(nodeId);
+		status.setLeaderHost("169.254.214.175");
+		header.setElection(true);
+		header.setNodeId(state.getConf().getNodeId());
+		header.setTime(System.currentTimeMillis());
+
+		//infoMsgBuilder.setCandidateID(candidate);
+		//infoMsgBuilder.setIsVoteGranted(isGranted);
+
+		electionMessage.setType(ElectionMessageType.LEADERRESPONSE);
+		electionMessage.setTerm(currentTerm);
+        electionMessage.setInfo(infoMsgBuilder);
+
+		workMessage.setLeader(status);
+		workMessage.setElectionMessage(electionMessage);
+		workMessage.setSecret(789456);
+		workMessage.setHeader(header);
+		return workMessage.build();
 	}
 	private boolean checkIfLeader(WorkMessage wm) {
 		// TODO Auto-generated method stub
-		return false;
+		if(voteCount>=state.getEmon().getOutboundEdges().size()/2+1){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	public static WorkMessage buildVote(int candidate,boolean isGranted,int term){
     	WorkMessage.Builder workMessage = WorkMessage.newBuilder();
