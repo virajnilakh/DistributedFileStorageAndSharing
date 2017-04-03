@@ -108,9 +108,9 @@ public class ServerState {
 
             	if(electionMessage.getTerm()>getCurrentTerm()){
                     setCurrentTerm(electionMessage.getTerm());
-                    elecHandler.getVote2TermMap().put(electionMessage.getTerm(),false);
+                    elecHandler.setVote2TermMap(electionMessage.getTerm(),false);
                 }else{
-                	elecHandler.getVote2TermMap().put(currentTerm, true);
+                	elecHandler.setVote2TermMap(currentTerm, false);
 
                 }
             	requestHandler=reqVote;

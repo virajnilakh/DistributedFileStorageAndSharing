@@ -18,7 +18,7 @@ public class HandleVoteRequestState implements Handelable{
 
 		switch(state.getState()){
     	case Follower:
-    		if(state.getElecHandler().getVote2TermMap().get(state.getCurrentTerm())){
+    		if(state.getElecHandler().getVote2TermMap(state.getCurrentTerm())){
 				
 
             }else{
@@ -48,11 +48,10 @@ public class HandleVoteRequestState implements Handelable{
 }
 public void vote(Channel channel,ElectionMessage electionMessage){
 	WorkMessage vote = state.getElecHandler().buildVote(electionMessage.getInfo().getCandidateID(),true,state.getCurrentTerm());
-	state.getElecHandler().getVote2TermMap().put(electionMessage.getTerm(),true);
+	state.getElecHandler().setVote2TermMap(electionMessage.getTerm(),true);
     state.getElecHandler().setHasVoted(true);
     System.out.println("Voted for "+electionMessage.getInfo().getCandidateID());
     ChannelFuture cf = channel.writeAndFlush(vote);
     cf.awaitUninterruptibly();
-    state.getElecHandler().getVote2TermMap().put(state.getCurrentTerm(), true);
 }
 }

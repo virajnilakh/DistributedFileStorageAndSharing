@@ -21,12 +21,13 @@ public class ElectionHandler{
     private static Timer timer;
     private static boolean hasVoted=false;
     private HashMap<Integer,Boolean> vote2TermMap=new HashMap<Integer,Boolean>();
-    public HashMap<Integer, Boolean> getVote2TermMap() {
-		return vote2TermMap;
+    public boolean getVote2TermMap(int key) {
+		return vote2TermMap.get(key);
 	}
-	public void setVote2TermMap(HashMap<Integer, Boolean> vote2TermMap) {
-		this.vote2TermMap = vote2TermMap;
+	public void setVote2TermMap(int key,boolean value) {
+		this.vote2TermMap.put(key, value);
 	}
+	
 	private static int voteCount = 0;
 
     public static synchronized void incrementVoteCount() {
@@ -66,8 +67,8 @@ public class ElectionHandler{
 		electionMessage.setType(ElectionMessageType.LEADERRESPONSE);
 		electionMessage.setTerm(currentTerm);
         electionMessage.setInfo(infoMsgBuilder);
-
-		workMessage.setLeader(status);
+        
+		workMessage.setLeaderStatus(status);
 		workMessage.setElectionMessage(electionMessage);
 		workMessage.setSecret(789456);
 		workMessage.setHeader(header);
@@ -101,7 +102,7 @@ public class ElectionHandler{
 		electionMessage.setTerm(term);
         electionMessage.setInfo(infoMsgBuilder);
 
-		workMessage.setLeader(status);
+		workMessage.setLeaderStatus(status);
 		workMessage.setElectionMessage(electionMessage);
 		workMessage.setSecret(789456);
 		workMessage.setHeader(header);
@@ -126,7 +127,7 @@ public class ElectionHandler{
 		electionMessage.setTerm(term);
         electionMessage.setInfo(infoMsgBuilder);
 
-		workMessage.setLeader(status);
+		workMessage.setLeaderStatus(status);
 		workMessage.setElectionMessage(electionMessage);
 		workMessage.setSecret(789456);
 		workMessage.setHeader(header);

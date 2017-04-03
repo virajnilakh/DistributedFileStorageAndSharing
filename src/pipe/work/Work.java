@@ -1859,17 +1859,17 @@ public final class Work {
     pipe.work.Work.WorkStateOrBuilder getStateOrBuilder();
 
     /**
-     * <code>optional .LeaderStatus leader = 8;</code>
+     * <code>optional .LeaderStatus leaderStatus = 8;</code>
      */
-    boolean hasLeader();
+    boolean hasLeaderStatus();
     /**
-     * <code>optional .LeaderStatus leader = 8;</code>
+     * <code>optional .LeaderStatus leaderStatus = 8;</code>
      */
-    pipe.election.Election.LeaderStatus getLeader();
+    pipe.election.Election.LeaderStatus getLeaderStatus();
     /**
-     * <code>optional .LeaderStatus leader = 8;</code>
+     * <code>optional .LeaderStatus leaderStatus = 8;</code>
      */
-    pipe.election.Election.LeaderStatusOrBuilder getLeaderOrBuilder();
+    pipe.election.Election.LeaderStatusOrBuilder getLeaderStatusOrBuilder();
 
     /**
      * <code>optional .ElectionMessage electionMessage = 9;</code>
@@ -2074,7 +2074,7 @@ public final class Work {
       BEAT(5),
       TASK(6),
       STATE(7),
-      LEADER(8),
+      LEADERSTATUS(8),
       ELECTIONMESSAGE(9),
       PAYLOAD_NOT_SET(0);
       private final int value;
@@ -2096,7 +2096,7 @@ public final class Work {
           case 5: return BEAT;
           case 6: return TASK;
           case 7: return STATE;
-          case 8: return LEADER;
+          case 8: return LEADERSTATUS;
           case 9: return ELECTIONMESSAGE;
           case 0: return PAYLOAD_NOT_SET;
           default: return null;
@@ -2290,26 +2290,26 @@ public final class Work {
       return pipe.work.Work.WorkState.getDefaultInstance();
     }
 
-    public static final int LEADER_FIELD_NUMBER = 8;
+    public static final int LEADERSTATUS_FIELD_NUMBER = 8;
     /**
-     * <code>optional .LeaderStatus leader = 8;</code>
+     * <code>optional .LeaderStatus leaderStatus = 8;</code>
      */
-    public boolean hasLeader() {
+    public boolean hasLeaderStatus() {
       return payloadCase_ == 8;
     }
     /**
-     * <code>optional .LeaderStatus leader = 8;</code>
+     * <code>optional .LeaderStatus leaderStatus = 8;</code>
      */
-    public pipe.election.Election.LeaderStatus getLeader() {
+    public pipe.election.Election.LeaderStatus getLeaderStatus() {
       if (payloadCase_ == 8) {
          return (pipe.election.Election.LeaderStatus) payload_;
       }
       return pipe.election.Election.LeaderStatus.getDefaultInstance();
     }
     /**
-     * <code>optional .LeaderStatus leader = 8;</code>
+     * <code>optional .LeaderStatus leaderStatus = 8;</code>
      */
-    public pipe.election.Election.LeaderStatusOrBuilder getLeaderOrBuilder() {
+    public pipe.election.Election.LeaderStatusOrBuilder getLeaderStatusOrBuilder() {
       if (payloadCase_ == 8) {
          return (pipe.election.Election.LeaderStatus) payload_;
       }
@@ -2521,8 +2521,8 @@ public final class Work {
               .equals(other.getState());
           break;
         case 8:
-          result = result && getLeader()
-              .equals(other.getLeader());
+          result = result && getLeaderStatus()
+              .equals(other.getLeaderStatus());
           break;
         case 9:
           result = result && getElectionMessage()
@@ -2574,8 +2574,8 @@ public final class Work {
           hash = (53 * hash) + getState().hashCode();
           break;
         case 8:
-          hash = (37 * hash) + LEADER_FIELD_NUMBER;
-          hash = (53 * hash) + getLeader().hashCode();
+          hash = (37 * hash) + LEADERSTATUS_FIELD_NUMBER;
+          hash = (53 * hash) + getLeaderStatus().hashCode();
           break;
         case 9:
           hash = (37 * hash) + ELECTIONMESSAGE_FIELD_NUMBER;
@@ -2785,10 +2785,10 @@ public final class Work {
           }
         }
         if (payloadCase_ == 8) {
-          if (leaderBuilder_ == null) {
+          if (leaderStatusBuilder_ == null) {
             result.payload_ = payload_;
           } else {
-            result.payload_ = leaderBuilder_.build();
+            result.payload_ = leaderStatusBuilder_.build();
           }
         }
         if (payloadCase_ == 9) {
@@ -2868,8 +2868,8 @@ public final class Work {
             mergeState(other.getState());
             break;
           }
-          case LEADER: {
-            mergeLeader(other.getLeader());
+          case LEADERSTATUS: {
+            mergeLeaderStatus(other.getLeaderStatus());
             break;
           }
           case ELECTIONMESSAGE: {
@@ -3740,64 +3740,64 @@ public final class Work {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          pipe.election.Election.LeaderStatus, pipe.election.Election.LeaderStatus.Builder, pipe.election.Election.LeaderStatusOrBuilder> leaderBuilder_;
+          pipe.election.Election.LeaderStatus, pipe.election.Election.LeaderStatus.Builder, pipe.election.Election.LeaderStatusOrBuilder> leaderStatusBuilder_;
       /**
-       * <code>optional .LeaderStatus leader = 8;</code>
+       * <code>optional .LeaderStatus leaderStatus = 8;</code>
        */
-      public boolean hasLeader() {
+      public boolean hasLeaderStatus() {
         return payloadCase_ == 8;
       }
       /**
-       * <code>optional .LeaderStatus leader = 8;</code>
+       * <code>optional .LeaderStatus leaderStatus = 8;</code>
        */
-      public pipe.election.Election.LeaderStatus getLeader() {
-        if (leaderBuilder_ == null) {
+      public pipe.election.Election.LeaderStatus getLeaderStatus() {
+        if (leaderStatusBuilder_ == null) {
           if (payloadCase_ == 8) {
             return (pipe.election.Election.LeaderStatus) payload_;
           }
           return pipe.election.Election.LeaderStatus.getDefaultInstance();
         } else {
           if (payloadCase_ == 8) {
-            return leaderBuilder_.getMessage();
+            return leaderStatusBuilder_.getMessage();
           }
           return pipe.election.Election.LeaderStatus.getDefaultInstance();
         }
       }
       /**
-       * <code>optional .LeaderStatus leader = 8;</code>
+       * <code>optional .LeaderStatus leaderStatus = 8;</code>
        */
-      public Builder setLeader(pipe.election.Election.LeaderStatus value) {
-        if (leaderBuilder_ == null) {
+      public Builder setLeaderStatus(pipe.election.Election.LeaderStatus value) {
+        if (leaderStatusBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           payload_ = value;
           onChanged();
         } else {
-          leaderBuilder_.setMessage(value);
+          leaderStatusBuilder_.setMessage(value);
         }
         payloadCase_ = 8;
         return this;
       }
       /**
-       * <code>optional .LeaderStatus leader = 8;</code>
+       * <code>optional .LeaderStatus leaderStatus = 8;</code>
        */
-      public Builder setLeader(
+      public Builder setLeaderStatus(
           pipe.election.Election.LeaderStatus.Builder builderForValue) {
-        if (leaderBuilder_ == null) {
+        if (leaderStatusBuilder_ == null) {
           payload_ = builderForValue.build();
           onChanged();
         } else {
-          leaderBuilder_.setMessage(builderForValue.build());
+          leaderStatusBuilder_.setMessage(builderForValue.build());
         }
         payloadCase_ = 8;
         return this;
       }
       /**
-       * <code>optional .LeaderStatus leader = 8;</code>
+       * <code>optional .LeaderStatus leaderStatus = 8;</code>
        */
-      public Builder mergeLeader(pipe.election.Election.LeaderStatus value) {
-        if (leaderBuilder_ == null) {
+      public Builder mergeLeaderStatus(pipe.election.Election.LeaderStatus value) {
+        if (leaderStatusBuilder_ == null) {
           if (payloadCase_ == 8 &&
               payload_ != pipe.election.Election.LeaderStatus.getDefaultInstance()) {
             payload_ = pipe.election.Election.LeaderStatus.newBuilder((pipe.election.Election.LeaderStatus) payload_)
@@ -3808,18 +3808,18 @@ public final class Work {
           onChanged();
         } else {
           if (payloadCase_ == 8) {
-            leaderBuilder_.mergeFrom(value);
+            leaderStatusBuilder_.mergeFrom(value);
           }
-          leaderBuilder_.setMessage(value);
+          leaderStatusBuilder_.setMessage(value);
         }
         payloadCase_ = 8;
         return this;
       }
       /**
-       * <code>optional .LeaderStatus leader = 8;</code>
+       * <code>optional .LeaderStatus leaderStatus = 8;</code>
        */
-      public Builder clearLeader() {
-        if (leaderBuilder_ == null) {
+      public Builder clearLeaderStatus() {
+        if (leaderStatusBuilder_ == null) {
           if (payloadCase_ == 8) {
             payloadCase_ = 0;
             payload_ = null;
@@ -3830,22 +3830,22 @@ public final class Work {
             payloadCase_ = 0;
             payload_ = null;
           }
-          leaderBuilder_.clear();
+          leaderStatusBuilder_.clear();
         }
         return this;
       }
       /**
-       * <code>optional .LeaderStatus leader = 8;</code>
+       * <code>optional .LeaderStatus leaderStatus = 8;</code>
        */
-      public pipe.election.Election.LeaderStatus.Builder getLeaderBuilder() {
-        return getLeaderFieldBuilder().getBuilder();
+      public pipe.election.Election.LeaderStatus.Builder getLeaderStatusBuilder() {
+        return getLeaderStatusFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .LeaderStatus leader = 8;</code>
+       * <code>optional .LeaderStatus leaderStatus = 8;</code>
        */
-      public pipe.election.Election.LeaderStatusOrBuilder getLeaderOrBuilder() {
-        if ((payloadCase_ == 8) && (leaderBuilder_ != null)) {
-          return leaderBuilder_.getMessageOrBuilder();
+      public pipe.election.Election.LeaderStatusOrBuilder getLeaderStatusOrBuilder() {
+        if ((payloadCase_ == 8) && (leaderStatusBuilder_ != null)) {
+          return leaderStatusBuilder_.getMessageOrBuilder();
         } else {
           if (payloadCase_ == 8) {
             return (pipe.election.Election.LeaderStatus) payload_;
@@ -3854,16 +3854,16 @@ public final class Work {
         }
       }
       /**
-       * <code>optional .LeaderStatus leader = 8;</code>
+       * <code>optional .LeaderStatus leaderStatus = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.election.Election.LeaderStatus, pipe.election.Election.LeaderStatus.Builder, pipe.election.Election.LeaderStatusOrBuilder> 
-          getLeaderFieldBuilder() {
-        if (leaderBuilder_ == null) {
+          getLeaderStatusFieldBuilder() {
+        if (leaderStatusBuilder_ == null) {
           if (!(payloadCase_ == 8)) {
             payload_ = pipe.election.Election.LeaderStatus.getDefaultInstance();
           }
-          leaderBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          leaderStatusBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               pipe.election.Election.LeaderStatus, pipe.election.Election.LeaderStatus.Builder, pipe.election.Election.LeaderStatusOrBuilder>(
                   (pipe.election.Election.LeaderStatus) payload_,
                   getParentForChildren(),
@@ -3872,7 +3872,7 @@ public final class Work {
         }
         payloadCase_ = 8;
         onChanged();;
-        return leaderBuilder_;
+        return leaderStatusBuilder_;
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -4092,14 +4092,14 @@ public final class Work {
       "to\"0\n\tWorkState\022\020\n\010enqueued\030\001 \002(\005\022\021\n\tpro" +
       "cessed\030\002 \002(\005\"&\n\tHeartbeat\022\031\n\005state\030\001 \002(\013" +
       "2\n.WorkState\")\n\004Task\022\021\n\tseries_id\030\001 \002(\003\022" +
-      "\016\n\006seq_id\030\002 \002(\005\"\210\002\n\013WorkMessage\022\027\n\006heade" +
+      "\016\n\006seq_id\030\002 \002(\005\"\216\002\n\013WorkMessage\022\027\n\006heade" +
       "r\030\001 \002(\0132\007.Header\022\016\n\006secret\030\002 \002(\003\022\027\n\003err\030" +
       "\003 \001(\0132\010.FailureH\000\022\016\n\004ping\030\004 \001(\010H\000\022\032\n\004bea" +
       "t\030\005 \001(\0132\n.HeartbeatH\000\022\025\n\004task\030\006 \001(\0132\005.Ta" +
-      "skH\000\022\033\n\005state\030\007 \001(\0132\n.WorkStateH\000\022\037\n\006lea" +
-      "der\030\010 \001(\0132\r.LeaderStatusH\000\022+\n\017electionMe",
-      "ssage\030\t \001(\0132\020.ElectionMessageH\000B\t\n\007paylo" +
-      "adB\r\n\tpipe.workH\001"
+      "skH\000\022\033\n\005state\030\007 \001(\0132\n.WorkStateH\000\022%\n\014lea" +
+      "derStatus\030\010 \001(\0132\r.LeaderStatusH\000\022+\n\017elec",
+      "tionMessage\030\t \001(\0132\020.ElectionMessageH\000B\t\n" +
+      "\007payloadB\r\n\tpipe.workH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4138,7 +4138,7 @@ public final class Work {
     internal_static_WorkMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_WorkMessage_descriptor,
-        new java.lang.String[] { "Header", "Secret", "Err", "Ping", "Beat", "Task", "State", "Leader", "ElectionMessage", "Payload", });
+        new java.lang.String[] { "Header", "Secret", "Err", "Ping", "Beat", "Task", "State", "LeaderStatus", "ElectionMessage", "Payload", });
     pipe.common.Common.getDescriptor();
     pipe.election.Election.getDescriptor();
   }

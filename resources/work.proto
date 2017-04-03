@@ -43,7 +43,7 @@ message WorkMessage {
 
       Task task = 6;
       WorkState state = 7;
-      LeaderStatus leader = 8;
+      LeaderStatus leaderStatus = 8;
       ElectionMessage electionMessage= 9;
 
    }
