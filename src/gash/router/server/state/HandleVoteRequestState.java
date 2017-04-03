@@ -18,6 +18,7 @@ public class HandleVoteRequestState implements Handelable{
 
 		switch(state.getState()){
     	case Follower:
+    		if(state.getElecHandler().getVote2TermMap().get(state.getCurrentTerm())){
 				
 
             }else{
