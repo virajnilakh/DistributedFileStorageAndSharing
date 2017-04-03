@@ -5,12 +5,22 @@ import java.util.concurrent.ConcurrentHashMap;
 import gash.router.container.RoutingConf;
 import gash.router.election.ElectionHandler;
 import gash.router.server.edges.EdgeMonitor;
+import gash.router.server.state.Handelable;
+import gash.router.server.state.HandleLeaderResponseState;
+import gash.router.server.state.HandleVoteReceivedState;
+import gash.router.server.state.HandleVoteRequestState;
 import gash.router.server.tasks.TaskList;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import pipe.election.Election.ElectionMessage;
+import pipe.work.Work.WorkMessage;
 
 public class ServerState {
+	 
 	public enum State {
 		Follower, Leader, Candidate;
 	}
+	private Handelable requestHandler;
 	private ElectionHandler elecHandler=new ElectionHandler(this);
 	public ElectionHandler getElecHandler() {
 		return elecHandler;
@@ -28,6 +38,14 @@ public class ServerState {
 	private int currentTerm=0;
 	private long timeout=0;
 	private String leaderAddress="";
+	Handelable reqVote;
+	Handelable resLeader;
+	Handelable voteReceived;
+	public ServerState(){
+		reqVote=new HandleVoteRequestState(this);
+		resLeader=new HandleLeaderResponseState(this);
+		voteReceived=new HandleVoteReceivedState(this);
+	}
 	public long getTimeout() {
 		return timeout;
 	}
@@ -81,7 +99,37 @@ public class ServerState {
 	public int getLeaderId() {
 		return leaderId;
 	}
+	public synchronized void handleMessage(Channel channel, WorkMessage wm) {
+		// TODO Auto-generated method stub
+		ElectionMessage electionMessage = wm.getElectionMessage();
+        switch (electionMessage.getType()) {
+            case ASKFORVOTE:
+				System.out.println("Got a vote request:");
 
+            	if(electionMessage.getTerm()>getCurrentTerm()){
+                    setCurrentTerm(electionMessage.getTerm());
+                    elecHandler.getVote2TermMap().put(electionMessage.getTerm(),false);
+                }else{
+                	elecHandler.getVote2TermMap().put(currentTerm, true);
+
+                }
+            	requestHandler=reqVote;
+            	requestHandler.handleMessage(channel, wm);
+            	break;
+            case LEADERRESPONSE:
+				System.out.println("Got response from leader:");
+
+            	requestHandler=resLeader;
+            	requestHandler.handleMessage(channel, wm);
+            	break;
+            case VOTE:
+				System.out.println("Got a vote:");
+
+            	requestHandler=voteReceived;
+            	requestHandler.handleMessage(channel, wm);
+            	break;
+        }
+	}
 	public String getLeaderAddress() {
 		return leaderAddress;
 	}

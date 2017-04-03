@@ -65,7 +65,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		try {
 			if(msg.getHeader().hasElection()){
 				System.out.println("Processing the message:");
-				state.getElecHandler().handleMessage(channel,msg);
+				state.handleMessage(channel,msg);
 			}else if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
 				logger.debug("heartbeat from " + msg.getHeader().getNodeId());

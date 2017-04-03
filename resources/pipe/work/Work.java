@@ -1871,6 +1871,19 @@ public final class Work {
      */
     pipe.election.Election.LeaderStatusOrBuilder getLeaderOrBuilder();
 
+    /**
+     * <code>optional .ElectionMessage electionMessage = 9;</code>
+     */
+    boolean hasElectionMessage();
+    /**
+     * <code>optional .ElectionMessage electionMessage = 9;</code>
+     */
+    pipe.election.Election.ElectionMessage getElectionMessage();
+    /**
+     * <code>optional .ElectionMessage electionMessage = 9;</code>
+     */
+    pipe.election.Election.ElectionMessageOrBuilder getElectionMessageOrBuilder();
+
     public pipe.work.Work.WorkMessage.PayloadCase getPayloadCase();
   }
   /**
@@ -2013,6 +2026,20 @@ public final class Work {
               payloadCase_ = 8;
               break;
             }
+            case 74: {
+              pipe.election.Election.ElectionMessage.Builder subBuilder = null;
+              if (payloadCase_ == 9) {
+                subBuilder = ((pipe.election.Election.ElectionMessage) payload_).toBuilder();
+              }
+              payload_ =
+                  input.readMessage(pipe.election.Election.ElectionMessage.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((pipe.election.Election.ElectionMessage) payload_);
+                payload_ = subBuilder.buildPartial();
+              }
+              payloadCase_ = 9;
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -2048,6 +2075,7 @@ public final class Work {
       TASK(6),
       STATE(7),
       LEADER(8),
+      ELECTIONMESSAGE(9),
       PAYLOAD_NOT_SET(0);
       private final int value;
       private PayloadCase(int value) {
@@ -2069,6 +2097,7 @@ public final class Work {
           case 6: return TASK;
           case 7: return STATE;
           case 8: return LEADER;
+          case 9: return ELECTIONMESSAGE;
           case 0: return PAYLOAD_NOT_SET;
           default: return null;
         }
@@ -2287,6 +2316,32 @@ public final class Work {
       return pipe.election.Election.LeaderStatus.getDefaultInstance();
     }
 
+    public static final int ELECTIONMESSAGE_FIELD_NUMBER = 9;
+    /**
+     * <code>optional .ElectionMessage electionMessage = 9;</code>
+     */
+    public boolean hasElectionMessage() {
+      return payloadCase_ == 9;
+    }
+    /**
+     * <code>optional .ElectionMessage electionMessage = 9;</code>
+     */
+    public pipe.election.Election.ElectionMessage getElectionMessage() {
+      if (payloadCase_ == 9) {
+         return (pipe.election.Election.ElectionMessage) payload_;
+      }
+      return pipe.election.Election.ElectionMessage.getDefaultInstance();
+    }
+    /**
+     * <code>optional .ElectionMessage electionMessage = 9;</code>
+     */
+    public pipe.election.Election.ElectionMessageOrBuilder getElectionMessageOrBuilder() {
+      if (payloadCase_ == 9) {
+         return (pipe.election.Election.ElectionMessage) payload_;
+      }
+      return pipe.election.Election.ElectionMessage.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -2329,8 +2384,8 @@ public final class Work {
           return false;
         }
       }
-      if (hasLeader()) {
-        if (!getLeader().isInitialized()) {
+      if (hasElectionMessage()) {
+        if (!getElectionMessage().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -2365,6 +2420,9 @@ public final class Work {
       }
       if (payloadCase_ == 8) {
         output.writeMessage(8, (pipe.election.Election.LeaderStatus) payload_);
+      }
+      if (payloadCase_ == 9) {
+        output.writeMessage(9, (pipe.election.Election.ElectionMessage) payload_);
       }
       unknownFields.writeTo(output);
     }
@@ -2406,6 +2464,10 @@ public final class Work {
       if (payloadCase_ == 8) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, (pipe.election.Election.LeaderStatus) payload_);
+      }
+      if (payloadCase_ == 9) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(9, (pipe.election.Election.ElectionMessage) payload_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2462,6 +2524,10 @@ public final class Work {
           result = result && getLeader()
               .equals(other.getLeader());
           break;
+        case 9:
+          result = result && getElectionMessage()
+              .equals(other.getElectionMessage());
+          break;
         case 0:
         default:
       }
@@ -2510,6 +2576,10 @@ public final class Work {
         case 8:
           hash = (37 * hash) + LEADER_FIELD_NUMBER;
           hash = (53 * hash) + getLeader().hashCode();
+          break;
+        case 9:
+          hash = (37 * hash) + ELECTIONMESSAGE_FIELD_NUMBER;
+          hash = (53 * hash) + getElectionMessage().hashCode();
           break;
         case 0:
         default:
@@ -2721,6 +2791,13 @@ public final class Work {
             result.payload_ = leaderBuilder_.build();
           }
         }
+        if (payloadCase_ == 9) {
+          if (electionMessageBuilder_ == null) {
+            result.payload_ = payload_;
+          } else {
+            result.payload_ = electionMessageBuilder_.build();
+          }
+        }
         result.bitField0_ = to_bitField0_;
         result.payloadCase_ = payloadCase_;
         onBuilt();
@@ -2795,6 +2872,10 @@ public final class Work {
             mergeLeader(other.getLeader());
             break;
           }
+          case ELECTIONMESSAGE: {
+            mergeElectionMessage(other.getElectionMessage());
+            break;
+          }
           case PAYLOAD_NOT_SET: {
             break;
           }
@@ -2834,8 +2915,8 @@ public final class Work {
             return false;
           }
         }
-        if (hasLeader()) {
-          if (!getLeader().isInitialized()) {
+        if (hasElectionMessage()) {
+          if (!getElectionMessage().isInitialized()) {
             return false;
           }
         }
@@ -3793,6 +3874,142 @@ public final class Work {
         onChanged();;
         return leaderBuilder_;
       }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          pipe.election.Election.ElectionMessage, pipe.election.Election.ElectionMessage.Builder, pipe.election.Election.ElectionMessageOrBuilder> electionMessageBuilder_;
+      /**
+       * <code>optional .ElectionMessage electionMessage = 9;</code>
+       */
+      public boolean hasElectionMessage() {
+        return payloadCase_ == 9;
+      }
+      /**
+       * <code>optional .ElectionMessage electionMessage = 9;</code>
+       */
+      public pipe.election.Election.ElectionMessage getElectionMessage() {
+        if (electionMessageBuilder_ == null) {
+          if (payloadCase_ == 9) {
+            return (pipe.election.Election.ElectionMessage) payload_;
+          }
+          return pipe.election.Election.ElectionMessage.getDefaultInstance();
+        } else {
+          if (payloadCase_ == 9) {
+            return electionMessageBuilder_.getMessage();
+          }
+          return pipe.election.Election.ElectionMessage.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>optional .ElectionMessage electionMessage = 9;</code>
+       */
+      public Builder setElectionMessage(pipe.election.Election.ElectionMessage value) {
+        if (electionMessageBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          payload_ = value;
+          onChanged();
+        } else {
+          electionMessageBuilder_.setMessage(value);
+        }
+        payloadCase_ = 9;
+        return this;
+      }
+      /**
+       * <code>optional .ElectionMessage electionMessage = 9;</code>
+       */
+      public Builder setElectionMessage(
+          pipe.election.Election.ElectionMessage.Builder builderForValue) {
+        if (electionMessageBuilder_ == null) {
+          payload_ = builderForValue.build();
+          onChanged();
+        } else {
+          electionMessageBuilder_.setMessage(builderForValue.build());
+        }
+        payloadCase_ = 9;
+        return this;
+      }
+      /**
+       * <code>optional .ElectionMessage electionMessage = 9;</code>
+       */
+      public Builder mergeElectionMessage(pipe.election.Election.ElectionMessage value) {
+        if (electionMessageBuilder_ == null) {
+          if (payloadCase_ == 9 &&
+              payload_ != pipe.election.Election.ElectionMessage.getDefaultInstance()) {
+            payload_ = pipe.election.Election.ElectionMessage.newBuilder((pipe.election.Election.ElectionMessage) payload_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            payload_ = value;
+          }
+          onChanged();
+        } else {
+          if (payloadCase_ == 9) {
+            electionMessageBuilder_.mergeFrom(value);
+          }
+          electionMessageBuilder_.setMessage(value);
+        }
+        payloadCase_ = 9;
+        return this;
+      }
+      /**
+       * <code>optional .ElectionMessage electionMessage = 9;</code>
+       */
+      public Builder clearElectionMessage() {
+        if (electionMessageBuilder_ == null) {
+          if (payloadCase_ == 9) {
+            payloadCase_ = 0;
+            payload_ = null;
+            onChanged();
+          }
+        } else {
+          if (payloadCase_ == 9) {
+            payloadCase_ = 0;
+            payload_ = null;
+          }
+          electionMessageBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .ElectionMessage electionMessage = 9;</code>
+       */
+      public pipe.election.Election.ElectionMessage.Builder getElectionMessageBuilder() {
+        return getElectionMessageFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .ElectionMessage electionMessage = 9;</code>
+       */
+      public pipe.election.Election.ElectionMessageOrBuilder getElectionMessageOrBuilder() {
+        if ((payloadCase_ == 9) && (electionMessageBuilder_ != null)) {
+          return electionMessageBuilder_.getMessageOrBuilder();
+        } else {
+          if (payloadCase_ == 9) {
+            return (pipe.election.Election.ElectionMessage) payload_;
+          }
+          return pipe.election.Election.ElectionMessage.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>optional .ElectionMessage electionMessage = 9;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          pipe.election.Election.ElectionMessage, pipe.election.Election.ElectionMessage.Builder, pipe.election.Election.ElectionMessageOrBuilder> 
+          getElectionMessageFieldBuilder() {
+        if (electionMessageBuilder_ == null) {
+          if (!(payloadCase_ == 9)) {
+            payload_ = pipe.election.Election.ElectionMessage.getDefaultInstance();
+          }
+          electionMessageBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              pipe.election.Election.ElectionMessage, pipe.election.Election.ElectionMessage.Builder, pipe.election.Election.ElectionMessageOrBuilder>(
+                  (pipe.election.Election.ElectionMessage) payload_,
+                  getParentForChildren(),
+                  isClean());
+          payload_ = null;
+        }
+        payloadCase_ = 9;
+        onChanged();;
+        return electionMessageBuilder_;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
@@ -3875,13 +4092,14 @@ public final class Work {
       "to\"0\n\tWorkState\022\020\n\010enqueued\030\001 \002(\005\022\021\n\tpro" +
       "cessed\030\002 \002(\005\"&\n\tHeartbeat\022\031\n\005state\030\001 \002(\013" +
       "2\n.WorkState\")\n\004Task\022\021\n\tseries_id\030\001 \002(\003\022" +
-      "\016\n\006seq_id\030\002 \002(\005\"\333\001\n\013WorkMessage\022\027\n\006heade" +
+      "\016\n\006seq_id\030\002 \002(\005\"\210\002\n\013WorkMessage\022\027\n\006heade" +
       "r\030\001 \002(\0132\007.Header\022\016\n\006secret\030\002 \002(\003\022\027\n\003err\030" +
       "\003 \001(\0132\010.FailureH\000\022\016\n\004ping\030\004 \001(\010H\000\022\032\n\004bea" +
       "t\030\005 \001(\0132\n.HeartbeatH\000\022\025\n\004task\030\006 \001(\0132\005.Ta" +
       "skH\000\022\033\n\005state\030\007 \001(\0132\n.WorkStateH\000\022\037\n\006lea" +
-      "der\030\010 \001(\0132\r.LeaderStatusH\000B\t\n\007payloadB\r\n",
-      "\tpipe.workH\001"
+      "der\030\010 \001(\0132\r.LeaderStatusH\000\022+\n\017electionMe",
+      "ssage\030\t \001(\0132\020.ElectionMessageH\000B\t\n\007paylo" +
+      "adB\r\n\tpipe.workH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3920,7 +4138,7 @@ public final class Work {
     internal_static_WorkMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_WorkMessage_descriptor,
-        new java.lang.String[] { "Header", "Secret", "Err", "Ping", "Beat", "Task", "State", "Leader", "Payload", });
+        new java.lang.String[] { "Header", "Secret", "Err", "Ping", "Beat", "Task", "State", "Leader", "ElectionMessage", "Payload", });
     pipe.common.Common.getDescriptor();
     pipe.election.Election.getDescriptor();
   }

@@ -19,11 +19,11 @@ public final class Election {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required .LeaderStatus.LeaderQuery action = 1;</code>
+     * <code>optional .LeaderStatus.LeaderQuery action = 1;</code>
      */
     boolean hasAction();
     /**
-     * <code>required .LeaderStatus.LeaderQuery action = 1;</code>
+     * <code>optional .LeaderStatus.LeaderQuery action = 1;</code>
      */
     pipe.election.Election.LeaderStatus.LeaderQuery getAction();
 
@@ -368,13 +368,13 @@ public final class Election {
     public static final int ACTION_FIELD_NUMBER = 1;
     private int action_;
     /**
-     * <code>required .LeaderStatus.LeaderQuery action = 1;</code>
+     * <code>optional .LeaderStatus.LeaderQuery action = 1;</code>
      */
     public boolean hasAction() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required .LeaderStatus.LeaderQuery action = 1;</code>
+     * <code>optional .LeaderStatus.LeaderQuery action = 1;</code>
      */
     public pipe.election.Election.LeaderStatus.LeaderQuery getAction() {
       pipe.election.Election.LeaderStatus.LeaderQuery result = pipe.election.Election.LeaderStatus.LeaderQuery.valueOf(action_);
@@ -460,10 +460,6 @@ public final class Election {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasAction()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -799,9 +795,6 @@ public final class Election {
       }
 
       public final boolean isInitialized() {
-        if (!hasAction()) {
-          return false;
-        }
         return true;
       }
 
@@ -826,20 +819,20 @@ public final class Election {
 
       private int action_ = 1;
       /**
-       * <code>required .LeaderStatus.LeaderQuery action = 1;</code>
+       * <code>optional .LeaderStatus.LeaderQuery action = 1;</code>
        */
       public boolean hasAction() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required .LeaderStatus.LeaderQuery action = 1;</code>
+       * <code>optional .LeaderStatus.LeaderQuery action = 1;</code>
        */
       public pipe.election.Election.LeaderStatus.LeaderQuery getAction() {
         pipe.election.Election.LeaderStatus.LeaderQuery result = pipe.election.Election.LeaderStatus.LeaderQuery.valueOf(action_);
         return result == null ? pipe.election.Election.LeaderStatus.LeaderQuery.WHOISTHELEADER : result;
       }
       /**
-       * <code>required .LeaderStatus.LeaderQuery action = 1;</code>
+       * <code>optional .LeaderStatus.LeaderQuery action = 1;</code>
        */
       public Builder setAction(pipe.election.Election.LeaderStatus.LeaderQuery value) {
         if (value == null) {
@@ -851,7 +844,7 @@ public final class Election {
         return this;
       }
       /**
-       * <code>required .LeaderStatus.LeaderQuery action = 1;</code>
+       * <code>optional .LeaderStatus.LeaderQuery action = 1;</code>
        */
       public Builder clearAction() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -2601,7 +2594,7 @@ public final class Election {
   static {
     java.lang.String[] descriptorData = {
       "\n\016election.proto\"\223\002\n\014LeaderStatus\022)\n\006act" +
-      "ion\030\001 \002(\0162\031.LeaderStatus.LeaderQuery\022(\n\005" +
+      "ion\030\001 \001(\0162\031.LeaderStatus.LeaderQuery\022(\n\005" +
       "state\030\002 \001(\0162\031.LeaderStatus.LeaderState\022\023" +
       "\n\013leader_host\030\003 \001(\t\022\021\n\tleader_id\030\004 \001(\005\"R" +
       "\n\013LeaderState\022\021\n\rLEADERUNKNOWN\020\001\022\017\n\013LEAD" +

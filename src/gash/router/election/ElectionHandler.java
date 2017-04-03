@@ -21,7 +21,13 @@ public class ElectionHandler{
     private static Timer timer;
     private static boolean hasVoted=false;
     private HashMap<Integer,Boolean> vote2TermMap=new HashMap<Integer,Boolean>();
-    private static int voteCount = 0;
+    public HashMap<Integer, Boolean> getVote2TermMap() {
+		return vote2TermMap;
+	}
+	public void setVote2TermMap(HashMap<Integer, Boolean> vote2TermMap) {
+		this.vote2TermMap = vote2TermMap;
+	}
+	private static int voteCount = 0;
 
     public static synchronized void incrementVoteCount() {
         voteCount++;
@@ -36,73 +42,10 @@ public class ElectionHandler{
         state=s;
         state.setCurrentTerm(0);
         timer=new Timer();
+        vote2TermMap.put(state.getCurrentTerm(), false);
     }
-    public synchronized void handleMessage(Channel channel,WorkMessage wm){
-        ElectionMessage electionMessage = wm.getElectionMessage();
-        switch (electionMessage.getType()) {
-            case ASKFORVOTE:
-            if(electionMessage.getTerm()>state.getCurrentTerm()){
-                state.setCurrentTerm(electionMessage.getTerm());
-                vote2TermMap.put(electionMessage.getTerm(),false);
-            }
-            switch(state.getState()){
-            	case Follower:
-            		if(vote2TermMap.get(state.getCurrentTerm())){
-    					
-
-                    }else{
-                        WorkMessage vote = buildVote(wm.getElectionMessage().getInfo().getCandidateID(),true,state.getCurrentTerm());
-                        vote2TermMap.put(electionMessage.getTerm(),true);
-                        hasVoted=true;
-                        System.out.println("Voted for "+wm.getElectionMessage().getInfo().getCandidateID());
-                        ChannelFuture cf = channel.writeAndFlush(vote);
-                        cf.awaitUninterruptibly();
-    					vote2TermMap.put(state.getCurrentTerm(), true);
-
-                    }
-            		break;
-            	case Candidate:
-            		if(state.getTimeout()<wm.getHeader().getTime()){
-            			
-            		}else{
-            			state.becomeFollower();
-            			WorkMessage vote = buildVote(wm.getElectionMessage().getInfo().getCandidateID(),true,state.getCurrentTerm());
-                        vote2TermMap.put(electionMessage.getTerm(),true);
-                        hasVoted=true;
-                        System.out.println("Voted for "+wm.getElectionMessage().getInfo().getCandidateID());
-                        ChannelFuture cf = channel.writeAndFlush(vote);
-                        cf.awaitUninterruptibly();
-    					vote2TermMap.put(state.getCurrentTerm(), true);
-            		}
-            		break;
-            	case Leader:
-            		break;
-            }
-            
-            case LEADERRESPONSE:
-            	
-            		System.out.println("New Leader elected is"+wm.getLeader().getLeaderId());
-            		state.setLeaderId(wm.getLeader().getLeaderId());
-            		state.setLeaderAddress(wm.getLeader().getLeaderHost());
-            	
-            case VOTE:
-            	if(state.isCandidate()){
-            		System.out.println("Received Vote!!!");
-            		if(wm.getElectionMessage().getInfo().getIsVoteGranted()){
-            			incrementVoteCount();
-            		}
-            		boolean leader=checkIfLeader(wm);
-            		if(leader){
-            			state.becomeLeader();
-                		System.out.println("NOde:"+state.getConf().getNodeId()+" is the Leader!!");
-						WorkMessage response = ElectionHandler.buildLeaderResponse(state.getConf().getNodeId(), state.getCurrentTerm());
-						state.getEmon().broadcast(response);
-						
-            		}
-            	}
-        }
-    }
-    private static WorkMessage buildLeaderResponse(int nodeId, int currentTerm) {
+    
+    public static WorkMessage buildLeaderResponse(int nodeId, int currentTerm) {
 		// TODO Auto-generated method stub
     	WorkMessage.Builder workMessage = WorkMessage.newBuilder();
 		Header.Builder header = Header.newBuilder();
@@ -112,7 +55,7 @@ public class ElectionHandler{
 
 		status.setState(LeaderState.LEADERALIVE);
 		status.setLeaderId(nodeId);
-		status.setLeaderHost("169.254.214.175");
+		status.setLeaderHost("localhost");
 		header.setElection(true);
 		header.setNodeId(state.getConf().getNodeId());
 		header.setTime(System.currentTimeMillis());
@@ -130,7 +73,7 @@ public class ElectionHandler{
 		workMessage.setHeader(header);
 		return workMessage.build();
 	}
-	private boolean checkIfLeader(WorkMessage wm) {
+	public boolean checkIfLeader(WorkMessage wm) {
 		// TODO Auto-generated method stub
 		if(voteCount>=state.getEmon().getOutboundEdges().size()/2+1){
 			return true;
@@ -198,17 +141,22 @@ public class ElectionHandler{
         
         @Override
         public void run(){
-            if(ElectionHandler.getHasVoted()){
+            System.out.println("Inside Timer");
+
+            if(getHasVoted()){
                 timer.cancel();
             }
-            if(state.isFollower() && !ElectionHandler.getHasVoted()){
+            if(state.isFollower() && !getHasVoted()){
                 try{
                     state.becomeCandidate();
                     state.setTimeout(System.currentTimeMillis());
+    				System.out.println("Asking for vote:");
+
                     WorkMessage electionMessage = ElectionHandler.createAskForVoteMessage(state.getTimeout(), state.getCurrentTerm());
                     state.getEmon().broadcast(electionMessage);
                 }catch(Exception e){
                     System.out.println("Error occured in timer");
+                    e.printStackTrace();
                 }
 
             }

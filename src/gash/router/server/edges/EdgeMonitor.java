@@ -64,7 +64,9 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		this.state.setEmon(this);
 
 		if (state.getConf().getRouting() != null) {
+			
 			for (RoutingEntry e : state.getConf().getRouting()) {
+				
 				outboundEdges.addNode(e.getId(), e.getHost(), e.getPort());
 			}
 		}
@@ -141,7 +143,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					if(activeOutboundEdges==outboundEdges.map.size() && !state.isLeader()){
 						state.getElecHandler().initElection();
 					}else{
-						System.out.println("Leader selected?="+state.isLeader());
+						System.out.println("Leader selected?"+state.isLeader());
 					}
 					if (ei.isActive() && ei.getChannel() != null) {
 						if (state.getLeaderId() == this.state.getConf().getNodeId()) {

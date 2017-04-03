@@ -54,8 +54,17 @@ public final class Common {
     int getDestination();
 
     /**
+     * <code>optional bool election = 9;</code>
+     */
+    boolean hasElection();
+    /**
+     * <code>optional bool election = 9;</code>
+     */
+    boolean getElection();
+
+    /**
      * <pre>
-     * This factor limits the distance that a msg travels from the originating 
+     * This factor limits the distance that a msg travels from the originating
      * node. Default (-1) is the whole network (not restricted).
      * </pre>
      *
@@ -64,7 +73,7 @@ public final class Common {
     boolean hasMaxHops();
     /**
      * <pre>
-     * This factor limits the distance that a msg travels from the originating 
+     * This factor limits the distance that a msg travels from the originating
      * node. Default (-1) is the whole network (not restricted).
      * </pre>
      *
@@ -93,6 +102,7 @@ public final class Common {
       nodeId_ = 0;
       time_ = 0L;
       destination_ = 0;
+      election_ = false;
       maxHops_ = -1;
     }
 
@@ -139,8 +149,13 @@ public final class Common {
               destination_ = input.readInt32();
               break;
             }
-            case 80: {
+            case 72: {
               bitField0_ |= 0x00000008;
+              election_ = input.readBool();
+              break;
+            }
+            case 80: {
+              bitField0_ |= 0x00000010;
               maxHops_ = input.readInt32();
               break;
             }
@@ -222,22 +237,37 @@ public final class Common {
       return destination_;
     }
 
+    public static final int ELECTION_FIELD_NUMBER = 9;
+    private boolean election_;
+    /**
+     * <code>optional bool election = 9;</code>
+     */
+    public boolean hasElection() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional bool election = 9;</code>
+     */
+    public boolean getElection() {
+      return election_;
+    }
+
     public static final int MAX_HOPS_FIELD_NUMBER = 10;
     private int maxHops_;
     /**
      * <pre>
-     * This factor limits the distance that a msg travels from the originating 
+     * This factor limits the distance that a msg travels from the originating
      * node. Default (-1) is the whole network (not restricted).
      * </pre>
      *
      * <code>optional int32 max_hops = 10 [default = -1];</code>
      */
     public boolean hasMaxHops() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <pre>
-     * This factor limits the distance that a msg travels from the originating 
+     * This factor limits the distance that a msg travels from the originating
      * node. Default (-1) is the whole network (not restricted).
      * </pre>
      *
@@ -277,6 +307,9 @@ public final class Common {
         output.writeInt32(8, destination_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBool(9, election_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeInt32(10, maxHops_);
       }
       unknownFields.writeTo(output);
@@ -300,6 +333,10 @@ public final class Common {
           .computeInt32Size(8, destination_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(9, election_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(10, maxHops_);
       }
@@ -335,6 +372,11 @@ public final class Common {
         result = result && (getDestination()
             == other.getDestination());
       }
+      result = result && (hasElection() == other.hasElection());
+      if (hasElection()) {
+        result = result && (getElection()
+            == other.getElection());
+      }
       result = result && (hasMaxHops() == other.hasMaxHops());
       if (hasMaxHops()) {
         result = result && (getMaxHops()
@@ -363,6 +405,11 @@ public final class Common {
       if (hasDestination()) {
         hash = (37 * hash) + DESTINATION_FIELD_NUMBER;
         hash = (53 * hash) + getDestination();
+      }
+      if (hasElection()) {
+        hash = (37 * hash) + ELECTION_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getElection());
       }
       if (hasMaxHops()) {
         hash = (37 * hash) + MAX_HOPS_FIELD_NUMBER;
@@ -498,8 +545,10 @@ public final class Common {
         bitField0_ = (bitField0_ & ~0x00000002);
         destination_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
-        maxHops_ = -1;
+        election_ = false;
         bitField0_ = (bitField0_ & ~0x00000008);
+        maxHops_ = -1;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -538,6 +587,10 @@ public final class Common {
         result.destination_ = destination_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
+        }
+        result.election_ = election_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
         }
         result.maxHops_ = maxHops_;
         result.bitField0_ = to_bitField0_;
@@ -590,6 +643,9 @@ public final class Common {
         }
         if (other.hasDestination()) {
           setDestination(other.getDestination());
+        }
+        if (other.hasElection()) {
+          setElection(other.getElection());
         }
         if (other.hasMaxHops()) {
           setMaxHops(other.getMaxHops());
@@ -740,21 +796,53 @@ public final class Common {
         return this;
       }
 
+      private boolean election_ ;
+      /**
+       * <code>optional bool election = 9;</code>
+       */
+      public boolean hasElection() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional bool election = 9;</code>
+       */
+      public boolean getElection() {
+        return election_;
+      }
+      /**
+       * <code>optional bool election = 9;</code>
+       */
+      public Builder setElection(boolean value) {
+        bitField0_ |= 0x00000008;
+        election_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool election = 9;</code>
+       */
+      public Builder clearElection() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        election_ = false;
+        onChanged();
+        return this;
+      }
+
       private int maxHops_ = -1;
       /**
        * <pre>
-       * This factor limits the distance that a msg travels from the originating 
+       * This factor limits the distance that a msg travels from the originating
        * node. Default (-1) is the whole network (not restricted).
        * </pre>
        *
        * <code>optional int32 max_hops = 10 [default = -1];</code>
        */
       public boolean hasMaxHops() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <pre>
-       * This factor limits the distance that a msg travels from the originating 
+       * This factor limits the distance that a msg travels from the originating
        * node. Default (-1) is the whole network (not restricted).
        * </pre>
        *
@@ -765,28 +853,28 @@ public final class Common {
       }
       /**
        * <pre>
-       * This factor limits the distance that a msg travels from the originating 
+       * This factor limits the distance that a msg travels from the originating
        * node. Default (-1) is the whole network (not restricted).
        * </pre>
        *
        * <code>optional int32 max_hops = 10 [default = -1];</code>
        */
       public Builder setMaxHops(int value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         maxHops_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * This factor limits the distance that a msg travels from the originating 
+       * This factor limits the distance that a msg travels from the originating
        * node. Default (-1) is the whole network (not restricted).
        * </pre>
        *
        * <code>optional int32 max_hops = 10 [default = -1];</code>
        */
       public Builder clearMaxHops() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         maxHops_ = -1;
         onChanged();
         return this;
@@ -1584,11 +1672,11 @@ public final class Common {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\014common.proto\"R\n\006Header\022\017\n\007node_id\030\001 \002(" +
-      "\005\022\014\n\004time\030\002 \002(\003\022\023\n\013destination\030\010 \001(\005\022\024\n\010" +
-      "max_hops\030\n \001(\005:\002-1\"6\n\007Failure\022\n\n\002id\030\001 \002(" +
-      "\005\022\016\n\006ref_id\030\002 \001(\005\022\017\n\007message\030\003 \001(\tB\017\n\013pi" +
-      "pe.commonH\001"
+      "\n\014common.proto\"d\n\006Header\022\017\n\007node_id\030\001 \002(" +
+      "\005\022\014\n\004time\030\002 \002(\003\022\023\n\013destination\030\010 \001(\005\022\020\n\010" +
+      "election\030\t \001(\010\022\024\n\010max_hops\030\n \001(\005:\002-1\"6\n\007" +
+      "Failure\022\n\n\002id\030\001 \002(\005\022\016\n\006ref_id\030\002 \001(\005\022\017\n\007m" +
+      "essage\030\003 \001(\tB\017\n\013pipe.commonH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1607,7 +1695,7 @@ public final class Common {
     internal_static_Header_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Header_descriptor,
-        new java.lang.String[] { "NodeId", "Time", "Destination", "MaxHops", });
+        new java.lang.String[] { "NodeId", "Time", "Destination", "Election", "MaxHops", });
     internal_static_Failure_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_Failure_fieldAccessorTable = new

@@ -2384,12 +2384,6 @@ public final class Work {
           return false;
         }
       }
-      if (hasLeader()) {
-        if (!getLeader().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       if (hasElectionMessage()) {
         if (!getElectionMessage().isInitialized()) {
           memoizedIsInitialized = 0;
@@ -2918,11 +2912,6 @@ public final class Work {
         }
         if (hasState()) {
           if (!getState().isInitialized()) {
-            return false;
-          }
-        }
-        if (hasLeader()) {
-          if (!getLeader().isInitialized()) {
             return false;
           }
         }
