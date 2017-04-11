@@ -26,7 +26,8 @@ message Task {
 message WorkMessage {
    required Header header = 1;
    required int64 secret = 2;
-
+   required LeaderStatus leaderStatus = 8;
+	
    /**
     * The actions (request or response) is
     * implicit through which data structure is in the payload.
@@ -43,7 +44,6 @@ message WorkMessage {
 
       Task task = 6;
       WorkState state = 7;
-      LeaderStatus leaderStatus = 8;
       ElectionMessage electionMessage= 9;
 
    }
