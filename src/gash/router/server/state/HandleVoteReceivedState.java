@@ -21,6 +21,7 @@ public class HandleVoteReceivedState implements Handelable{
     		boolean leader=state.getElecHandler().checkIfLeader(wm);
     		if(leader){
     			state.becomeLeader();
+    			state.setLeaderId(state.getConf().getNodeId());
         		System.out.println("NOde:"+state.getConf().getNodeId()+" is the Leader!!");
 				WorkMessage response = state.getElecHandler().buildLeaderResponse(state.getConf().getNodeId(), state.getCurrentTerm());
 				state.getEmon().broadcast(response);
