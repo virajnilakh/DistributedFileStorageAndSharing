@@ -152,7 +152,13 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 						if(activeOutboundEdges==outboundEdges.map.size() && state.getLeaderId()==0){
 							state.getElecHandler().initElection();
 						}else{
-							System.out.println("Leader selected?="+state.isLeader());
+							if(state.getLeaderId()!=0){
+								System.out.println("Leader selected?="+true);
+
+							}else{
+								System.out.println("Leader selected?="+false);
+
+							}
 						}
 						
 					} else {

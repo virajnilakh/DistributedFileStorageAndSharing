@@ -15,6 +15,7 @@ public class HandleLeaderResponseState implements Handelable {
 		System.out.println("New Leader elected is "+wm.getLeaderStatus().getLeaderId());
 		state.setLeaderId(wm.getLeaderStatus().getLeaderId());
 		state.setLeaderAddress(wm.getLeaderStatus().getLeaderHost());
+		state.becomeFollower();
 	}
 
 }
