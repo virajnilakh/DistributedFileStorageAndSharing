@@ -56,7 +56,7 @@ public class ElectionHandler{
 
 		status.setState(LeaderState.LEADERALIVE);
 		status.setLeaderId(nodeId);
-		status.setLeaderHost("localhost");
+		status.setLeaderHost("10.0.0.130");
 		header.setElection(true);
 		header.setNodeId(state.getConf().getNodeId());
 		header.setTime(System.currentTimeMillis());
