@@ -95,7 +95,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				Channel ch=ei.getChannel();
 				ChannelFuture cf = ch.writeAndFlush(msg);
 				if (cf.isDone() && !cf.isSuccess()) {
-					logger.error("failed to send vote to server");
+					logger.info("failed to send vote to server");
 
 				}
 			}
@@ -140,17 +140,21 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		while (forever) {
 			try {
 				for (EdgeInfo ei : this.outboundEdges.map.values()) {
-					if(activeOutboundEdges==outboundEdges.map.size() && !state.isLeader()){
-						state.getElecHandler().initElection();
-					}else{
-						System.out.println("Leader selected?"+state.isLeader());
-					}
+					
+					
 					if (ei.isActive() && ei.getChannel() != null) {
-						if (state.getLeaderId() == this.state.getConf().getNodeId()) {
+						if(state.isLeader()){
+							WorkMessage wm = createHB(ei);
+							System.out.println("Sending heartbeat");
 
-						WorkMessage wm = createHB(ei);
-						ei.getChannel().writeAndFlush(wm);
+							ei.getChannel().writeAndFlush(wm);
 						}
+						if(activeOutboundEdges==outboundEdges.map.size() && state.getLeaderId()==0){
+							state.getElecHandler().initElection();
+						}else{
+							System.out.println("Leader selected?="+state.isLeader());
+						}
+						
 					} else {
 						// TODO create a client to the node
 						logger.info("trying to connect to node " + ei.getRef());
@@ -166,6 +170,8 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				            b.handler(new WorkInit(state,false));
 
 				            // Start the client.
+				            System.out.println("Connect to a node.");
+
 				            ChannelFuture f = b.connect(host, port).sync(); // (5)
 				            ei.setChannel(f.channel());
 				            ei.setActive(true);

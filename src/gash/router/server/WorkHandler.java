@@ -22,6 +22,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
+import pipe.election.Election.LeaderStatus.LeaderState;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.Task;
 import pipe.work.Work.WorkMessage;
@@ -54,7 +55,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	public void handleMessage(WorkMessage msg, Channel channel) {
 		if (msg == null) {
 			// TODO add logging
-			System.out.println("ERROR: Unexpected content - " + msg);
+			System.out.println("ERROR: Unexpected content  - " + msg);
 			return;
 		}
 
@@ -63,9 +64,13 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 
 		// TODO How can you implement this without if-else statements?
 		try {
-			if(msg.getHeader().hasElection()){
+			 if(msg.getHeader().hasElection()){
 				System.out.println("Processing the message:");
 				state.handleMessage(channel,msg);
+			}else if(msg.getLeaderStatus().getState()==LeaderState.LEADERALIVE){
+				System.out.println("Heartbeat from leader...Resetting the timmer:");
+				state.getElecHandler().getTimer().cancel();
+				state.getElecHandler().setTimer();
 			}else if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
 				logger.debug("heartbeat from " + msg.getHeader().getNodeId());

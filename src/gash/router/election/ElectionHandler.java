@@ -28,7 +28,7 @@ public class ElectionHandler{
 		this.vote2TermMap.put(key, value);
 	}
 	
-	private static int voteCount = 0;
+	private static int voteCount = 1;
 
     public static synchronized void incrementVoteCount() {
         voteCount++;
@@ -134,25 +134,34 @@ public class ElectionHandler{
 		return workMessage.build();
 
     }
-    public void initElection(){
+    public synchronized void initElection(){
         int randomTimeout=(1000+(new Random()).nextInt(3500))*state.getConf().getNodeId();
         timer.schedule(new ElectionTimer(),(long)randomTimeout,(long)randomTimeout);
     }
-    private static class ElectionTimer extends TimerTask{
+    public static Timer getTimer() {
+		return timer;
+	}
+	public static void setTimer() {
+		timer=null;
+		timer=new Timer();
+		int randomTimeout=(1000+(new Random()).nextInt(3500))*state.getConf().getNodeId();
+        timer.schedule(new ElectionTimer(),(long)randomTimeout,(long)randomTimeout);
+    	}
+	private static class ElectionTimer extends TimerTask{
         
         @Override
         public void run(){
             System.out.println("Inside Timer");
 
-            if(getHasVoted()){
+            /*if(getHasVoted()){
                 timer.cancel();
-            }
-            if(state.isFollower() && !getHasVoted()){
+            }*/
+            if(state.isFollower()){
                 try{
                     state.becomeCandidate();
                     state.setTimeout(System.currentTimeMillis());
     				System.out.println("Asking for vote:");
-
+    				state.setCurrentTerm(state.getCurrentTerm()+1);
                     WorkMessage electionMessage = ElectionHandler.createAskForVoteMessage(state.getTimeout(), state.getCurrentTerm());
                     state.getEmon().broadcast(electionMessage);
                 }catch(Exception e){
