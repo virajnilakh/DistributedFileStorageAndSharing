@@ -15,13 +15,37 @@
  */
 package gash.router.app;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Logger;
+
+import com.google.protobuf.ByteString;
+
 import gash.router.client.CommConnection;
 import gash.router.client.CommListener;
+import gash.router.client.Constants;
 import gash.router.client.MessageClient;
+import gash.router.client.WriteChannel;
+import gash.router.server.CommandInit;
+import gash.router.server.WorkInit;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import routing.Pipe.CommandMessage;
 
 public class DemoApp implements CommListener {
-	private MessageClient mc;
+	private static MessageClient mc;
+	public static Channel channel = null;
 
 	public DemoApp(MessageClient mc) {
 		init(mc);
@@ -66,15 +90,39 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String host = "127.0.0.1";
-		int port = 4568;
+		// String host = "127.0.0.1";
+		// int port = 4568;
 
 		try {
-			MessageClient mc = new MessageClient(host, port);
-			DemoApp da = new DemoApp(mc);
+			// MessageClient mc = new MessageClient(host, port);
+			// DemoApp da = new DemoApp(mc);
 
 			// do stuff w/ the connection
-			da.ping(2);
+			// da.ping(2);
+
+			// Logger.info("trying to connect to node " + );
+			String host = "127.0.0.1";
+			int port = 4568;
+			EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+			Bootstrap b = new Bootstrap(); // (1)
+			b.group(workerGroup); // (2)
+			b.channel(NioSocketChannel.class); // (3)
+			b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+			b.handler(new CommandInit(null, false));
+
+			// Start the client.
+			System.out.println("Connect to a node.");
+
+			ChannelFuture f = b.connect(host, port).sync(); // (5)
+			channel = f.channel();
+
+			String path = "C:\\1\\Natrang.avi";
+			File file = new File(path);
+			long begin = System.currentTimeMillis();
+			System.out.println("Begin time");
+			System.out.println(begin);
+			sendFile(file);
 
 			System.out.println("\n** exiting in 10 seconds. **");
 			System.out.flush();
@@ -84,5 +132,63 @@ public class DemoApp implements CommListener {
 		} finally {
 			CommConnection.getInstance().release();
 		}
+	}
+
+	private static void sendFile(File file) {
+		// TODO Auto-generated method stub
+
+		/*
+		 * Task 1: Send Read Command Task 2: Receive Ack Task 3: Split into
+		 * chunks Task 4: Send chunks Task 5: Recv Ack Task 6: Resend chunks not
+		 * ack
+		 */
+
+		sendReadCommand(file);
+
+	}
+
+	private static void sendReadCommand(File file) {
+		// TODO Auto-generated method stub
+
+		ArrayList<ByteString> chunksFile = new ArrayList<ByteString>();
+		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
+		int sizeChunks = Constants.sizeOfChunk;
+		int numChunks = 0;
+		byte[] buffer = new byte[sizeChunks];
+
+		try {
+			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+			String name = file.getName();
+
+			int tmp = 0;
+			while ((tmp = bis.read(buffer)) > 0) {
+				try {
+					ByteString bs = ByteString.copyFrom(buffer, 0, tmp);
+					chunksFile.add(bs);
+					numChunks++;
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+
+			for (int i = 0; i < chunksFile.size(); i++) {
+				CommandMessage commMsg = MessageClient.sendWriteRequest(chunksFile.get(i), name, numChunks, i + 1);
+				WriteChannel myCallable = new WriteChannel(commMsg, channel);
+				futuresList.add(myCallable);
+			}
+
+			long start = System.currentTimeMillis();
+			System.out.print(start);
+			System.out.println("Start send");
+
+			List<Future<Long>> futures = service.invokeAll(futuresList);
+			System.out.println("Completed tasks");
+			service.shutdown();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
 	}
 }

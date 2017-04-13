@@ -15,8 +15,19 @@
  */
 package gash.router.server;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Hashtable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.protobuf.ByteString;
 
 import gash.router.container.RoutingConf;
 import io.netty.channel.Channel;
@@ -36,6 +47,8 @@ import routing.Pipe.CommandMessage;
 public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> {
 	protected static Logger logger = LoggerFactory.getLogger("cmd");
 	protected RoutingConf conf;
+	protected ArrayList<ByteString> chunkedFile = new ArrayList<ByteString>();
+	protected ArrayList<CommandMessage> lstMsg = new ArrayList<CommandMessage>();
 
 	public CommandHandler(RoutingConf conf) {
 		if (conf != null) {
@@ -49,18 +62,49 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	 * behavior (e.g., jax-rs).
 	 * 
 	 * @param msg
+	 * @throws IOException
 	 */
-	public void handleMessage(CommandMessage msg, Channel channel) {
+	public void handleMessage(CommandMessage msg, Channel channel) throws IOException {
+
 		if (msg == null) {
-			// TODO add logging
 			System.out.println("ERROR: Unexpected content - " + msg);
 			return;
 		}
 
 		PrintUtil.printCommand(msg);
+		lstMsg.add(msg);
+
+		if (chunkedFile.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
+
+			// Sorting
+			Collections.sort(lstMsg, new Comparator<CommandMessage>() {
+				@Override
+				public int compare(CommandMessage msg1, CommandMessage msg2) {
+					return Integer.compare(msg1.getReqMsg().getRwb().getChunk().getChunkId(),
+							msg2.getReqMsg().getRwb().getChunk().getChunkId());
+				}
+			});
+
+			for (CommandMessage message : lstMsg) {
+				chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
+			}
+
+			File file = new File("C:\\Gossamer\\" + msg.getReqMsg().getRwb().getFilename());
+			file.createNewFile();
+
+			FileOutputStream outputStream = new FileOutputStream(file);
+			ByteString bs = ByteString.copyFrom(chunkedFile);
+			outputStream.write(bs.toByteArray());
+			outputStream.flush();
+			outputStream.close();
+			System.out.println("File done");
+			long end = System.currentTimeMillis();
+			System.out.println("End time");
+			System.out.println(end);
+
+		}
 
 		try {
-			// TODO How can you implement this without if-else statements?
 			if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
 			} else if (msg.hasMessage()) {

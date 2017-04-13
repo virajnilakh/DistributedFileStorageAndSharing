@@ -15,7 +15,12 @@
  */
 package gash.router.client;
 
+import com.google.protobuf.ByteString;
+
+import pipe.common.Common.Chunk;
 import pipe.common.Common.Header;
+import pipe.common.Common.Request;
+import pipe.common.Common.WriteBody;
 import routing.Pipe.CommandMessage;
 
 /**
@@ -60,6 +65,34 @@ public class MessageClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static CommandMessage sendWriteRequest(ByteString bs, String fileName, int chunkCount, int chunkId)
+			throws Exception {
+
+		Header.Builder header = Header.newBuilder();
+		header.setNodeId(99);
+		header.setTime(System.currentTimeMillis());
+		header.setDestination(-1);
+
+		Chunk.Builder chunk = Chunk.newBuilder();
+		chunk.setChunkId(chunkId);
+		chunk.setChunkData(bs);
+		// chunk.setChunkSize(value);
+
+		WriteBody.Builder body = WriteBody.newBuilder();
+		body.setFilename(fileName);
+		body.setNumOfChunks(chunkCount);
+		body.setChunk(chunk);
+
+		Request.Builder req = Request.newBuilder();
+		req.setRequestType(Request.RequestType.WRITEFILE);
+		req.setRwb(body);
+
+		CommandMessage.Builder comm = CommandMessage.newBuilder();
+		comm.setHeader(header);
+		comm.setReqMsg(req);
+		return comm.build();
 	}
 
 	public void release() {
