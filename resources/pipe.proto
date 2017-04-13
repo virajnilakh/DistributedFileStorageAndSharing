@@ -8,11 +8,11 @@ message CommandMessage {
    required Header header = 1;
 
     oneof payload {
-      // a client (external) sanity check for testing
       bool ping = 3;
-
       string message = 4;
-
       Failure err = 5;
+      Request reqMsg = 6;
+      Response resMsg = 7;
    }
+
 }
