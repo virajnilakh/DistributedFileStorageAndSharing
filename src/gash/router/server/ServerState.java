@@ -30,7 +30,8 @@ public class ServerState {
 	public void setElecHandler(ElectionHandler elecHandler) {
 		this.elecHandler = elecHandler;
 	}
-	private Jedis jedisHandler=null;
+	private Jedis jedisHandler1=null;
+	private Jedis jedisHandler2=null;
 	private RoutingConf conf;
 	private EdgeMonitor emon;
 	private TaskList tasks;
@@ -49,7 +50,8 @@ public class ServerState {
 		reqVote=new HandleVoteRequestState(this);
 		resLeader=new HandleLeaderResponseState(this);
 		voteReceived=new HandleVoteReceivedState(this);
-		jedisHandler=new Jedis("10.0.0.130",6379);
+		jedisHandler1=new Jedis("10.0.0.130",6379);
+		jedisHandler2=new Jedis("10.0.0.120",6379);
 		try{
 			ipAddress=InetAddress.getLocalHost().getHostAddress();
 		}catch(Exception e){
@@ -59,8 +61,11 @@ public class ServerState {
 	public String getIpAddress() {
 		return ipAddress;
 	}
-	public Jedis getJedisHandler() {
-		return jedisHandler;
+	public Jedis getJedisHandler1() {
+		return jedisHandler1;
+	}
+	public Jedis getJedisHandler2() {
+		return jedisHandler2;
 	}
 	
 	public long getTimeout() {

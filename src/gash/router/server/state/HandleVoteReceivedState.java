@@ -25,8 +25,11 @@ public class HandleVoteReceivedState implements Handelable{
         		System.out.println("Node:"+state.getConf().getNodeId()+" is the Leader!!");
 				WorkMessage response = state.getElecHandler().buildLeaderResponse(state.getConf().getNodeId(), state.getCurrentTerm());
 				state.getEmon().broadcast(response);
-				if(state.getJedisHandler().ping().equals("PONG")){
-					state.getJedisHandler().set("1", state.getIpAddress()+":4568");
+				if(state.getJedisHandler1().ping().equals("PONG")){
+					state.getJedisHandler1().set("1", state.getIpAddress()+":4568");
+				}
+				if(state.getJedisHandler2().ping().equals("PONG")){
+					state.getJedisHandler2().set("1", state.getIpAddress()+":4568");
 				}
 				
     		}

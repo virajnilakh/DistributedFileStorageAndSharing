@@ -47,7 +47,8 @@ import routing.Pipe.CommandMessage;
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
-	private static Jedis jedisHandler=new Jedis("10.0.0.130",4568);
+	private static Jedis jedisHandler1=new Jedis("10.0.0.130",4568);
+	private static Jedis jedisHandler2=new Jedis("10.0.0.120",4568);
 	
 	public static Jedis getJedisHandler() {
 		return jedisHandler;
@@ -110,7 +111,7 @@ public class DemoApp implements CommListener {
 			if(jedisHandler.ping().equals("PONG")){
 				host = jedisHandler.get("1").split(":")[0];
 				port = Integer.parseInt(jedisHandler.get("1").split(":")[1]);
-			}
+			}else if()
 			
 			EventLoopGroup workerGroup = new NioEventLoopGroup();
 
