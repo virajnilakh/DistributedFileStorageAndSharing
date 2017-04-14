@@ -37,6 +37,15 @@ public final class Common {
     long getTime();
 
     /**
+     * <code>optional bool election = 3;</code>
+     */
+    boolean hasElection();
+    /**
+     * <code>optional bool election = 3;</code>
+     */
+    boolean getElection();
+
+    /**
      * <pre>
      * if the message is for a specific node, this will be set
      * </pre>
@@ -92,6 +101,7 @@ public final class Common {
     private Header() {
       nodeId_ = 0;
       time_ = 0L;
+      election_ = false;
       destination_ = 0;
       maxHops_ = -1;
     }
@@ -134,13 +144,18 @@ public final class Common {
               time_ = input.readInt64();
               break;
             }
-            case 64: {
+            case 24: {
               bitField0_ |= 0x00000004;
+              election_ = input.readBool();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000008;
               destination_ = input.readInt32();
               break;
             }
             case 80: {
-              bitField0_ |= 0x00000008;
+              bitField0_ |= 0x00000010;
               maxHops_ = input.readInt32();
               break;
             }
@@ -199,6 +214,21 @@ public final class Common {
       return time_;
     }
 
+    public static final int ELECTION_FIELD_NUMBER = 3;
+    private boolean election_;
+    /**
+     * <code>optional bool election = 3;</code>
+     */
+    public boolean hasElection() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional bool election = 3;</code>
+     */
+    public boolean getElection() {
+      return election_;
+    }
+
     public static final int DESTINATION_FIELD_NUMBER = 8;
     private int destination_;
     /**
@@ -209,7 +239,7 @@ public final class Common {
      * <code>optional int32 destination = 8;</code>
      */
     public boolean hasDestination() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
      * <pre>
@@ -233,7 +263,7 @@ public final class Common {
      * <code>optional int32 max_hops = 10 [default = -1];</code>
      */
     public boolean hasMaxHops() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <pre>
@@ -270,9 +300,12 @@ public final class Common {
         output.writeInt64(2, time_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt32(8, destination_);
+        output.writeBool(3, election_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt32(8, destination_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeInt32(10, maxHops_);
       }
       unknownFields.writeTo(output);
@@ -293,9 +326,13 @@ public final class Common {
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(8, destination_);
+          .computeBoolSize(3, election_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(8, destination_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(10, maxHops_);
       }
@@ -326,6 +363,11 @@ public final class Common {
         result = result && (getTime()
             == other.getTime());
       }
+      result = result && (hasElection() == other.hasElection());
+      if (hasElection()) {
+        result = result && (getElection()
+            == other.getElection());
+      }
       result = result && (hasDestination() == other.hasDestination());
       if (hasDestination()) {
         result = result && (getDestination()
@@ -355,6 +397,11 @@ public final class Common {
         hash = (37 * hash) + TIME_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
             getTime());
+      }
+      if (hasElection()) {
+        hash = (37 * hash) + ELECTION_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getElection());
       }
       if (hasDestination()) {
         hash = (37 * hash) + DESTINATION_FIELD_NUMBER;
@@ -492,10 +539,12 @@ public final class Common {
         bitField0_ = (bitField0_ & ~0x00000001);
         time_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000002);
-        destination_ = 0;
+        election_ = false;
         bitField0_ = (bitField0_ & ~0x00000004);
-        maxHops_ = -1;
+        destination_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
+        maxHops_ = -1;
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
 
@@ -531,9 +580,13 @@ public final class Common {
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.destination_ = destination_;
+        result.election_ = election_;
         if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
           to_bitField0_ |= 0x00000008;
+        }
+        result.destination_ = destination_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
         }
         result.maxHops_ = maxHops_;
         result.bitField0_ = to_bitField0_;
@@ -583,6 +636,9 @@ public final class Common {
         }
         if (other.hasTime()) {
           setTime(other.getTime());
+        }
+        if (other.hasElection()) {
+          setElection(other.getElection());
         }
         if (other.hasDestination()) {
           setDestination(other.getDestination());
@@ -685,6 +741,38 @@ public final class Common {
         return this;
       }
 
+      private boolean election_ ;
+      /**
+       * <code>optional bool election = 3;</code>
+       */
+      public boolean hasElection() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional bool election = 3;</code>
+       */
+      public boolean getElection() {
+        return election_;
+      }
+      /**
+       * <code>optional bool election = 3;</code>
+       */
+      public Builder setElection(boolean value) {
+        bitField0_ |= 0x00000004;
+        election_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool election = 3;</code>
+       */
+      public Builder clearElection() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        election_ = false;
+        onChanged();
+        return this;
+      }
+
       private int destination_ ;
       /**
        * <pre>
@@ -694,7 +782,7 @@ public final class Common {
        * <code>optional int32 destination = 8;</code>
        */
       public boolean hasDestination() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
        * <pre>
@@ -714,7 +802,7 @@ public final class Common {
        * <code>optional int32 destination = 8;</code>
        */
       public Builder setDestination(int value) {
-        bitField0_ |= 0x00000004;
+        bitField0_ |= 0x00000008;
         destination_ = value;
         onChanged();
         return this;
@@ -727,7 +815,7 @@ public final class Common {
        * <code>optional int32 destination = 8;</code>
        */
       public Builder clearDestination() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000008);
         destination_ = 0;
         onChanged();
         return this;
@@ -743,7 +831,7 @@ public final class Common {
        * <code>optional int32 max_hops = 10 [default = -1];</code>
        */
       public boolean hasMaxHops() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <pre>
@@ -765,7 +853,7 @@ public final class Common {
        * <code>optional int32 max_hops = 10 [default = -1];</code>
        */
       public Builder setMaxHops(int value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000010;
         maxHops_ = value;
         onChanged();
         return this;
@@ -779,7 +867,7 @@ public final class Common {
        * <code>optional int32 max_hops = 10 [default = -1];</code>
        */
       public Builder clearMaxHops() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000010);
         maxHops_ = -1;
         onChanged();
         return this;
@@ -10350,35 +10438,35 @@ public final class Common {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\014common.proto\"R\n\006Header\022\017\n\007node_id\030\001 \002(" +
-      "\005\022\014\n\004time\030\002 \001(\003\022\023\n\013destination\030\010 \001(\005\022\024\n\010" +
-      "max_hops\030\n \001(\005:\002-1\"\300\001\n\007Request\022)\n\013reques" +
-      "tType\030\003 \002(\0162\024.Request.RequestType\022\031\n\003rwb" +
-      "\030\004 \001(\0132\n.WriteBodyH\000\022\030\n\003rrb\030\005 \001(\0132\t.Read" +
-      "BodyH\000\"J\n\013RequestType\022\014\n\010READFILE\020\001\022\r\n\tW" +
-      "RITEFILE\020\002\022\016\n\nDELETEFILE\020\003\022\016\n\nUPDATEFILE" +
-      "\020\004B\t\n\007payload\"n\n\tWriteBody\022\017\n\007file_id\030\001 " +
-      "\001(\t\022\020\n\010filename\030\002 \002(\t\022\020\n\010file_ext\030\003 \001(\t\022" +
-      "\025\n\005chunk\030\004 \001(\0132\006.Chunk\022\025\n\rnum_of_chunks\030",
-      "\005 \001(\005\" \n\rWriteResponse\022\017\n\007ChunkId\030\001 \003(\005\"" +
-      "A\n\005Chunk\022\020\n\010chunk_id\030\001 \002(\005\022\022\n\nchunk_data" +
-      "\030\006 \002(\014\022\022\n\nchunk_size\030\t \001(\005\"S\n\010ReadBody\022\020" +
-      "\n\010filename\030\001 \001(\t\022\017\n\007file_id\030\002 \001(\003\022\020\n\010chu" +
-      "nk_id\030\003 \001(\003\022\022\n\nchunk_size\030\004 \001(\003\"\202\001\n\014Read" +
-      "Response\022\017\n\007file_id\030\001 \001(\t\022\020\n\010filename\030\002 " +
-      "\002(\t\022\020\n\010file_ext\030\003 \001(\t\022\025\n\rnum_of_chunks\030\004" +
-      " \001(\005\022&\n\016chunk_location\030\005 \003(\0132\016.ChunkLoca" +
-      "tion\"5\n\rChunkLocation\022\017\n\007chunkid\030\001 \001(\005\022\023" +
-      "\n\004node\030\002 \003(\0132\005.Node\"3\n\004Node\022\017\n\007node_id\030\001",
-      " \002(\005\022\014\n\004host\030\002 \002(\t\022\014\n\004port\030\003 \002(\005\"\350\001\n\010Res" +
-      "ponse\022\020\n\010filename\030\003 \001(\t\022\'\n\rwriteResponse" +
-      "\030\004 \001(\0132\016.WriteResponseH\000\022%\n\014readResponse" +
-      "\030\005 \001(\0132\r.ReadResponseH\000\"K\n\014ResponseType\022" +
+      "\n\014common.proto\"d\n\006Header\022\017\n\007node_id\030\001 \002(" +
+      "\005\022\014\n\004time\030\002 \001(\003\022\020\n\010election\030\003 \001(\010\022\023\n\013des" +
+      "tination\030\010 \001(\005\022\024\n\010max_hops\030\n \001(\005:\002-1\"\300\001\n" +
+      "\007Request\022)\n\013requestType\030\003 \002(\0162\024.Request." +
+      "RequestType\022\031\n\003rwb\030\004 \001(\0132\n.WriteBodyH\000\022\030" +
+      "\n\003rrb\030\005 \001(\0132\t.ReadBodyH\000\"J\n\013RequestType\022" +
       "\014\n\010READFILE\020\001\022\r\n\tWRITEFILE\020\002\022\016\n\nDELETEFI" +
-      "LE\020\003\022\016\n\nUPDATEFILE\020\004\"\"\n\006Status\022\013\n\007Succes" +
-      "s\020\001\022\013\n\007Failure\020\002B\t\n\007payload\"6\n\007Failure\022\n" +
-      "\n\002id\030\001 \002(\005\022\016\n\006ref_id\030\002 \001(\005\022\017\n\007message\030\003 " +
-      "\001(\tB\017\n\013pipe.commonH\001"
+      "LE\020\003\022\016\n\nUPDATEFILE\020\004B\t\n\007payload\"n\n\tWrite" +
+      "Body\022\017\n\007file_id\030\001 \001(\t\022\020\n\010filename\030\002 \002(\t\022" +
+      "\020\n\010file_ext\030\003 \001(\t\022\025\n\005chunk\030\004 \001(\0132\006.Chunk",
+      "\022\025\n\rnum_of_chunks\030\005 \001(\005\" \n\rWriteResponse" +
+      "\022\017\n\007ChunkId\030\001 \003(\005\"A\n\005Chunk\022\020\n\010chunk_id\030\001" +
+      " \002(\005\022\022\n\nchunk_data\030\006 \002(\014\022\022\n\nchunk_size\030\t" +
+      " \001(\005\"S\n\010ReadBody\022\020\n\010filename\030\001 \001(\t\022\017\n\007fi" +
+      "le_id\030\002 \001(\003\022\020\n\010chunk_id\030\003 \001(\003\022\022\n\nchunk_s" +
+      "ize\030\004 \001(\003\"\202\001\n\014ReadResponse\022\017\n\007file_id\030\001 " +
+      "\001(\t\022\020\n\010filename\030\002 \002(\t\022\020\n\010file_ext\030\003 \001(\t\022" +
+      "\025\n\rnum_of_chunks\030\004 \001(\005\022&\n\016chunk_location" +
+      "\030\005 \003(\0132\016.ChunkLocation\"5\n\rChunkLocation\022" +
+      "\017\n\007chunkid\030\001 \001(\005\022\023\n\004node\030\002 \003(\0132\005.Node\"3\n",
+      "\004Node\022\017\n\007node_id\030\001 \002(\005\022\014\n\004host\030\002 \002(\t\022\014\n\004" +
+      "port\030\003 \002(\005\"\350\001\n\010Response\022\020\n\010filename\030\003 \001(" +
+      "\t\022\'\n\rwriteResponse\030\004 \001(\0132\016.WriteResponse" +
+      "H\000\022%\n\014readResponse\030\005 \001(\0132\r.ReadResponseH" +
+      "\000\"K\n\014ResponseType\022\014\n\010READFILE\020\001\022\r\n\tWRITE" +
+      "FILE\020\002\022\016\n\nDELETEFILE\020\003\022\016\n\nUPDATEFILE\020\004\"\"" +
+      "\n\006Status\022\013\n\007Success\020\001\022\013\n\007Failure\020\002B\t\n\007pa" +
+      "yload\"6\n\007Failure\022\n\n\002id\030\001 \002(\005\022\016\n\006ref_id\030\002" +
+      " \001(\005\022\017\n\007message\030\003 \001(\tB\017\n\013pipe.commonH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10397,7 +10485,7 @@ public final class Common {
     internal_static_Header_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Header_descriptor,
-        new java.lang.String[] { "NodeId", "Time", "Destination", "MaxHops", });
+        new java.lang.String[] { "NodeId", "Time", "Election", "Destination", "MaxHops", });
     internal_static_Request_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_Request_fieldAccessorTable = new

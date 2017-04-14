@@ -41,11 +41,17 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import redis.clients.jedis.Jedis;
 import routing.Pipe.CommandMessage;
 
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
+	private static Jedis jedisHandler=new Jedis("10.0.0.130",4568);
+	
+	public static Jedis getJedisHandler() {
+		return jedisHandler;
+	}
 
 	public DemoApp(MessageClient mc) {
 		init(mc);
@@ -90,8 +96,8 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// String host = "127.0.0.1";
-		// int port = 4568;
+		String host="";
+		int port=0;
 
 		try {
 			// MessageClient mc = new MessageClient(host, port);
@@ -101,8 +107,11 @@ public class DemoApp implements CommListener {
 			// da.ping(2);
 
 			// Logger.info("trying to connect to node " + );
-			String host = "127.0.0.1";
-			int port = 4568;
+			if(jedisHandler.ping().equals("PONG")){
+				host = jedisHandler.get("1").split(":")[0];
+				port = Integer.parseInt(jedisHandler.get("1").split(":")[1]);
+			}
+			
 			EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 			Bootstrap b = new Bootstrap(); // (1)

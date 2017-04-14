@@ -1,5 +1,6 @@
 package gash.router.server;
 
+import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
 import gash.router.container.RoutingConf;
@@ -14,6 +15,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import pipe.election.Election.ElectionMessage;
 import pipe.work.Work.WorkMessage;
+import redis.clients.jedis.Jedis; 
 
 public class ServerState {
 	 
@@ -28,7 +30,7 @@ public class ServerState {
 	public void setElecHandler(ElectionHandler elecHandler) {
 		this.elecHandler = elecHandler;
 	}
-
+	private Jedis jedisHandler=null;
 	private RoutingConf conf;
 	private EdgeMonitor emon;
 	private TaskList tasks;
@@ -41,11 +43,26 @@ public class ServerState {
 	Handelable reqVote;
 	Handelable resLeader;
 	Handelable voteReceived;
+	private String ipAddress="";
+	
 	public ServerState(){
 		reqVote=new HandleVoteRequestState(this);
 		resLeader=new HandleLeaderResponseState(this);
 		voteReceived=new HandleVoteReceivedState(this);
+		jedisHandler=new Jedis("10.0.0.130",6379);
+		try{
+			ipAddress=InetAddress.getLocalHost().getHostAddress();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
+	public String getIpAddress() {
+		return ipAddress;
+	}
+	public Jedis getJedisHandler() {
+		return jedisHandler;
+	}
+	
 	public long getTimeout() {
 		return timeout;
 	}
