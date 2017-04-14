@@ -50,8 +50,8 @@ public class DemoApp implements CommListener {
 	private static Jedis jedisHandler1=new Jedis("10.0.0.130",4568);
 	private static Jedis jedisHandler2=new Jedis("10.0.0.120",4568);
 	
-	public static Jedis getJedisHandler() {
-		return jedisHandler;
+	public static Jedis getJedisHandler1() {
+		return jedisHandler1;
 	}
 
 	public DemoApp(MessageClient mc) {
@@ -108,10 +108,13 @@ public class DemoApp implements CommListener {
 			// da.ping(2);
 
 			// Logger.info("trying to connect to node " + );
-			if(jedisHandler.ping().equals("PONG")){
-				host = jedisHandler.get("1").split(":")[0];
-				port = Integer.parseInt(jedisHandler.get("1").split(":")[1]);
-			}else if()
+			if(jedisHandler1.ping().equals("PONG")){
+				host = jedisHandler1.get("1").split(":")[0];
+				port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
+			}else if(jedisHandler2.ping().equals("PONG")){
+				host = jedisHandler2.get("1").split(":")[0];
+				port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
+			}
 			
 			EventLoopGroup workerGroup = new NioEventLoopGroup();
 
