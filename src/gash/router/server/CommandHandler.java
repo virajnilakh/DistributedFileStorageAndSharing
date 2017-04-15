@@ -89,7 +89,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
 			}
 
-			File file = new File("C:\\Gossamer\\" + msg.getReqMsg().getRwb().getFilename());
+			File file = new File("D:\\" + msg.getReqMsg().getRwb().getFilename());
 			file.createNewFile();
 
 			FileOutputStream outputStream = new FileOutputStream(file);

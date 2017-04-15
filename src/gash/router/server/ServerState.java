@@ -50,8 +50,8 @@ public class ServerState {
 		reqVote=new HandleVoteRequestState(this);
 		resLeader=new HandleLeaderResponseState(this);
 		voteReceived=new HandleVoteReceivedState(this);
-		jedisHandler1=new Jedis("10.0.0.130",6379);
-		jedisHandler2=new Jedis("10.0.0.120",6379);
+		jedisHandler1=new Jedis("10.250.47.208",6379);
+		jedisHandler2=new Jedis("10.250.47.205",6379);
 		try{
 			ipAddress=InetAddress.getLocalHost().getHostAddress();
 		}catch(Exception e){

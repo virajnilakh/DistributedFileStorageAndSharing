@@ -48,8 +48,8 @@ import routing.Pipe.CommandMessage;
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
-	private static Jedis jedisHandler1=new Jedis("10.0.0.130",4568);
-	private static Jedis jedisHandler2=new Jedis("10.0.0.120",4568);
+	private static Jedis jedisHandler1=new Jedis("10.250.47.208",6379);
+	private static Jedis jedisHandler2=new Jedis("10.250.47.205",6379);
 	
 	public static Jedis getJedisHandler1() {
 		return jedisHandler1;

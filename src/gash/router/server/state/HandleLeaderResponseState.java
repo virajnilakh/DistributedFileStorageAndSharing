@@ -12,7 +12,7 @@ public class HandleLeaderResponseState implements Handelable {
 	@Override
 	public synchronized void handleMessage(Channel channel, WorkMessage wm) {
 		// TODO Auto-generated method stub
-		System.out.println("New Leader elected is "+wm.getLeaderStatus().getLeaderId());
+		System.out.println("New Leader elected is "+wm.getLeaderStatus().getLeaderId()+"and "+wm.getLeaderStatus().getLeaderHost());
 		state.setLeaderId(wm.getLeaderStatus().getLeaderId());
 		state.setLeaderAddress(wm.getLeaderStatus().getLeaderHost());
 		state.becomeFollower();
