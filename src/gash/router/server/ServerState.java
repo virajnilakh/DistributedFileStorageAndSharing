@@ -44,7 +44,7 @@ public class ServerState {
 	Handelable reqVote;
 	Handelable resLeader;
 	Handelable voteReceived;
-	private String ipAddress="";
+	private String ipAddress="10.250.47.208";
 	
 	public ServerState(){
 		reqVote=new HandleVoteRequestState(this);
