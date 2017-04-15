@@ -33,6 +33,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.FutureListener;
 import pipe.common.Common.Header;
 import pipe.election.Election.LeaderStatus;
 import pipe.election.Election.LeaderStatus.LeaderState;
@@ -155,7 +157,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	public void run() {
 		while (forever) {
 			try {
-				for (EdgeInfo ei : this.outboundEdges.map.values()) {
+				for (final EdgeInfo ei : this.outboundEdges.map.values()) {
 					
 					
 					if (ei.isActive() && ei.getChannel() != null) {
@@ -194,10 +196,23 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				            // Start the client.
 				            System.out.println("Connect to a node.");
 
-				            ChannelFuture f = b.connect(host, port).sync(); // (5)
-				            ei.setChannel(f.channel());
-				            ei.setActive(true);
-				            activeOutboundEdges++;
+				            final ChannelFuture f = b.connect(host, port);
+				            f.addListener(new FutureListener<Void>() {
+
+				                @Override
+				                public void operationComplete(Future<Void> future) throws Exception {
+				                    if (!f.isSuccess()) {
+				                        System.out.println("Test Connection failed");
+				                        future.cause();
+
+				                    }else{
+				                    	ei.setChannel(f.channel());
+							            ei.setActive(true);
+							            activeOutboundEdges++;
+				                    }
+				                }
+				            });				            
+				            
 				            // Wait until the connection is closed.
 				            //f.channel().closeFuture().sync();
 				        } finally {
