@@ -93,11 +93,17 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	public void broadcast(WorkMessage msg){
 			for (EdgeInfo ei : this.outboundEdges.map.values()){
 				Channel ch=ei.getChannel();
-				ChannelFuture cf = ch.writeAndFlush(msg);
-				if (cf.isDone() && !cf.isSuccess()) {
-					logger.info("failed to send vote to server");
+				ChannelFuture cf =null;
+				if(ch!=null){
+					cf= ch.write(msg);
+					ch.flush();
+					if (cf.isDone() && !cf.isSuccess()) {
+						logger.info("failed to send vote to server");
 
+					}
 				}
+				
+				
 			}
 		}
 	public void broadcast(CommandMessage msg){
