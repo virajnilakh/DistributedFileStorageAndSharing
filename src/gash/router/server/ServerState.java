@@ -3,6 +3,7 @@ package gash.router.server;
 import java.net.InetAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
+import discovery.LocalAddress;
 import gash.router.container.RoutingConf;
 import gash.router.election.ElectionHandler;
 import gash.router.server.edges.EdgeMonitor;
@@ -44,9 +45,12 @@ public class ServerState {
 	Handelable reqVote;
 	Handelable resLeader;
 	Handelable voteReceived;
-	private String ipAddress="10.250.47.208";
+	
+	private String ipAddress="";
 	
 	public ServerState(){
+		ipAddress=LocalAddress.getLocalHostLANAddress().getHostAddress();
+		System.out.println(LocalAddress.getLocalHostLANAddress().getHostAddress());
 		reqVote=new HandleVoteRequestState(this);
 		resLeader=new HandleLeaderResponseState(this);
 		voteReceived=new HandleVoteReceivedState(this);
