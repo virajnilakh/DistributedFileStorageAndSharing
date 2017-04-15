@@ -48,7 +48,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 	private EdgeList outboundEdges;
 	private EdgeList inboundEdges;
-	private long dt = 2000;
+	private long dt = 50;
 	private ServerState state;
 	private boolean forever = true;
 	private int activeOutboundEdges=0;

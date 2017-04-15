@@ -135,7 +135,7 @@ public class ElectionHandler{
 
     }
     public synchronized void initElection(){
-        int randomTimeout=(2000+(new Random()).nextInt(3500))*state.getConf().getNodeId();
+        int randomTimeout=(5000+(new Random()).nextInt(3500))*state.getConf().getNodeId();
         timer.schedule(new ElectionTimer(),(long)randomTimeout,(long)randomTimeout);
     }
     public static Timer getTimer() {
@@ -144,7 +144,7 @@ public class ElectionHandler{
 	public static void setTimer() {
 		timer=null;
 		timer=new Timer();
-		int randomTimeout=(2000+(new Random()).nextInt(3500))*state.getConf().getNodeId();
+		int randomTimeout=(5000+(new Random()).nextInt(3500))*state.getConf().getNodeId();
         timer.schedule(new ElectionTimer(),(long)randomTimeout,(long)randomTimeout);
     	}
 	private static class ElectionTimer extends TimerTask{
