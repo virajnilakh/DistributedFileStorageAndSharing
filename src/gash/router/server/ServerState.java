@@ -50,13 +50,13 @@ public class ServerState {
 		reqVote=new HandleVoteRequestState(this);
 		resLeader=new HandleLeaderResponseState(this);
 		voteReceived=new HandleVoteReceivedState(this);
-		jedisHandler1=new Jedis("10.250.47.208",6379);
-		jedisHandler2=new Jedis("10.250.47.205",6379);
-		try{
+		jedisHandler1=new Jedis("localhost",6379);
+		//jedisHandler2=new Jedis("localhost",6379);
+		/*try{
 			ipAddress=InetAddress.getLocalHost().getHostAddress();
 		}catch(Exception e){
 			e.printStackTrace();
-		}
+		}*/
 	}
 	public String getIpAddress() {
 		return ipAddress;
@@ -64,9 +64,7 @@ public class ServerState {
 	public Jedis getJedisHandler1() {
 		return jedisHandler1;
 	}
-	public Jedis getJedisHandler2() {
-		return jedisHandler2;
-	}
+	
 	
 	public long getTimeout() {
 		return timeout;
