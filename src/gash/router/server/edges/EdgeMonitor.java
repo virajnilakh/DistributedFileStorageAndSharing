@@ -100,6 +100,16 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				}
 			}
 		}
+	public void broadcast(CommandMessage msg){
+		for (EdgeInfo ei : this.outboundEdges.map.values()){
+			Channel ch=ei.getChannel();
+			ChannelFuture cf = ch.writeAndFlush(msg);
+			if (cf.isDone() && !cf.isSuccess()) {
+				logger.info("failed to send vote to server");
+
+			}
+		}
+	}
 	private WorkMessage createHB(EdgeInfo ei) {
 		WorkState.Builder sb = WorkState.newBuilder();
 		sb.setEnqueued(-1);

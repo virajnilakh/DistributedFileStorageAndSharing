@@ -56,7 +56,7 @@ public class ElectionHandler{
 
 		status.setState(LeaderState.LEADERALIVE);
 		status.setLeaderId(nodeId);
-		status.setLeaderHost("localhost");
+		status.setLeaderHost(state.getIpAddress());
 		header.setElection(true);
 		header.setNodeId(state.getConf().getNodeId());
 		header.setTime(System.currentTimeMillis());
@@ -152,7 +152,8 @@ public class ElectionHandler{
         @Override
         public void run(){
             System.out.println("Inside Timer");
-
+            state.setLeaderId(0);
+            state.setLeaderAddress("");
             /*if(getHasVoted()){
                 timer.cancel();
             }*/

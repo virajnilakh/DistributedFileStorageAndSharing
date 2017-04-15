@@ -73,7 +73,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		PrintUtil.printCommand(msg);
 		lstMsg.add(msg);
-
+		
 		if (chunkedFile.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
 
 			// Sorting

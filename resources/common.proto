@@ -9,7 +9,7 @@ option java_package = "pipe.common";
 message Header { 
 required int32 node_id = 1;
 optional int64 time = 2;
-
+optional bool election=3;
 // if the message is for a specific node, this will be set
 optional int32 destination = 8;
 

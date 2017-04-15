@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 
 import com.google.protobuf.ByteString;
 
-import commandConsole.CommandConsole;
 import gash.router.client.CommConnection;
 import gash.router.client.CommListener;
 import gash.router.client.Constants;
@@ -43,11 +42,18 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import redis.clients.jedis.Jedis;
 import routing.Pipe.CommandMessage;
 
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
+	private static Jedis jedisHandler1=new Jedis("10.0.0.130",4568);
+	private static Jedis jedisHandler2=new Jedis("10.0.0.120",4568);
+	
+	public static Jedis getJedisHandler1() {
+		return jedisHandler1;
+	}
 
 	public DemoApp(MessageClient mc) {
 		init(mc);
@@ -92,8 +98,8 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// String host = "127.0.0.1";
-		// int port = 4568;
+		String host="";
+		int port=0;
 		try {
 			// MessageClient mc = new MessageClient(host, port);
 			// DemoApp da = new DemoApp(mc);
@@ -102,8 +108,14 @@ public class DemoApp implements CommListener {
 			// da.ping(2);
 
 			// Logger.info("trying to connect to node " + );
-			String host = "127.0.0.1";
-			int port = 4568;
+			if(jedisHandler1.ping().equals("PONG")){
+				host = jedisHandler1.get("1").split(":")[0];
+				port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
+			}else if(jedisHandler2.ping().equals("PONG")){
+				host = jedisHandler2.get("1").split(":")[0];
+				port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
+			}
+			
 			EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 			Bootstrap b = new Bootstrap(); // (1)

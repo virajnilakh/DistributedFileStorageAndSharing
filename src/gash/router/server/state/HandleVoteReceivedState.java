@@ -22,9 +22,16 @@ public class HandleVoteReceivedState implements Handelable{
     		if(leader){
     			state.becomeLeader();
     			state.setLeaderId(state.getConf().getNodeId());
-        		System.out.println("NOde:"+state.getConf().getNodeId()+" is the Leader!!");
+        		System.out.println("Node:"+state.getConf().getNodeId()+" is the Leader!!");
 				WorkMessage response = state.getElecHandler().buildLeaderResponse(state.getConf().getNodeId(), state.getCurrentTerm());
 				state.getEmon().broadcast(response);
+				if(state.getJedisHandler1().ping().equals("PONG")){
+					state.getJedisHandler1().set("1", state.getIpAddress()+":4568");
+					System.out.println("Updated redis server!");
+				}
+				if(state.getJedisHandler2().ping().equals("PONG")){
+					state.getJedisHandler2().set("1", state.getIpAddress()+":4568");
+				}
 				
     		}
     	}

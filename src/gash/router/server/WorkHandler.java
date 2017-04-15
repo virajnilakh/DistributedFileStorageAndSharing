@@ -27,6 +27,7 @@ import pipe.work.Work.Heartbeat;
 import pipe.work.Work.Task;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkState;
+import routing.Pipe.CommandMessage;
 
 /**
  * The message handler processes json messages that are delimited by a 'newline'
@@ -117,6 +118,14 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, WorkMessage msg) throws Exception {
 		handleMessage(msg, ctx.channel());
+	}
+	protected void channelRead0(ChannelHandlerContext ctx, CommandMessage msg) throws Exception {
+		handleMessage(msg, ctx.channel());
+	}
+
+	private void handleMessage(CommandMessage msg, Channel channel) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
