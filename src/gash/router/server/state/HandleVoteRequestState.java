@@ -27,7 +27,7 @@ public class HandleVoteRequestState implements Handelable{
             }
     		break;
     	case Candidate:
-    		if(state.getTimeout()<wm.getHeader().getTime()){
+    		if(state.getTimeout()>wm.getHeader().getTime()){
     			
     		}else{
     			state.becomeFollower();
