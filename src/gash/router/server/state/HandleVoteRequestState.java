@@ -15,7 +15,7 @@ public class HandleVoteRequestState implements Handelable{
 	public synchronized void handleMessage(Channel channel, WorkMessage wm) {
 		// TODO Auto-generated method stub
 		ElectionMessage electionMessage = wm.getElectionMessage();
-
+		
 		switch(state.getState()){
     	case Follower:
     		if(state.getElecHandler().getVote2TermMap(state.getCurrentTerm())){

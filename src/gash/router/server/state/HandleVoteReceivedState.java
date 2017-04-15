@@ -27,6 +27,7 @@ public class HandleVoteReceivedState implements Handelable{
 				state.getEmon().broadcast(response);
 				if(state.getJedisHandler1().ping().equals("PONG")){
 					state.getJedisHandler1().set("1", state.getIpAddress()+":4568");
+					System.out.println("Updated redis server!");
 				}
 				if(state.getJedisHandler2().ping().equals("PONG")){
 					state.getJedisHandler2().set("1", state.getIpAddress()+":4568");

@@ -152,7 +152,8 @@ public class ElectionHandler{
         @Override
         public void run(){
             System.out.println("Inside Timer");
-
+            state.setLeaderId(0);
+            state.setLeaderAddress("");
             /*if(getHasVoted()){
                 timer.cancel();
             }*/
