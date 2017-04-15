@@ -103,6 +103,9 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 						logger.info("failed to send vote to server");
 
 					}
+				}else{
+					ei.setActive(false);
+					activeOutboundEdges--;
 				}
 				
 				
