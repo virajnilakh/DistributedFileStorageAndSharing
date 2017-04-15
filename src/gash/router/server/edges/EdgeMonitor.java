@@ -142,7 +142,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		if (state.getLeaderId() == 0) {
 			status.setState(LeaderState.LEADERUNKNOWN);
 			wb.setLeaderStatus(status);
-		} else if (state.getLeaderId() == this.state.getConf().getNodeId()) {
+		} else if (state.getLeaderId() == state.getConf().getNodeId()) {
 			status.setState(LeaderState.LEADERALIVE);
 			wb.setLeaderStatus(status);
 		} else {
