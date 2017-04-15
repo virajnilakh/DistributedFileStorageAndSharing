@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
 
 import com.google.protobuf.ByteString;
 
+import commandConsole.CommandConsole;
 import gash.router.client.CommConnection;
 import gash.router.client.CommListener;
 import gash.router.client.Constants;
@@ -92,7 +94,6 @@ public class DemoApp implements CommListener {
 	public static void main(String[] args) {
 		// String host = "127.0.0.1";
 		// int port = 4568;
-
 		try {
 			// MessageClient mc = new MessageClient(host, port);
 			// DemoApp da = new DemoApp(mc);
@@ -117,21 +118,62 @@ public class DemoApp implements CommListener {
 			ChannelFuture f = b.connect(host, port).sync(); // (5)
 			channel = f.channel();
 
-			String path = "C:\\1\\Natrang.avi";
-			File file = new File(path);
-			long begin = System.currentTimeMillis();
-			System.out.println("Begin time");
-			System.out.println(begin);
-			sendFile(file);
+			Scanner reader = new Scanner(System.in);
+			try {
+				int option = 0;
+				System.out.println("Welcome to Gossamer Distributed");
+				do {
+					System.out.println("Please choose an option to continue: ");
+					System.out.println("1. Read a file");
+					System.out.println("2. Write a file");
+					System.out.println("0. Exit");
+					option = reader.nextInt();
+					System.out.println("You entered " + option);
+					switch (option) {
+					case 1:
+						break;
+					case 2:
+						//For testing writes
+						//String path = runWriteTest();
+						System.out.println("Please enter directory (path) to upload:");
+						String path = reader.nextLine();
+						File file = new File(path);
+						long begin = System.currentTimeMillis();
+						System.out.println("Begin time");
+						System.out.println(begin);
+						sendFile(file);
+						System.out.println("File sent");
+						System.out.flush();
+						break;
+					}
 
-			System.out.println("\n** exiting in 10 seconds. **");
-			System.out.flush();
-			Thread.sleep(10 * 1000);
+				} while (option != 0);
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				System.out.println("Error occurred...");
+				Thread.sleep(10 * 1000);
+				e.printStackTrace();
+			} finally {
+				System.out.println("Exiting...");
+				Thread.sleep(10 * 1000);
+				reader.close();
+
+			}
+
+			// System.out.println("\n** exiting in 10 seconds. **");
+			// System.out.flush();
+			// Thread.sleep(10 * 1000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			CommConnection.getInstance().release();
 		}
+	}
+
+	private static String runWriteTest() {
+		String path = "C:\\1\\Natrang.avi";
+		return path;
 	}
 
 	private static void sendFile(File file) {
