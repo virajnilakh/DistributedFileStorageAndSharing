@@ -14,7 +14,6 @@ import gash.router.server.state.HandleVoteReceivedState;
 import gash.router.server.state.HandleVoteRequestState;
 import gash.router.server.tasks.TaskList;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import pipe.election.Election.ElectionMessage;
 import pipe.work.Work.WorkMessage;
 import redis.clients.jedis.Jedis; 
@@ -51,6 +50,7 @@ public class ServerState {
 	
 	public ServerState() throws UnknownHostException{
 		ipAddress=LocalAddress.getLocalHostLANAddress().getHostAddress();
+		//ipAddress="169.254.56.202";
 		System.out.println(LocalAddress.getLocalHostLANAddress().getHostAddress());
 		reqVote=new HandleVoteRequestState(this);
 		resLeader=new HandleLeaderResponseState(this);

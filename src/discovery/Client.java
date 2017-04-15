@@ -55,7 +55,9 @@ public class Client {
 					InetAddress broadcast = interfaceAddress.getBroadcast();
 					//Hack: Manually excluding addresses starting with 10 and 192
 					//ToDo: Make broadcast over LAN address less crude.
-					if (broadcast == null || broadcast.getHostAddress().startsWith("10.") || broadcast.getHostAddress().startsWith("192.") ) {
+					if (broadcast == null ||broadcast.getHostAddress().startsWith("169.")
+							//||broadcast.getHostAddress().startsWith("10.")
+							) {
 						continue;
 					}
 

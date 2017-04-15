@@ -47,21 +47,10 @@ public class LocalAddress {
 				for (Enumeration inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements();) {
 					InetAddress inetAddr = (InetAddress) inetAddrs.nextElement();
 					if (!inetAddr.isLoopbackAddress()) {
-
-						if (inetAddr.isSiteLocalAddress()) {
-							// Found non-loopback site-local address. Return it
-							// immediately...
-							return inetAddr;
-						} else if (candidateAddress == null) {
-							// Found non-loopback address, but not necessarily
-							// site-local.
-							// Store it as a candidate to be returned if
-							// site-local address is not subsequently found...
-							candidateAddress = inetAddr;
-							// Note that we don't repeatedly assign non-loopback
-							// non-site-local addresses as candidates,
-							// only the first. For subsequent iterations,
-							// candidate will be non-null.
+						if (inetAddr .getHostAddress().startsWith("169.")
+								//|| inetAddr .getHostAddress().startsWith("10.")
+								) {
+							candidateAddress=inetAddr;
 						}
 					}
 				}
