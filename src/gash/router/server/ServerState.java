@@ -1,6 +1,7 @@
 package gash.router.server;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import discovery.LocalAddress;
@@ -48,7 +49,7 @@ public class ServerState {
 	
 	private String ipAddress="";
 	
-	public ServerState(){
+	public ServerState() throws UnknownHostException{
 		ipAddress=LocalAddress.getLocalHostLANAddress().getHostAddress();
 		System.out.println(LocalAddress.getLocalHostLANAddress().getHostAddress());
 		reqVote=new HandleVoteRequestState(this);
