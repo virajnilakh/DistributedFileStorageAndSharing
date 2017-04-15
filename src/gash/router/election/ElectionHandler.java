@@ -151,13 +151,14 @@ public class ElectionHandler{
         
         @Override
         public void run(){
-            System.out.println("Inside Timer");
             
             /*if(getHasVoted()){
                 timer.cancel();
             }*/
             if(state.isFollower()){
                 try{
+                    System.out.println("---Timer timed out---");
+
                     state.becomeCandidate();
                     state.setTimeout(System.currentTimeMillis());
     				System.out.println("Asking for vote:");

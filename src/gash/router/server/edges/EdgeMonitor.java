@@ -166,7 +166,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					if (ei.isActive() && ei.getChannel() != null) {
 						if(state.isLeader()){
 							WorkMessage wm = createHB(ei);
-							System.out.println("Sending heartbeat");
+							System.out.println("---Leader "+state.getLeaderId()+" sending heartbeat---");
 
 							ei.getChannel().writeAndFlush(wm);
 						}
@@ -174,10 +174,11 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 							state.getElecHandler().initElection();
 						}else{
 							if(state.getLeaderId()!=0){
-								System.out.println("Leader selected?="+true);
+								System.out.println("---Current Leader is:"+state.getLeaderId()+"---");
 
 							}else{
-								System.out.println("Leader selected?="+false);
+								System.out.println("No proper connections");
+								
 
 							}
 						}
@@ -197,7 +198,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				            b.handler(new WorkInit(state,false));
 
 				            // Start the client.
-				            System.out.println("Connect to a node.");
+				            //System.out.println("Connect to a node.");
 
 				            final ChannelFuture f = b.connect(host, port);
 				            f.addListener(new FutureListener<Void>() {
