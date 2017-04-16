@@ -242,8 +242,8 @@ public class MessageServer {
 
 				// shutdown monitor
 				EdgeMonitor emon = state.getEmon();
-				if (emon != null)
-					emon.shutdown();
+				//if (emon != null)
+					//emon.shutdown();
 			}
 		}
 	}
