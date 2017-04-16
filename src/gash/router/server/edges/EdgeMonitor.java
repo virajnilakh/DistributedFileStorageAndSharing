@@ -16,6 +16,9 @@
 package gash.router.server.edges;
 
 import java.util.HashMap;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +48,8 @@ import routing.Pipe.CommandMessage;
 
 public class EdgeMonitor implements EdgeListener, Runnable {
 	protected static Logger logger = LoggerFactory.getLogger("edge monitor");
-
-	private EdgeList outboundEdges;
+	private HashMap<Integer,Timer> timer=new HashMap<Integer,Timer>();
+	private static EdgeList outboundEdges;
 	private EdgeList inboundEdges;
 	private long dt = 50;
 	private ServerState state;
@@ -160,6 +163,33 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		}
 		return wb.build();
 	}
+	public WorkMessage createHB(int nodeId) {
+		WorkState.Builder sb = WorkState.newBuilder();
+		sb.setEnqueued(-1);
+		sb.setProcessed(-1);
+
+		Heartbeat.Builder bb = Heartbeat.newBuilder();
+		bb.setState(sb);
+
+		Header.Builder hb = Header.newBuilder();
+		hb.setNodeId(state.getConf().getNodeId());
+		hb.setDestination(-1);
+		hb.setTime(System.currentTimeMillis());
+		LeaderStatus.Builder status=LeaderStatus.newBuilder();
+		status.setLeaderId(state.getConf().getNodeId());
+		WorkMessage.Builder wb = WorkMessage.newBuilder();
+		wb.setHeader(hb);
+		wb.setSecret(0);
+		wb.setBeat(bb);
+		if(state.getLeaderId()!=0){
+			status.setState(LeaderState.LEADERKNOWN);
+		}else{
+			status.setState(LeaderState.LEADERUNKNOWN);
+		}
+		wb.setLeaderStatus(status);
+		
+		return wb.build();
+	}
 
 	public void shutdown() {
 		forever = false;
@@ -173,6 +203,8 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					
 					
 					if (ei.isActive() && ei.getChannel() != null) {
+						WorkMessage wmhb=state.getEmon().createHB(state.getConf().getNodeId());
+						ei.getChannel().writeAndFlush(wmhb);
 						if(state.isLeader()){
 							WorkMessage wm = createHB(ei);
 							System.out.println("---Leader "+state.getLeaderId()+" sending heartbeat---");
@@ -222,6 +254,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				                        future.cause();
 
 				                    }else{
+				                    	setTimer(ei.getRef());
 				                    	ei.setChannel(f.channel());
 							            ei.setActive(true);
 							            activeOutboundEdges++;
@@ -246,6 +279,20 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			}
 		}
 	}
+	
+private static class DeadFollowerTimer extends TimerTask{
+		private int nodeId;
+        public DeadFollowerTimer(int nodeId){
+        	this.nodeId=nodeId;
+        }
+        @Override
+        public void run(){
+        	System.out.println("Node "+nodeId+"dead");
+        	outboundEdges.map.get(nodeId).setChannel(null);;
+        	outboundEdges.map.get(nodeId).setActive(false);
+        	this.cancel();
+        }
+    }
 	@Override
 	public synchronized void onAdd(EdgeInfo ei) {
 		// TODO check connection
@@ -254,5 +301,16 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	@Override
 	public synchronized void onRemove(EdgeInfo ei) {
 		// TODO ?
+	}
+
+	public Timer getTimer(int nodeId) {
+		return timer.get(nodeId);
+	}
+
+	public void setTimer(int nodeId) {
+		int randomTimeout=(2000+(new Random()).nextInt(3500))*1000;
+        Timer t=new Timer();
+        t.schedule(new DeadFollowerTimer(nodeId),(long)randomTimeout,(long)randomTimeout);
+		timer.put(nodeId,t );
 	}
 }
