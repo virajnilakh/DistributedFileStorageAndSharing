@@ -39,6 +39,9 @@ public class HandleVoteRequestState implements Handelable{
     			state.becomeFollower();
     			vote(channel,electionMessage);
     			
+    		}else{
+    			WorkMessage hb=state.getElecHandler().buildLeaderResponse(state.getConf().getNodeId(), state.getCurrentTerm());
+    			channel.writeAndFlush(hb);
     		}
     		break;
     	default:
