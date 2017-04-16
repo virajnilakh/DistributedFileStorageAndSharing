@@ -67,7 +67,7 @@ public class MessageClient {
 		}
 	}
 
-	public static CommandMessage sendWriteRequest(ByteString bs, String fileName, int chunkCount, int chunkId)
+	public static CommandMessage sendWriteRequest(ByteString bs, String hash, String fileName, int chunkCount, int chunkId)
 			throws Exception {
 
 		Header.Builder header = Header.newBuilder();
@@ -82,6 +82,8 @@ public class MessageClient {
 
 		WriteBody.Builder body = WriteBody.newBuilder();
 		body.setFilename(fileName);
+		//File Id is the MD5 hash in string format of the file name
+		body.setFileId(hash);
 		body.setNumOfChunks(chunkCount);
 		body.setChunk(chunk);
 

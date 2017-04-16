@@ -23,17 +23,31 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.ByteString;
 
+import gash.router.client.WriteChannel;
 import gash.router.container.RoutingConf;
+import global.Constants;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import pipe.common.Common.Chunk;
 import pipe.common.Common.Failure;
+import pipe.common.Common.Header;
+import pipe.common.Common.ReadResponse;
+import pipe.common.Common.Request;
+import pipe.common.Common.Response;
+import pipe.common.Common.WriteBody;
+import pipe.common.Common.WriteResponse;
+import redis.clients.jedis.Jedis;
 import routing.Pipe.CommandMessage;
 
 /**
@@ -49,6 +63,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	protected RoutingConf conf;
 	protected ArrayList<ByteString> chunkedFile = new ArrayList<ByteString>();
 	protected ArrayList<CommandMessage> lstMsg = new ArrayList<CommandMessage>();
+	private static Jedis jedisHandler1 = new Jedis("localhost", 6379);
+	List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
+	ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 	public CommandHandler(RoutingConf conf) {
 		if (conf != null) {
@@ -62,46 +79,84 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	 * behavior (e.g., jax-rs).
 	 * 
 	 * @param msg
-	 * @throws IOException
+	 * @throws Exception
 	 */
-	public void handleMessage(CommandMessage msg, Channel channel) throws IOException {
+	public void handleMessage(CommandMessage msg, Channel channel) throws Exception {
 
 		if (msg == null) {
 			System.out.println("ERROR: Unexpected content - " + msg);
 			return;
 		}
 
-		PrintUtil.printCommand(msg);
-		lstMsg.add(msg);
-		
-		if (chunkedFile.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
+		if (msg.getReqMsg().getRequestType() == Request.RequestType.READFILE) {
 
-			// Sorting
-			Collections.sort(lstMsg, new Comparator<CommandMessage>() {
-				@Override
-				public int compare(CommandMessage msg1, CommandMessage msg2) {
-					return Integer.compare(msg1.getReqMsg().getRwb().getChunk().getChunkId(),
-							msg2.getReqMsg().getRwb().getChunk().getChunkId());
+		}
+
+		if (msg.getReqMsg().getRequestType() == Request.RequestType.WRITEFILE) {
+
+			System.out.println("Message received :" + msg.getReqMsg().getRwb().getChunk().getChunkId());
+			PrintUtil.printCommand(msg);
+			lstMsg.add(msg);
+			System.out.println("List size is: ");
+			System.out.println(lstMsg.size());
+			String storeStr = new String(msg.getReqMsg().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
+
+			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), msg.getReqMsg().getRwb().getFilename(),
+					msg.getReqMsg().getRwb().getFileExt());
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileId());
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileExt());
+			// Uncomment to store chunk data
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()),storeStr);
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getChunk().getChunkData());
+			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),
+					String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkSize()),
+					String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getNumOfChunks());
+			CommandMessage commMsg = createAckWriteRequest(msg.getReqMsg().getRwb().getFileId(),
+					msg.getReqMsg().getRwb().getFilename(), msg.getReqMsg().getRwb().getChunk().getChunkId());
+			WriteChannel myCallable = new WriteChannel(commMsg, channel);
+
+			futuresList.add(myCallable);
+
+			if (lstMsg.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
+				System.out.println("All chunks received");
+				// Sorting
+				Collections.sort(lstMsg, new Comparator<CommandMessage>() {
+					@Override
+					public int compare(CommandMessage msg1, CommandMessage msg2) {
+						return Integer.compare(msg1.getReqMsg().getRwb().getChunk().getChunkId(),
+								msg2.getReqMsg().getRwb().getChunk().getChunkId());
+					}
+				});
+
+				System.out.println("All chunks sorted");
+				for (CommandMessage message : lstMsg) {
+					chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
 				}
-			});
+				System.out.println("Chunked file created");
+				File file = new File(Constants.dataDir + msg.getReqMsg().getRwb().getFilename());
+				file.createNewFile();
+				System.out.println("File created in Gossamer dir");
+				FileOutputStream outputStream = new FileOutputStream(file);
+				ByteString bs = ByteString.copyFrom(chunkedFile);
+				outputStream.write(bs.toByteArray());
+				outputStream.flush();
+				outputStream.close();
+				System.out.println("File created");
+				long end = System.currentTimeMillis();
+				System.out.println("End time");
+				System.out.println(end);
 
-			for (CommandMessage message : lstMsg) {
-				chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
+				// Send acks
+				List<Future<Long>> futures = service.invokeAll(futuresList);
+				service.shutdown();
+
+				// Cleanup
+				chunkedFile = new ArrayList<ByteString>();
+				lstMsg = new ArrayList<CommandMessage>();
+				futuresList = new ArrayList<WriteChannel>();
+
 			}
-
-			File file = new File("D:\\" + msg.getReqMsg().getRwb().getFilename());
-			file.createNewFile();
-
-			FileOutputStream outputStream = new FileOutputStream(file);
-			ByteString bs = ByteString.copyFrom(chunkedFile);
-			outputStream.write(bs.toByteArray());
-			outputStream.flush();
-			outputStream.close();
-			System.out.println("File done");
-			long end = System.currentTimeMillis();
-			System.out.println("End time");
-			System.out.println(end);
-
 		}
 
 		try {
@@ -124,6 +179,31 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		}
 
 		System.out.flush();
+	}
+
+	public static CommandMessage createAckWriteRequest(String hash, String fileName, int chunkId) throws Exception {
+
+		Header.Builder header = Header.newBuilder();
+		// ToDO: Set actual Node Id and hash as well
+
+		header.setNodeId(99);
+		header.setTime(System.currentTimeMillis());
+		header.setDestination(-1);
+
+		WriteResponse.Builder body = WriteResponse.newBuilder();
+		// body.setChunkId(chunkId, chunkId);
+
+		Response.Builder res = Response.newBuilder();
+
+		// res.setResponseType(Response.ResponseType.WRITEFILE);
+		// req.setRwb(body);
+		res.setFilename(fileName);
+		res.setWriteResponse(body);
+
+		CommandMessage.Builder comm = CommandMessage.newBuilder();
+		comm.setHeader(header);
+		comm.setResMsg(res);
+		return comm.build();
 	}
 
 	/**

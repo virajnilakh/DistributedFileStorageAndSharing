@@ -18,6 +18,9 @@ package gash.router.app;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -30,11 +33,11 @@ import com.google.protobuf.ByteString;
 
 import gash.router.client.CommConnection;
 import gash.router.client.CommListener;
-import gash.router.client.Constants;
 import gash.router.client.MessageClient;
 import gash.router.client.WriteChannel;
 import gash.router.server.CommandInit;
 import gash.router.server.WorkInit;
+import global.Constants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -42,18 +45,12 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import redis.clients.jedis.Jedis;
+
 import routing.Pipe.CommandMessage;
 
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
-	private static Jedis jedisHandler1=new Jedis("10.250.47.208",6379);
-	private static Jedis jedisHandler2=new Jedis("10.250.47.205",6379);
-	
-	public static Jedis getJedisHandler1() {
-		return jedisHandler1;
-	}
 
 	public DemoApp(MessageClient mc) {
 		init(mc);
@@ -98,8 +95,10 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String host="";
-		int port=0;
+		String host = "127.0.0.1";
+		int port = 4568;
+		Boolean affirm = true;
+		Boolean mainAffirm = true;
 		try {
 			// MessageClient mc = new MessageClient(host, port);
 			// DemoApp da = new DemoApp(mc);
@@ -108,14 +107,14 @@ public class DemoApp implements CommListener {
 			// da.ping(2);
 
 			// Logger.info("trying to connect to node " + );
-			if(jedisHandler1.ping().equals("PONG")){
-				host = jedisHandler1.get("1").split(":")[0];
-				port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
-			}else if(jedisHandler2.ping().equals("PONG")){
-				host = jedisHandler2.get("1").split(":")[0];
-				port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
-			}
-			
+			// if(jedisHandler1.ping().equals("PONG")){
+			// host = jedisHandler1.get("1").split(":")[0];
+			// port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
+			// }else if(jedisHandler2.ping().equals("PONG")){
+			// host = jedisHandler2.get("1").split(":")[0];
+			// port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
+			// }
+
 			EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 			Bootstrap b = new Bootstrap(); // (1)
@@ -134,33 +133,57 @@ public class DemoApp implements CommListener {
 			try {
 				int option = 0;
 				System.out.println("Welcome to Gossamer Distributed");
-				do {
-					System.out.println("Please choose an option to continue: ");
-					System.out.println("1. Read a file");
-					System.out.println("2. Write a file");
-					System.out.println("0. Exit");
-					option = reader.nextInt();
-					System.out.println("You entered " + option);
-					switch (option) {
-					case 1:
-						break;
-					case 2:
-						//For testing writes
-						//String path = runWriteTest();
-						System.out.println("Please enter directory (path) to upload:");
-						String path = reader.nextLine();
-						File file = new File(path);
-						long begin = System.currentTimeMillis();
-						System.out.println("Begin time");
-						System.out.println(begin);
-						sendFile(file);
-						System.out.println("File sent");
-						System.out.flush();
-						break;
+				System.out.println("Please choose an option to continue: ");
+				System.out.println("1. Read a file");
+				System.out.println("2. Write a file");
+				System.out.println("0. Exit");
+				option = reader.nextInt();
+				// option = 2;
+				// reader.nextLine();
+				System.out.println("You entered " + option);
+				System.out.println("Press Y to continue or any other key to cancel");
+
+				String ans = "";
+				// ans=reader.nextLine();
+				// ans = "Y";
+				if (ans.equals("Y")) {
+					mainAffirm = false;
+				}
+
+				String path = "";
+				switch (option) {
+				case 1:
+					break;
+				case 2:
+					// For testing writes
+					// String path = runWriteTest();
+
+					System.out.println("Please enter directory (path) to upload:");
+
+					// path = reader.nextLine();
+					// path = "C:\\Songs\\1.mp4";
+					System.in.read();
+
+					System.out.println("You entered" + path);
+
+					System.out.println("Press Y to continue or any other key to cancel");
+					affirm = false;
+					String ans1 = "";
+					ans1 = reader.next();
+					// ans1 = "Y";
+					if (ans1.equals("Y")) {
+						affirm = true;
 					}
-
-				} while (option != 0);
-
+					reader.close();
+					File file = new File(path);
+					long begin = System.currentTimeMillis();
+					System.out.println("Begin time");
+					System.out.println(begin);
+					sendFile(file);
+					System.out.println("File sent");
+					System.out.flush();
+					break;
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				System.out.println("Error occurred...");
@@ -168,18 +191,19 @@ public class DemoApp implements CommListener {
 				e.printStackTrace();
 			} finally {
 				System.out.println("Exiting...");
-				Thread.sleep(10 * 1000);
-				reader.close();
+				// Thread.sleep(10 * 1000);
 
 			}
 
 			// System.out.println("\n** exiting in 10 seconds. **");
 			// System.out.flush();
 			// Thread.sleep(10 * 1000);
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			e.printStackTrace();
 		} finally {
-			CommConnection.getInstance().release();
+			// CommConnection.getInstance().release();
 		}
 	}
 
@@ -214,7 +238,7 @@ public class DemoApp implements CommListener {
 		try {
 			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
 			String name = file.getName();
-
+			String hash = getHashFileName(name);
 			int tmp = 0;
 			while ((tmp = bis.read(buffer)) > 0) {
 				try {
@@ -227,10 +251,13 @@ public class DemoApp implements CommListener {
 			}
 
 			for (int i = 0; i < chunksFile.size(); i++) {
-				CommandMessage commMsg = MessageClient.sendWriteRequest(chunksFile.get(i), name, numChunks, i + 1);
+				CommandMessage commMsg = MessageClient.sendWriteRequest(chunksFile.get(i), hash, name, numChunks,
+						i + 1);
 				WriteChannel myCallable = new WriteChannel(commMsg, channel);
 				futuresList.add(myCallable);
 			}
+
+			System.out.println("No. of chunks: " + futuresList.size());
 
 			long start = System.currentTimeMillis();
 			System.out.print(start);
@@ -244,5 +271,31 @@ public class DemoApp implements CommListener {
 			ex.printStackTrace();
 		}
 
+	}
+
+	private static String getHashFileName(String name) {
+		// TODO Auto-generated method stub
+
+		MessageDigest digest = null;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		digest.reset();
+
+		digest.update(name.getBytes());
+		byte[] bs = digest.digest();
+
+		BigInteger bigInt = new BigInteger(1, bs);
+		String hashText = bigInt.toString(16);
+
+		// Zero pad until 32 chars
+		while (hashText.length() < 32) {
+			hashText = "0" + hashText;
+		}
+
+		return hashText;
 	}
 }
