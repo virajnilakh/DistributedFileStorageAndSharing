@@ -87,7 +87,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				System.out.println("Processing the message:");
 				state.handleMessage(channel,msg);
 			}else if(msg.getLeaderStatus().getState()==LeaderState.LEADERALIVE){
-				System.out.println("Heartbeat from leader...Resetting the timmer:");
+				System.out.println("Heartbeat from leader "+msg.getLeaderStatus().getLeaderId()+"...Resetting the timmer:");
 				state.getElecHandler().getTimer().cancel();
 				state.getElecHandler().setTimer();
 			}else if (msg.hasBeat()) {
