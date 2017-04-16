@@ -200,11 +200,11 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				            // Start the client.
 				            //System.out.println("Connect to a node.");
 
-				            final ChannelFuture f = b.connect(host, port).sync();
-				            ei.setChannel(f.channel());
+				            final ChannelFuture f = b.connect(host, port);
+				            /*ei.setChannel(f.channel());
 				            ei.setActive(true);
-				            activeOutboundEdges++;
-				            /*f.addListener(new FutureListener<Void>() {
+				            activeOutboundEdges++;*/
+				            f.addListener(new FutureListener<Void>() {
 
 				                @Override
 				                public void operationComplete(Future<Void> future) throws Exception {
@@ -218,7 +218,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 							            activeOutboundEdges++;
 				                    }
 				                }
-				            });	*/			            
+				            });			            
 				            
 				            // Wait until the connection is closed.
 				            //f.channel().closeFuture().sync();
