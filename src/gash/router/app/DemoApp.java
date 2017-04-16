@@ -45,7 +45,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import redis.clients.jedis.Jedis;
+
 import routing.Pipe.CommandMessage;
 
 public class DemoApp implements CommListener {

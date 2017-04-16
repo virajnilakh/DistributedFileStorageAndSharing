@@ -90,12 +90,9 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				System.out.println("Heartbeat from leader "+msg.getLeaderStatus().getLeaderId()+"...Resetting the timmer:");
 				state.getElecHandler().getTimer().cancel();
 				state.getElecHandler().setTimer();
-				
 			}else if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
-				logger.info("heartbeat from " + msg.getHeader().getNodeId());
-				state.getEmon().getTimer(msg.getHeader().getNodeId()).cancel();
-				state.getEmon().setTimer(msg.getHeader().getNodeId());
+				logger.debug("heartbeat from " + msg.getHeader().getNodeId());
 			} else if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
 				boolean p = msg.getPing();
