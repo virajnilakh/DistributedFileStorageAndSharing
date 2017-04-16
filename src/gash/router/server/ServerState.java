@@ -50,7 +50,7 @@ public class ServerState {
 	
 	public ServerState() throws UnknownHostException{
 		//ipAddress=LocalAddress.getLocalHostLANAddress().getHostAddress();
-		ipAddress="169.254.214.175";
+		ipAddress=InetAddress.getLocalHost().getHostAddress();
 		System.out.println(LocalAddress.getLocalHostLANAddress().getHostAddress());
 		reqVote=new HandleVoteRequestState(this);
 		resLeader=new HandleLeaderResponseState(this);
