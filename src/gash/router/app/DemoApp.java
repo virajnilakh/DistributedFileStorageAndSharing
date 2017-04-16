@@ -48,11 +48,18 @@ import routing.Pipe.CommandMessage;
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
-	private static Jedis jedisHandler1=new Jedis("10.250.47.208",6379);
-	private static Jedis jedisHandler2=new Jedis("10.250.47.205",6379);
-	
+	private static Jedis jedisHandler1=new Jedis("169.254.214.175",6379);
+	private static Jedis jedisHandler2=new Jedis("169.254.56.202",6379);
+	private static Jedis jedisHandler3=new Jedis("169.254.80.87",6379);
+
 	public static Jedis getJedisHandler1() {
 		return jedisHandler1;
+	}
+	public static Jedis getJedisHandler2() {
+		return jedisHandler2;
+	}
+	public static Jedis getJedisHandler3() {
+		return jedisHandler3;
 	}
 
 	public DemoApp(MessageClient mc) {
@@ -114,6 +121,9 @@ public class DemoApp implements CommListener {
 			}else if(jedisHandler2.ping().equals("PONG")){
 				host = jedisHandler2.get("1").split(":")[0];
 				port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
+			}else if(jedisHandler3.ping().equals("PONG")){
+				host = jedisHandler3.get("1").split(":")[0];
+				port = Integer.parseInt(jedisHandler3.get("1").split(":")[1]);
 			}
 			
 			EventLoopGroup workerGroup = new NioEventLoopGroup();
