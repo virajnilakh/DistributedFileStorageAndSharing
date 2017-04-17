@@ -15,9 +15,14 @@
  */
 package gash.router.server;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,6 +41,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.ByteString;
 
+import gash.router.client.MessageClient;
 import gash.router.client.WriteChannel;
 import gash.router.container.RoutingConf;
 import global.Constants;
@@ -250,8 +256,55 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		}
 
 		System.out.flush();
+		
 	}
+	private static void sendReadCommand(File file,Channel channel) {
+		// TODO Auto-generated method stub
 
+		ArrayList<ByteString> chunksFile = new ArrayList<ByteString>();
+		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
+		int sizeChunks = Constants.sizeOfChunk;
+		int numChunks = 0;
+		byte[] buffer = new byte[sizeChunks];
+
+		try {
+			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+			String name = file.getName();
+			String hash = getHashFileName(name);
+			int tmp = 0;
+			while ((tmp = bis.read(buffer)) > 0) {
+				try {
+					ByteString bs = ByteString.copyFrom(buffer, 0, tmp);
+					chunksFile.add(bs);
+					numChunks++;
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+
+			for (int i = 0; i < chunksFile.size(); i++) {
+				CommandMessage commMsg = MessageClient.sendWriteRequest(chunksFile.get(i), hash, name, numChunks,
+						i + 1);
+				WriteChannel myCallable = new WriteChannel(commMsg, channel);
+				futuresList.add(myCallable);
+			}
+
+			System.out.println("No. of chunks: " + futuresList.size());
+
+			long start = System.currentTimeMillis();
+			System.out.print(start);
+			System.out.println("Start send");
+
+			List<Future<Long>> futures = service.invokeAll(futuresList);
+			System.out.println("Completed tasks");
+			service.shutdown();
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+	}
 	private WorkMessage SendWriteWorkMessage(CommandMessage msg) {
 		// TODO Auto-generated method stub
 
@@ -339,6 +392,31 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		comm.setHeader(header);
 		comm.setResMsg(res);
 		return comm.build();
+	}
+	private static String getHashFileName(String name) {
+		// TODO Auto-generated method stub
+
+		MessageDigest digest = null;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		digest.reset();
+
+		digest.update(name.getBytes());
+		byte[] bs = digest.digest();
+
+		BigInteger bigInt = new BigInteger(1, bs);
+		String hashText = bigInt.toString(16);
+
+		// Zero pad until 32 chars
+		while (hashText.length() < 32) {
+			hashText = "0" + hashText;
+		}
+
+		return hashText;
 	}
 
 	/**
