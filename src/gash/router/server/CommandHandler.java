@@ -100,6 +100,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			System.out.println("Message received :" + msg.getReqMsg().getRwb().getChunk().getChunkId());
 			PrintUtil.printCommand(msg);
 			lstMsg.add(msg);
+			ServerState.getEmon().broadcast(msg);
 			System.out.println("List size is: ");
 			System.out.println(lstMsg.size());
 			String storeStr = new String(msg.getReqMsg().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");

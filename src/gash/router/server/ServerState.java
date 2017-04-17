@@ -34,7 +34,7 @@ public class ServerState {
 	private Jedis jedisHandler1=null;
 	private Jedis jedisHandler2=null;
 	private RoutingConf conf;
-	private EdgeMonitor emon;
+	private static EdgeMonitor emon;
 	private TaskList tasks;
 	private boolean hasLeader=false;
 	private int leaderId=0;
@@ -179,12 +179,12 @@ public class ServerState {
 		this.conf = conf;
 	}
 
-	public EdgeMonitor getEmon() {
+	public static EdgeMonitor getEmon() {
 		return emon;
 	}
 
-	public void setEmon(EdgeMonitor emon) {
-		this.emon = emon;
+	public static void setEmon(EdgeMonitor emon) {
+		emon = emon;
 	}
 
 	public TaskList getTasks() {
