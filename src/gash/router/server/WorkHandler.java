@@ -60,7 +60,7 @@ import routing.Pipe.CommandMessage;
 public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	protected static Logger logger = LoggerFactory.getLogger("work");
 	protected ArrayList<ByteString> chunkedFile = new ArrayList<ByteString>();
-	protected ArrayList<CommandMessage> lstMsg = new ArrayList<CommandMessage>();
+	protected ArrayList<WorkMessage> lstMsg = new ArrayList<WorkMessage>();
 	private static Jedis jedisHandler1 = new Jedis("localhost", 6379);
 	List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
 	ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -143,17 +143,17 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 
 				System.out.println("All chunks received");
 				// Sorting
-				Collections.sort(lstMsg, new Comparator<CommandMessage>() {
+				Collections.sort(lstMsg, new Comparator<WorkMessage>() {
 					@Override
-					public int compare(CommandMessage msg1, CommandMessage msg2) {
-						return Integer.compare(msg1.getReqMsg().getRwb().getChunk().getChunkId(),
-								msg2.getReqMsg().getRwb().getChunk().getChunkId());
+					public int compare(WorkMessage msg1, WorkMessage msg2) {
+						return Integer.compare(msg1.getReq().getRwb().getChunk().getChunkId(),
+								msg2.getReq().getRwb().getChunk().getChunkId());
 					}
 				});
 
 				System.out.println("All chunks sorted");
-				for (CommandMessage message : lstMsg) {
-					chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
+				for (WorkMessage message : lstMsg) {
+					chunkedFile.add(message.getReq().getRwb().getChunk().getChunkData());
 				}
 				System.out.println("Chunked file created");
 
@@ -180,7 +180,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 
 				// Cleanup
 				chunkedFile = new ArrayList<ByteString>();
-				lstMsg = new ArrayList<CommandMessage>();
+				lstMsg = new ArrayList<WorkMessage>();
 				futuresList = new ArrayList<WriteChannel>();
 
 			}
@@ -247,132 +247,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		handleMessage(msg, ctx.channel());
 	}
 
-	protected void channelRead0(ChannelHandlerContext ctx, CommandMessage msg) throws Exception {
-		handleMessage(msg, ctx.channel());
-	}
-
-	private void handleMessage(CommandMessage msg, Channel channel) throws IOException {
-
-		if (msg == null) {
-			System.out.println("ERROR: Unexpected content - " + msg);
-			return;
-		}
-
-		if (msg.getReqMsg().getRequestType() == Request.RequestType.READFILE) {
-
-		}
-
-		if (msg.getReqMsg().getRequestType() == Request.RequestType.WRITEFILE) {
-
-			System.out.println("Message received :" + msg.getReqMsg().getRwb().getChunk().getChunkId());
-			PrintUtil.printCommand(msg);
-			lstMsg.add(msg);
-			System.out.println("List size is: ");
-			System.out.println(lstMsg.size());
-			String storeStr = new String(msg.getReqMsg().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
-			System.out.println("No. of chunks" + String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
-			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "name", msg.getReqMsg().getRwb().getFilename());
-			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileId());
-			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileExt());
-			// Uncomment to store chunk data
-			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()),storeStr);
-			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getChunk().getChunkData());
-			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "numChunks",
-					String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
-
-			Map<String, String> map = jedisHandler1.hgetAll(msg.getReqMsg().getRwb().getFileId());
-			String temp = map.get("chunks");
-
-			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "chunks",
-					temp + "," + String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()));
-
-			if (lstMsg.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
-
-				System.out.println("Checking if chunks exist");
-				try {
-					if (!jedisHandler1.exists(msg.getReqMsg().getRwb().getFileId())) {
-						// return null;
-						System.out.println("Does not exists");
-					}
-					System.out.println("Printing map");
-
-					Map<String, String> map1 = jedisHandler1.hgetAll(msg.getReqMsg().getRwb().getFileId());
-
-					System.out.println(new PrettyPrintingMap<String, String>(map1));
-
-				} catch (JedisConnectionException exception) {
-					// Do stuff
-				} finally {
-					// Clean up
-				}
-
-				System.out.println("All chunks received");
-				// Sorting
-				Collections.sort(lstMsg, new Comparator<CommandMessage>() {
-					@Override
-					public int compare(CommandMessage msg1, CommandMessage msg2) {
-						return Integer.compare(msg1.getReqMsg().getRwb().getChunk().getChunkId(),
-								msg2.getReqMsg().getRwb().getChunk().getChunkId());
-					}
-				});
-
-				System.out.println("All chunks sorted");
-				for (CommandMessage message : lstMsg) {
-					chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
-				}
-				System.out.println("Chunked file created");
-
-				File directory = new File(Constants.dataDir);
-				if (!directory.exists()) {
-					directory.mkdir();
-					// If you require it to make the entire directory path
-					// including parents,
-					// use directory.mkdirs(); here instead.
-				}
-
-				File file = new File(Constants.dataDir + msg.getReqMsg().getRwb().getFilename());
-				file.createNewFile();
-				System.out.println("File created in Gossamer dir");
-				FileOutputStream outputStream = new FileOutputStream(file);
-				ByteString bs = ByteString.copyFrom(chunkedFile);
-				outputStream.write(bs.toByteArray());
-				outputStream.flush();
-				outputStream.close();
-				System.out.println("File created");
-				long end = System.currentTimeMillis();
-				System.out.println("End time");
-				System.out.println(end);
-
-				// Cleanup
-				chunkedFile = new ArrayList<ByteString>();
-				lstMsg = new ArrayList<CommandMessage>();
-				futuresList = new ArrayList<WriteChannel>();
-
-			}
-		}
-
-		try {
-			if (msg.hasPing()) {
-				logger.info("ping from " + msg.getHeader().getNodeId());
-			} else if (msg.hasMessage()) {
-				logger.info(msg.getMessage());
-			} else {
-			}
-
-		} catch (Exception e) {
-			// TODO add logging
-			Failure.Builder eb = Failure.newBuilder();
-			eb.setId(conf.getNodeId());
-			eb.setRefId(msg.getHeader().getNodeId());
-			eb.setMessage(e.getMessage());
-			CommandMessage.Builder rb = CommandMessage.newBuilder(msg);
-			rb.setErr(eb);
-			channel.write(rb.build());
-		}
-
-		System.out.flush();
-
-	}
+	
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
