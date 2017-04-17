@@ -27,14 +27,21 @@ message WorkMessage {
    required Header header = 1;
    required int64 secret = 2;
    required LeaderStatus leaderStatus = 8;
-	
+   optional RequestType requestType = 3; 
+   
+   enum RequestType {
+  READFILE = 1;
+  WRITEFILE = 2;
+  DELETEFILE = 3;
+  UPDATEFILE = 4;
+  }	
    /**
     * The actions (request or response) is
     * implicit through which data structure is in the payload.
     */
 
    oneof payload {
-      Failure err = 3;
+      Failure err = 13;
 
       // a sanity check for testing
       bool ping = 4;
@@ -45,6 +52,7 @@ message WorkMessage {
       Task task = 6;
       WorkState state = 7;
       ElectionMessage electionMessage= 9;
-
+      
+      Request req=10;
    }
 }
