@@ -183,8 +183,8 @@ public class ServerState {
 		return emon;
 	}
 
-	public static void setEmon(EdgeMonitor emon) {
-		emon = emon;
+	public static void setEmon(EdgeMonitor em) {
+		emon = em;
 	}
 
 	public TaskList getTasks() {
