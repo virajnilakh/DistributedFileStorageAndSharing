@@ -203,6 +203,8 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					
 					
 					if (ei.isActive() && ei.getChannel() != null) {
+						WorkMessage wmhb=state.getEmon().createHB(state.getConf().getNodeId());
+						ei.getChannel().writeAndFlush(wmhb);
 						if(state.isLeader()){
 							WorkMessage wm = createHB(ei);
 							System.out.println("---Leader "+state.getLeaderId()+" sending heartbeat---");
@@ -285,7 +287,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
         }
         @Override
         public void run(){
-        	System.out.println("Node "+nodeId+"dead");
+        	//System.out.println("Node "+nodeId+"dead");
         	outboundEdges.map.get(nodeId).setChannel(null);;
         	outboundEdges.map.get(nodeId).setActive(false);
         	this.cancel();
