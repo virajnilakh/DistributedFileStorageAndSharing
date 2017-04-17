@@ -106,6 +106,23 @@ public class DemoApp implements CommListener {
 		Boolean mainAffirm = true;
 		Scanner reader = new Scanner(System.in);
 		try {
+			if(jedisHandler1.ping().equals("PONG")){
+				host = jedisHandler1.get("1").split(":")[0];
+				port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
+				 }
+			EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+			Bootstrap b = new Bootstrap(); // (1)
+			b.group(workerGroup); // (2)
+			b.channel(NioSocketChannel.class); // (3)
+			b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+			b.handler(new CommandInit(null, false));
+
+			// Start the client.
+			System.out.println("Connect to a node.");
+
+			ChannelFuture f = b.connect(host, port).sync(); // (5)
+			channel = f.channel();
 			// do {
 			int option = 0;
 			System.out.println("Welcome to Gossamer Distributed");
