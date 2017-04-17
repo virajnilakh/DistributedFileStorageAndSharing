@@ -84,12 +84,106 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	 * override this method to provide processing behavior. T
 	 *
 	 * @param msg
+	 * @throws IOException
 	 */
-	public void handleMessage(WorkMessage msg, Channel channel) {
+	public void handleMessage(WorkMessage msg, Channel channel) throws IOException {
 		if (msg == null) {
 			// TODO add logging
 			System.out.println("ERROR: Unexpected content  - " + msg);
 			return;
+		}
+
+		if (msg.getReq().getRequestType() == Request.RequestType.WRITEFILE) {
+
+			// WorkMessage wm=SendWriteWorkMessage(msg);
+			// System.out.println("File replicated");
+
+			// System.out.println("Message received :" +
+			// msg.getReqMsg().getRwb().getChunk().getChunkId());
+			// PrintUtil.printCommand(msg);
+
+			System.out.println("List size is: ");
+			System.out.println(lstMsg.size());
+			String storeStr = new String(msg.getReq().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
+			System.out.println("No. of chunks" + String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
+			jedisHandler1.hset(msg.getReq().getRwb().getFileId(), "name", msg.getReq().getRwb().getFilename());
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileId());
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileExt());
+			// Uncomment to store chunk data
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()),storeStr);
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getChunk().getChunkData());
+			jedisHandler1.hset(msg.getReq().getRwb().getFileId(), "numChunks",
+					String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
+
+			Map<String, String> map = jedisHandler1.hgetAll(msg.getReq().getRwb().getFileId());
+			String temp = map.get("chunks");
+
+			jedisHandler1.hset(msg.getReq().getRwb().getFileId(), "chunks",
+					temp + "," + String.valueOf(msg.getReq().getRwb().getChunk().getChunkId()));
+
+			if (lstMsg.size() == msg.getReq().getRwb().getNumOfChunks()) {
+
+				System.out.println("Checking if chunks exist");
+				try {
+					if (!jedisHandler1.exists(msg.getReq().getRwb().getFileId())) {
+						// return null;
+						System.out.println("Does not exists");
+					}
+					System.out.println("Printing map");
+
+					Map<String, String> map1 = jedisHandler1.hgetAll(msg.getReq().getRwb().getFileId());
+
+					System.out.println(new PrettyPrintingMap<String, String>(map1));
+
+				} catch (JedisConnectionException exception) {
+					// Do stuff
+				} finally {
+					// Clean up
+				}
+
+				System.out.println("All chunks received");
+				// Sorting
+				Collections.sort(lstMsg, new Comparator<CommandMessage>() {
+					@Override
+					public int compare(CommandMessage msg1, CommandMessage msg2) {
+						return Integer.compare(msg1.getReqMsg().getRwb().getChunk().getChunkId(),
+								msg2.getReqMsg().getRwb().getChunk().getChunkId());
+					}
+				});
+
+				System.out.println("All chunks sorted");
+				for (CommandMessage message : lstMsg) {
+					chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
+				}
+				System.out.println("Chunked file created");
+
+				File directory = new File(Constants.dataDir);
+				if (!directory.exists()) {
+					directory.mkdir();
+					// If you require it to make the entire directory path
+					// including parents,
+					// use directory.mkdirs(); here instead.
+				}
+
+				File file = new File(Constants.dataDir + msg.getReq().getRwb().getFilename());
+				file.createNewFile();
+				System.out.println("File created in Gossamer dir");
+				FileOutputStream outputStream = new FileOutputStream(file);
+				ByteString bs = ByteString.copyFrom(chunkedFile);
+				outputStream.write(bs.toByteArray());
+				outputStream.flush();
+				outputStream.close();
+				System.out.println("File created");
+				long end = System.currentTimeMillis();
+				System.out.println("End time");
+				System.out.println(end);
+
+				// Cleanup
+				chunkedFile = new ArrayList<ByteString>();
+				lstMsg = new ArrayList<CommandMessage>();
+				futuresList = new ArrayList<WriteChannel>();
+
+			}
 		}
 
 		if (debug)

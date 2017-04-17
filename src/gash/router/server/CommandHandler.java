@@ -23,12 +23,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
+import redis.clients.jedis.ScanParams;
+import redis.clients.jedis.ScanResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +50,9 @@ import pipe.common.Common.Request;
 import pipe.common.Common.Response;
 import pipe.common.Common.WriteBody;
 import pipe.common.Common.WriteResponse;
+import pipe.election.Election.LeaderStatus;
+import pipe.election.Election.LeaderStatus.LeaderState;
+import pipe.work.Work.WorkMessage;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import routing.Pipe.CommandMessage;
@@ -92,15 +97,44 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		if (msg.getReqMsg().getRequestType() == Request.RequestType.READFILE) {
 
+			if (msg.getReqMsg().getRrb().getFilename().equals("*")) {
+				System.out.println("Send all files message received");
+				ScanParams params = new ScanParams();
+				params.match("*");
+				// Use "0" to do a full iteration of the collection.
+				ScanResult<String> scanResult = jedisHandler1.scan("0", params);
+				List<String> keys = scanResult.getResult();
+				System.out.println("Key count " + keys.size());
+				Iterator<String> it = keys.iterator();
+				ArrayList<String> fileNames = new ArrayList<String>();
+				while (it.hasNext()) {
+					String s = it.next();
+					if (s.length() > 6) {
+						Map<String, String> map = jedisHandler1.hgetAll(s);
+						String temp = map.get("name");
+						fileNames.add(temp);
+						// System.out.println(temp);
+					}
+				}
+				// CommandMessage msg2 = createAllFilesResponse(fileNames);
+				String msg2 = createAllFilesResponse(fileNames);
+				channel.writeAndFlush(msg2);
+				System.out.println("Responses sent");
+			}
 		}
 
 		if (msg.getReqMsg().getRequestType() == Request.RequestType.WRITEFILE) {
+
+			WorkMessage wm = SendWriteWorkMessage(msg);
 			System.out.println("File replicated");
 
 			System.out.println("Message received :" + msg.getReqMsg().getRwb().getChunk().getChunkId());
 			PrintUtil.printCommand(msg);
+
 			lstMsg.add(msg);
-			ServerState.getEmon().broadcast(msg);
+			ServerState.getEmon().broadcast(wm);
+			System.out.println("Message broadcasted");
+
 			System.out.println("List size is: ");
 			System.out.println(lstMsg.size());
 			String storeStr = new String(msg.getReqMsg().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
@@ -216,6 +250,70 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		}
 
 		System.out.flush();
+	}
+
+	private WorkMessage SendWriteWorkMessage(CommandMessage msg) {
+		// TODO Auto-generated method stub
+
+		Header.Builder header = Header.newBuilder();
+		// ToDO: set correct nodeId
+		header.setNodeId(99);
+		header.setTime(System.currentTimeMillis());
+		header.setDestination(-1);
+
+		Chunk.Builder chunk = Chunk.newBuilder();
+		chunk.setChunkId(msg.getReqMsg().getRwb().getChunk().getChunkId());
+		chunk.setChunkData(msg.getReqMsg().getRwb().getChunk().getChunkData());
+
+		WriteBody.Builder body = WriteBody.newBuilder();
+		body.setFilename(msg.getReqMsg().getRwb().getFilename());
+		// File Id is the MD5 hash in string format of the file name
+		body.setFileId(msg.getReqMsg().getRwb().getFileId());
+		body.setNumOfChunks(msg.getReqMsg().getRwb().getNumOfChunks());
+		body.setChunk(chunk);
+
+		Request.Builder req = Request.newBuilder();
+		req.setRequestType(Request.RequestType.WRITEFILE);
+		req.setRwb(body);
+
+		LeaderStatus.Builder status = LeaderStatus.newBuilder();
+		status.setState(LeaderState.LEADERALIVE);
+
+		WorkMessage.Builder comm = WorkMessage.newBuilder();
+		comm.setHeader(header);
+		comm.setSecret(0);
+		comm.setLeaderStatus(status);
+		comm.setReq(req);
+		return comm.build();
+
+	}
+
+	private String createAllFilesResponse(ArrayList<String> fileNames) {
+		// TODO Auto-generated method stub
+		Header.Builder header = Header.newBuilder();
+		// ToDO: Set actual Node Id and hash as well
+		header.setNodeId(99);
+		header.setTime(System.currentTimeMillis());
+		header.setDestination(-1);
+		ReadResponse.Builder body = ReadResponse.newBuilder();
+		// body.setChunkId(chunkId, chunkId);
+		System.out.println("File names size:" + fileNames.size());
+		String fileName = "";
+		for (int i = 0; i < fileNames.size() - 1; i++) {
+			System.out.println(fileNames.get(i));
+			fileName += "," + fileNames.get(i);
+		}
+		// body.setFilename(0, fileName);
+		Response.Builder res = Response.newBuilder();
+		// res.setResponseType(Response.ResponseType.WRITEFILE);
+		// req.setRwb(body);
+		// res.setFilename(fileName);
+		res.setReadResponse(body);
+		CommandMessage.Builder comm = CommandMessage.newBuilder();
+		comm.setHeader(header);
+		comm.setResMsg(res);
+		// return comm.build();
+		return fileName;
 	}
 
 	public static CommandMessage createAckWriteRequest(String hash, String fileName, int chunkId) throws Exception {

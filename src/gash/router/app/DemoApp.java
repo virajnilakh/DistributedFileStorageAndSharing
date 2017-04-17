@@ -51,12 +51,12 @@ import routing.Pipe.CommandMessage;
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
-	private static Jedis jedisHandler1=new Jedis("localhost",6379);
-	
+	private static Jedis jedisHandler1 = new Jedis("localhost", 6379);
+
 	public static Jedis getJedisHandler1() {
 		return jedisHandler1;
 	}
-	
+
 	public DemoApp(MessageClient mc) {
 		init(mc);
 	}
@@ -104,114 +104,107 @@ public class DemoApp implements CommListener {
 		int port = 4568;
 		Boolean affirm = true;
 		Boolean mainAffirm = true;
+		Scanner reader = new Scanner(System.in);
 		try {
-			// MessageClient mc = new MessageClient(host, port);
-			// DemoApp da = new DemoApp(mc);
-
-			// do stuff w/ the connection
-			// da.ping(2);
-
-			// Logger.info("trying to connect to node " + );
-			if(jedisHandler1.ping().equals("PONG")){
-			host = jedisHandler1.get("1").split(":")[0];
-			port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
-			 }
-			EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-			Bootstrap b = new Bootstrap(); // (1)
-			b.group(workerGroup); // (2)
-			b.channel(NioSocketChannel.class); // (3)
-			b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-			b.handler(new CommandInit(null, false));
-
-			// Start the client.
-			System.out.println("Connect to a node.");
-
-			ChannelFuture f = b.connect(host, port).sync(); // (5)
-			channel = f.channel();
-
-			Scanner reader = new Scanner(System.in);
-			try {
-				do {
-					int option = 0;
-					System.out.println("Welcome to Gossamer Distributed");
-					System.out.println("Please choose an option to continue: ");
-					System.out.println("1. Read a file");
-					System.out.println("2. Write a file");
-					System.out.println("0. Exit");
-					option = reader.nextInt();
-					// option = 2;
-					// reader.nextLine();
-					System.out.println("You entered " + option);
-					System.out.println("Press Y to continue or any other key to cancel");
-					String ans = "";
-					ans = reader.nextLine();
-					// ans = "Y";
-					if (ans.equals("Y")) {
-						mainAffirm = false;
-					}
-					String path = "";
-					switch (option) {
-					case 1:
-						break;
-					case 2:
-						// For testing writes
-						// String path = runWriteTest();
-
-						System.out.println("Please enter directory (path) to upload:");
-
-						path = reader.nextLine();
-						// path = "C:\\Songs\\1.mp4";
-						// path = "C:\\JS\\test\\test.js";
-						// path = "C:\\Songs\\2.mp4";
-
-						System.in.read();
-
-						System.out.println("You entered" + path);
-
-						System.out.println("Press Y to continue or any other key to cancel");
-						affirm = false;
-						String ans1 = "";
-						ans1 = reader.next();
-						//ans1 = "Y";
-						if (ans1.equals("Y")) {
-							affirm = true;
-						}
-						reader.close();
-						File file = new File(path);
-						long begin = System.currentTimeMillis();
-						System.out.println("Begin time");
-						System.out.println(begin);
-						sendFile(file);
-						System.out.println("File sent");
-						System.out.flush();
-						break;
-
-					default:
-						break;
-					}
-				} while (true);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				System.out.println("Error occurred...");
-				Thread.sleep(10 * 1000);
-				e.printStackTrace();
-			} finally {
-				System.out.println("Exiting...");
-				// Thread.sleep(10 * 1000);
-
+			// do {
+			int option = 0;
+			System.out.println("Welcome to Gossamer Distributed");
+			System.out.println("Please choose an option to continue: ");
+			System.out.println("1. Read a file");
+			System.out.println("2. Write a file");
+			System.out.println("0. Exit");
+			option = reader.nextInt();
+			// option = 2;
+			// reader.nextLine();
+			System.out.println("You entered " + option);
+			System.out.println("Press Y to continue or any other key to cancel");
+			String ans = "";
+			ans = reader.nextLine();
+			// ans = "Y";
+			if (ans.equals("Y")) {
+				mainAffirm = false;
 			}
+			String path = "";
+			switch (option) {
+			case 1:
 
-			// System.out.println("\n** exiting in 10 seconds. **");
-			// System.out.flush();
-			// Thread.sleep(10 * 1000);
-		} catch (
+				System.out.println("Retreiving list of files stored...");
+				List<String> files = SendReadAllFileInfo(channel);
+				System.out.println("Please enter option of which file to fetch");
+				/*
+				 * for (int i = 0; i < files.size(); i++) { System.out.print(i +
+				 * "."); System.out.println(files.get(i)); }
+				 * 
+				 * int fileOption = reader.nextInt();
+				 * 
+				 * System.out.println("You entered " + files.get(fileOption));
+				 * 
+				 * System.out.
+				 * println("Press Y to continue or any other key to cancel" );
+				 * affirm = false; String ans1 = ""; ans1 = reader.next(); ans1
+				 * = "Y"; if (ans1.equals("Y")) { affirm = true; }
+				 */
+				break;
+			case 2:
+				// For testing writes
+				// String path = runWriteTest();
 
-		Exception e) {
+				System.out.println("Please enter directory (path) to upload:");
+
+				path = reader.nextLine();
+				// path = "C:\\Songs\\1.mp4";
+				// path = "C:\\JS\\test\\test.js";
+				// path = "C:\\Songs\\2.mp4";
+
+				System.in.read();
+
+				System.out.println("You entered" + path);
+
+				System.out.println("Press Y to continue or any other key to cancel");
+				affirm = false;
+				String ans2 = "";
+				ans2 = reader.next();
+				ans2 = "Y";
+				if (ans2.equals("Y")) {
+					affirm = true;
+				}
+				reader.close();
+				File file = new File(path);
+				long begin = System.currentTimeMillis();
+				System.out.println("Begin time");
+				System.out.println(begin);
+				sendFile(file);
+				System.out.println("File sent");
+				System.out.flush();
+				break;
+
+			default:
+				break;
+			}
+			// } while (true);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.out.println("Error occurred...");
+			//Thread.sleep(10 * 1000);
 			e.printStackTrace();
 		} finally {
-			// CommConnection.getInstance().release();
+			System.out.println("Exiting...");
+			// Thread.sleep(10 * 1000);
+
 		}
+
+		// System.out.println("\n** exiting in 10 seconds. **");
+		// System.out.flush();
+		// Thread.sleep(10 * 1000);
+	}
+
+	private static List<String> SendReadAllFileInfo(Channel channel) {
+		// TODO Auto-generated method stub
+		List<String> response = null;
+		CommandMessage msg = MessageClient.CreateReadAllMessage();
+		channel.writeAndFlush(msg);
+		System.out.println("Read all files request sent");
+		return response;
 	}
 
 	private static String runWriteTest() {
@@ -305,4 +298,12 @@ public class DemoApp implements CommListener {
 
 		return hashText;
 	}
+
+	@Override
+	public void onMessage(String msg) {
+		// TODO Auto-generated method stub
+		System.out.println("Files received");
+		System.out.println(msg);
+	}
+
 }

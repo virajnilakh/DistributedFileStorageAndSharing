@@ -33,4 +33,6 @@ public interface CommListener {
 	 *            structure
 	 */
 	public abstract void onMessage(CommandMessage msg);
+
+	public abstract void onMessage(String msg);
 }

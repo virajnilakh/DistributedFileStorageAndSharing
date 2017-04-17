@@ -116,6 +116,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			Channel ch=ei.getChannel();
 			ChannelFuture cf =null;
 			if(ch!=null){
+				System.out.println("Broadcast cmd msg");
 				cf= ch.write(msg);
 				ch.flush();
 				if (cf.isDone() && !cf.isSuccess()) {

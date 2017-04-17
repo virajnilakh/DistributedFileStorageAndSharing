@@ -25,6 +25,7 @@ READFILE = 1;
 WRITEFILE = 2;
 DELETEFILE = 3;
 UPDATEFILE = 4;
+GETFILES = 5;
 }
 oneof payload{
 WriteBody rwb = 4;
@@ -47,6 +48,8 @@ optional int32 num_of_chunks = 5;
 message WriteResponse {
 repeated int32 ChunkId=1;
 }
+
+
 message Chunk{
 required int32 chunk_id = 1;
 required bytes chunk_data = 6;
@@ -62,10 +65,10 @@ optional int64 chunk_size = 4;
 
 message ReadResponse{
 optional string file_id = 1;
-required string filename = 2;
+repeated string filename = 2;
 optional string file_ext= 3;
 optional int32 num_of_chunks = 4;
-repeated ChunkLocation chunk_location = 5;
+optional ChunkLocation chunk_location = 5;
 }
 
 message ChunkLocation{

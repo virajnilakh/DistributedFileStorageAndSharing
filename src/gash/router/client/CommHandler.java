@@ -74,7 +74,18 @@ public class CommHandler extends SimpleChannelInboundHandler<CommandMessage> {
 		System.out.println("--> got incoming message");
 		for (String id : listeners.keySet()) {
 			CommListener cl = listeners.get(id);
-
+			
+			// TODO this may need to be delegated to a thread pool to allow
+			// async processing of replies
+			cl.onMessage(msg);
+		}
+	}
+	
+	protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
+		System.out.println("--> got incoming message");
+		for (String id : listeners.keySet()) {
+			CommListener cl = listeners.get(id);
+			
 			// TODO this may need to be delegated to a thread pool to allow
 			// async processing of replies
 			cl.onMessage(msg);
