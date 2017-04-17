@@ -21,22 +21,32 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.ByteString;
 
+import gash.router.client.WriteChannel;
 import gash.router.container.RoutingConf;
+import global.Constants;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
+import pipe.common.Common.Request;
 import pipe.election.Election.LeaderStatus.LeaderState;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.Task;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkState;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 import routing.Pipe.CommandMessage;
 
 /**
@@ -49,17 +59,21 @@ import routing.Pipe.CommandMessage;
  */
 public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	protected static Logger logger = LoggerFactory.getLogger("work");
-	protected ArrayList<CommandMessage> lstMsg = new ArrayList<CommandMessage>();
 	protected ArrayList<ByteString> chunkedFile = new ArrayList<ByteString>();
+	protected ArrayList<CommandMessage> lstMsg = new ArrayList<CommandMessage>();
+	private static Jedis jedisHandler1 = new Jedis("localhost", 6379);
+	List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
+	ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	protected ServerState state;
 	protected boolean debug = false;
 	protected RoutingConf conf;
+
 	public WorkHandler(ServerState state) {
 		if (state != null) {
 			this.state = state;
 		}
 	}
-	
+
 	public WorkHandler(RoutingConf conf) {
 		if (conf != null) {
 			this.conf = conf;
@@ -83,14 +97,15 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 
 		// TODO How can you implement this without if-else statements?
 		try {
-			 if(msg.getHeader().hasElection()){
+			if (msg.getHeader().hasElection()) {
 				System.out.println("Processing the message:");
-				state.handleMessage(channel,msg);
-			}else if(msg.getLeaderStatus().getState()==LeaderState.LEADERALIVE){
-				System.out.println("Heartbeat from leader "+msg.getLeaderStatus().getLeaderId()+"...Resetting the timmer:");
+				state.handleMessage(channel, msg);
+			} else if (msg.getLeaderStatus().getState() == LeaderState.LEADERALIVE) {
+				System.out.println(
+						"Heartbeat from leader " + msg.getLeaderStatus().getLeaderId() + "...Resetting the timmer:");
 				state.getElecHandler().getTimer().cancel();
 				state.getElecHandler().setTimer();
-			}else if (msg.hasBeat()) {
+			} else if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
 				logger.debug("heartbeat from " + msg.getHeader().getNodeId());
 			} else if (msg.hasPing()) {
@@ -137,49 +152,111 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	protected void channelRead0(ChannelHandlerContext ctx, WorkMessage msg) throws Exception {
 		handleMessage(msg, ctx.channel());
 	}
+
 	protected void channelRead0(ChannelHandlerContext ctx, CommandMessage msg) throws Exception {
 		handleMessage(msg, ctx.channel());
 	}
 
 	private void handleMessage(CommandMessage msg, Channel channel) throws IOException {
-		// TODO Auto-generated method stub
-		
+
 		if (msg == null) {
 			System.out.println("ERROR: Unexpected content - " + msg);
 			return;
 		}
-		PrintUtil.printCommand(msg);
-		lstMsg.add(msg);
-		
-		if (chunkedFile.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
 
-			// Sorting
-			Collections.sort(lstMsg, new Comparator<CommandMessage>() {
-				@Override
-				public int compare(CommandMessage msg1, CommandMessage msg2) {
-					return Integer.compare(msg1.getReqMsg().getRwb().getChunk().getChunkId(),
-							msg2.getReqMsg().getRwb().getChunk().getChunkId());
-				}
-			});
+		if (msg.getReqMsg().getRequestType() == Request.RequestType.READFILE) {
 
-			for (CommandMessage message : lstMsg) {
-				chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
-			}
-
-			File file = new File("C:\\Gossamer\\" + msg.getReqMsg().getRwb().getFilename());
-			file.createNewFile();
-
-			FileOutputStream outputStream = new FileOutputStream(file);
-			ByteString bs = ByteString.copyFrom(chunkedFile);
-			outputStream.write(bs.toByteArray());
-			outputStream.flush();
-			outputStream.close();
-			System.out.println("File done");
-			long end = System.currentTimeMillis();
-			System.out.println("End time");
-			System.out.println(end);
 		}
-		
+
+		if (msg.getReqMsg().getRequestType() == Request.RequestType.WRITEFILE) {
+
+			System.out.println("Message received :" + msg.getReqMsg().getRwb().getChunk().getChunkId());
+			PrintUtil.printCommand(msg);
+			lstMsg.add(msg);
+			System.out.println("List size is: ");
+			System.out.println(lstMsg.size());
+			String storeStr = new String(msg.getReqMsg().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
+			System.out.println("No. of chunks" + String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
+			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "name", msg.getReqMsg().getRwb().getFilename());
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileId());
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileExt());
+			// Uncomment to store chunk data
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()),storeStr);
+			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getChunk().getChunkData());
+			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "numChunks",
+					String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
+
+			Map<String, String> map = jedisHandler1.hgetAll(msg.getReqMsg().getRwb().getFileId());
+			String temp = map.get("chunks");
+
+			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "chunks",
+					temp + "," + String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()));
+
+			if (lstMsg.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
+
+				System.out.println("Checking if chunks exist");
+				try {
+					if (!jedisHandler1.exists(msg.getReqMsg().getRwb().getFileId())) {
+						// return null;
+						System.out.println("Does not exists");
+					}
+					System.out.println("Printing map");
+
+					Map<String, String> map1 = jedisHandler1.hgetAll(msg.getReqMsg().getRwb().getFileId());
+
+					System.out.println(new PrettyPrintingMap<String, String>(map1));
+
+				} catch (JedisConnectionException exception) {
+					// Do stuff
+				} finally {
+					// Clean up
+				}
+
+				System.out.println("All chunks received");
+				// Sorting
+				Collections.sort(lstMsg, new Comparator<CommandMessage>() {
+					@Override
+					public int compare(CommandMessage msg1, CommandMessage msg2) {
+						return Integer.compare(msg1.getReqMsg().getRwb().getChunk().getChunkId(),
+								msg2.getReqMsg().getRwb().getChunk().getChunkId());
+					}
+				});
+
+				System.out.println("All chunks sorted");
+				for (CommandMessage message : lstMsg) {
+					chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
+				}
+				System.out.println("Chunked file created");
+
+				File directory = new File(Constants.dataDir);
+				if (!directory.exists()) {
+					directory.mkdir();
+					// If you require it to make the entire directory path
+					// including parents,
+					// use directory.mkdirs(); here instead.
+				}
+
+				File file = new File(Constants.dataDir + msg.getReqMsg().getRwb().getFilename());
+				file.createNewFile();
+				System.out.println("File created in Gossamer dir");
+				FileOutputStream outputStream = new FileOutputStream(file);
+				ByteString bs = ByteString.copyFrom(chunkedFile);
+				outputStream.write(bs.toByteArray());
+				outputStream.flush();
+				outputStream.close();
+				System.out.println("File created");
+				long end = System.currentTimeMillis();
+				System.out.println("End time");
+				System.out.println(end);
+
+				// Cleanup
+				chunkedFile = new ArrayList<ByteString>();
+				lstMsg = new ArrayList<CommandMessage>();
+				futuresList = new ArrayList<WriteChannel>();
+
+			}
+		}
+
 		try {
 			if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
@@ -200,7 +277,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		}
 
 		System.out.flush();
-		
+
 	}
 
 	@Override

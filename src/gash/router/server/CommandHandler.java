@@ -95,6 +95,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		}
 
 		if (msg.getReqMsg().getRequestType() == Request.RequestType.WRITEFILE) {
+			System.out.println("File replicated");
 
 			System.out.println("Message received :" + msg.getReqMsg().getRwb().getChunk().getChunkId());
 			PrintUtil.printCommand(msg);

@@ -138,14 +138,14 @@ public class DemoApp implements CommListener {
 					System.out.println("1. Read a file");
 					System.out.println("2. Write a file");
 					System.out.println("0. Exit");
-					// option = reader.nextInt();
-					option = 2;
+					option = reader.nextInt();
+					// option = 2;
 					// reader.nextLine();
 					System.out.println("You entered " + option);
 					System.out.println("Press Y to continue or any other key to cancel");
 					String ans = "";
-					// ans=reader.nextLine();
-					ans = "Y";
+					ans = reader.nextLine();
+					// ans = "Y";
 					if (ans.equals("Y")) {
 						mainAffirm = false;
 					}
@@ -159,10 +159,10 @@ public class DemoApp implements CommListener {
 
 						System.out.println("Please enter directory (path) to upload:");
 
-						// path = reader.nextLine();
+						path = reader.nextLine();
 						// path = "C:\\Songs\\1.mp4";
 						// path = "C:\\JS\\test\\test.js";
-						path = "C:\\Songs\\2.mp4";
+						// path = "C:\\Songs\\2.mp4";
 
 						System.in.read();
 
@@ -172,7 +172,7 @@ public class DemoApp implements CommListener {
 						affirm = false;
 						String ans1 = "";
 						ans1 = reader.next();
-						ans1 = "Y";
+						//ans1 = "Y";
 						if (ans1.equals("Y")) {
 							affirm = true;
 						}
