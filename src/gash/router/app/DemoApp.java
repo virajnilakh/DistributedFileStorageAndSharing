@@ -33,11 +33,11 @@ import com.google.protobuf.ByteString;
 
 import gash.router.client.CommConnection;
 import gash.router.client.CommListener;
+import global.Constants;
 import gash.router.client.MessageClient;
 import gash.router.client.WriteChannel;
 import gash.router.server.CommandInit;
 import gash.router.server.WorkInit;
-import global.Constants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -51,19 +51,6 @@ import routing.Pipe.CommandMessage;
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
-	private static Jedis jedisHandler1=new Jedis("169.254.214.175",6379);
-	private static Jedis jedisHandler2=new Jedis("169.254.56.202",6379);
-	private static Jedis jedisHandler3=new Jedis("169.254.80.87",6379);
-
-	public static Jedis getJedisHandler1() {
-		return jedisHandler1;
-	}
-	public static Jedis getJedisHandler2() {
-		return jedisHandler2;
-	}
-	public static Jedis getJedisHandler3() {
-		return jedisHandler3;
-	}
 
 	public DemoApp(MessageClient mc) {
 		init(mc);
@@ -120,17 +107,14 @@ public class DemoApp implements CommListener {
 			// da.ping(2);
 
 			// Logger.info("trying to connect to node " + );
-			if(jedisHandler1.ping().equals("PONG")){
-				host = jedisHandler1.get("1").split(":")[0];
-				port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
-			}else if(jedisHandler2.ping().equals("PONG")){
-				host = jedisHandler2.get("1").split(":")[0];
-				port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
-			}else if(jedisHandler3.ping().equals("PONG")){
-				host = jedisHandler3.get("1").split(":")[0];
-				port = Integer.parseInt(jedisHandler3.get("1").split(":")[1]);
-			}
-			
+			// if(jedisHandler1.ping().equals("PONG")){
+			// host = jedisHandler1.get("1").split(":")[0];
+			// port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
+			// }else if(jedisHandler2.ping().equals("PONG")){
+			// host = jedisHandler2.get("1").split(":")[0];
+			// port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
+			// }
+
 			EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 			Bootstrap b = new Bootstrap(); // (1)
@@ -147,59 +131,65 @@ public class DemoApp implements CommListener {
 
 			Scanner reader = new Scanner(System.in);
 			try {
-				int option = 0;
-				System.out.println("Welcome to Gossamer Distributed");
-				System.out.println("Please choose an option to continue: ");
-				System.out.println("1. Read a file");
-				System.out.println("2. Write a file");
-				System.out.println("0. Exit");
-				option = reader.nextInt();
-				// option = 2;
-				// reader.nextLine();
-				System.out.println("You entered " + option);
-				System.out.println("Press Y to continue or any other key to cancel");
-
-				String ans = "";
-				// ans=reader.nextLine();
-				// ans = "Y";
-				if (ans.equals("Y")) {
-					mainAffirm = false;
-				}
-
-				String path = "";
-				switch (option) {
-				case 1:
-					break;
-				case 2:
-					// For testing writes
-					// String path = runWriteTest();
-
-					System.out.println("Please enter directory (path) to upload:");
-
-					// path = reader.nextLine();
-					// path = "C:\\Songs\\1.mp4";
-					System.in.read();
-
-					System.out.println("You entered" + path);
-
+				do {
+					int option = 0;
+					System.out.println("Welcome to Gossamer Distributed");
+					System.out.println("Please choose an option to continue: ");
+					System.out.println("1. Read a file");
+					System.out.println("2. Write a file");
+					System.out.println("0. Exit");
+					// option = reader.nextInt();
+					option = 2;
+					// reader.nextLine();
+					System.out.println("You entered " + option);
 					System.out.println("Press Y to continue or any other key to cancel");
-					affirm = false;
-					String ans1 = "";
-					ans1 = reader.next();
-					// ans1 = "Y";
-					if (ans1.equals("Y")) {
-						affirm = true;
+					String ans = "";
+					// ans=reader.nextLine();
+					ans = "Y";
+					if (ans.equals("Y")) {
+						mainAffirm = false;
 					}
-					reader.close();
-					File file = new File(path);
-					long begin = System.currentTimeMillis();
-					System.out.println("Begin time");
-					System.out.println(begin);
-					sendFile(file);
-					System.out.println("File sent");
-					System.out.flush();
-					break;
-				}
+					String path = "";
+					switch (option) {
+					case 1:
+						break;
+					case 2:
+						// For testing writes
+						// String path = runWriteTest();
+
+						System.out.println("Please enter directory (path) to upload:");
+
+						// path = reader.nextLine();
+						// path = "C:\\Songs\\1.mp4";
+						// path = "C:\\JS\\test\\test.js";
+						path = "C:\\Songs\\2.mp4";
+
+						System.in.read();
+
+						System.out.println("You entered" + path);
+
+						System.out.println("Press Y to continue or any other key to cancel");
+						affirm = false;
+						String ans1 = "";
+						ans1 = reader.next();
+						ans1 = "Y";
+						if (ans1.equals("Y")) {
+							affirm = true;
+						}
+						reader.close();
+						File file = new File(path);
+						long begin = System.currentTimeMillis();
+						System.out.println("Begin time");
+						System.out.println(begin);
+						sendFile(file);
+						System.out.println("File sent");
+						System.out.flush();
+						break;
+
+					default:
+						break;
+					}
+				} while (true);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				System.out.println("Error occurred...");
