@@ -101,6 +101,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			// System.out.println("Message received :" +
 			// msg.getReqMsg().getRwb().getChunk().getChunkId());
 			// PrintUtil.printCommand(msg);
+			lstMsg.add(msg);
 
 			System.out.println("List size is: ");
 			System.out.println(lstMsg.size());

@@ -123,6 +123,7 @@ public class DemoApp implements CommListener {
 
 			ChannelFuture f = b.connect(host, port).sync(); // (5)
 			channel = f.channel();
+			
 			// do {
 			int option = 0;
 			System.out.println("Welcome to Gossamer Distributed");
