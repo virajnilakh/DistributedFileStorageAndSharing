@@ -36,6 +36,7 @@ import com.google.protobuf.ByteString;
 
 import gash.router.client.WriteChannel;
 import gash.router.container.RoutingConf;
+import global.Constants;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -135,9 +136,8 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 					System.out.println("Printing map");
 
 					Map<String, String> map1 = jedisHandler1.hgetAll(msg.getReqMsg().getRwb().getFileId());
-					
+
 					System.out.println(new PrettyPrintingMap<String, String>(map1));
-					
 
 				} catch (JedisConnectionException exception) {
 					// Do stuff
@@ -160,7 +160,16 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 					chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
 				}
 				System.out.println("Chunked file created");
-				File file = new File("C:\\Gossamer\\" + msg.getReqMsg().getRwb().getFilename());
+
+				File directory = new File(Constants.dataDir);
+				if (!directory.exists()) {
+					directory.mkdir();
+					// If you require it to make the entire directory path
+					// including parents,
+					// use directory.mkdirs(); here instead.
+				}
+
+				File file = new File(Constants.dataDir + msg.getReqMsg().getRwb().getFilename());
 				file.createNewFile();
 				System.out.println("File created in Gossamer dir");
 				FileOutputStream outputStream = new FileOutputStream(file);
