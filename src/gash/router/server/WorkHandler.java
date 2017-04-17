@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -202,7 +203,13 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				state.getElecHandler().setTimer();
 			} else if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
-				logger.debug("heartbeat from " + msg.getHeader().getNodeId());
+				logger.info("heartbeat from " + msg.getHeader().getNodeId());
+				Timer t=state.getEmon().getTimer(msg.getHeader().getNodeId());
+				if(t!=null){
+				t.cancel();
+				t=null;
+				}
+				state.getEmon().setTimer(msg.getHeader().getNodeId());
 			} else if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
 				boolean p = msg.getPing();
