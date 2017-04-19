@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import com.google.protobuf.ByteString;
 
 import gash.router.client.CommConnection;
+import gash.router.client.CommInit;
 import gash.router.client.CommListener;
 import global.Constants;
 import gash.router.client.MessageClient;
@@ -45,15 +46,19 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import pipe.common.Common.Header;
+import pipe.common.Common.ReadBody;
+import pipe.common.Common.Request;
 import redis.clients.jedis.Jedis;
 import routing.Pipe.CommandMessage;
 
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
-	private static Jedis jedisHandler1 = new Jedis("localhost", 6379);
-
-	public static Jedis getJedisHandler1() {
+	static Jedis jedisHandler1=new Jedis("169.254.214.175",6379);
+	static Jedis jedisHandler2=new Jedis("169.254.56.202",6379);
+	static Jedis jedisHandler3=new Jedis("169.254.80.87",6379);
+	public Jedis getJedisHandler1() {
 		return jedisHandler1;
 	}
 
@@ -106,17 +111,37 @@ public class DemoApp implements CommListener {
 		Boolean mainAffirm = true;
 		Scanner reader = new Scanner(System.in);
 		try {
-			if(jedisHandler1.ping().equals("PONG")){
-				host = jedisHandler1.get("1").split(":")[0];
-				port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
-				 }
+			
+			try{
+				if(jedisHandler1.ping().equals("PONG")){
+					host = jedisHandler1.get("1").split(":")[0];
+					port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
+					 }
+			}catch(Exception e){
+				System.out.println("Connection to redis failed at 169.254.214.175:4567");
+			}
+			try{
+				if(jedisHandler2.ping().equals("PONG")){
+					host = jedisHandler2.get("1").split(":")[0];
+					port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
+					 }
+			}catch(Exception e){
+				System.out.println("Connection to redis failed at 169.254.56.202:4567");
+			}try{
+				if(jedisHandler3.ping().equals("PONG")){
+					host = jedisHandler3.get("1").split(":")[0];
+					port = Integer.parseInt(jedisHandler3.get("1").split(":")[1]);
+					 }
+			}catch(Exception e){
+				System.out.println("Connection to redis failed at 169.254.80.87:4567");
+			}
 			EventLoopGroup workerGroup = new NioEventLoopGroup();
 
 			Bootstrap b = new Bootstrap(); // (1)
 			b.group(workerGroup); // (2)
 			b.channel(NioSocketChannel.class); // (3)
 			b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-			b.handler(new CommandInit(null, false));
+			b.handler(new CommInit( false));
 
 			// Start the client.
 			System.out.println("Connect to a node.");
@@ -128,8 +153,10 @@ public class DemoApp implements CommListener {
 			int option = 0;
 			System.out.println("Welcome to Gossamer Distributed");
 			System.out.println("Please choose an option to continue: ");
-			System.out.println("1. Read a file");
+			System.out.println("1. Read all files");
 			System.out.println("2. Write a file");
+			System.out.println("3. Read files");
+
 			System.out.println("0. Exit");
 			option = reader.nextInt();
 			// option = 2;
@@ -195,7 +222,11 @@ public class DemoApp implements CommListener {
 				System.out.println("File sent");
 				System.out.flush();
 				break;
-
+			case 3:
+				System.out.println("Please enter name of file to fetch");
+				String fileName = reader.nextLine();
+				SendReadRequest(fileName, channel);
+				break;
 			default:
 				break;
 			}
@@ -215,7 +246,13 @@ public class DemoApp implements CommListener {
 		// System.out.flush();
 		// Thread.sleep(10 * 1000);
 	}
+	private static void SendReadRequest(String fileName, Channel channel2) {
+		// TODO Auto-generated method stub
+		CommandMessage msg = MessageClient.createReadMessage(fileName);
+		channel.writeAndFlush(msg);
+		System.out.println("Read request sent");
 
+	}
 	private static List<String> SendReadAllFileInfo(Channel channel) {
 		// TODO Auto-generated method stub
 		List<String> response = null;
@@ -224,7 +261,7 @@ public class DemoApp implements CommListener {
 		System.out.println("Read all files request sent");
 		return response;
 	}
-
+	
 	private static String runWriteTest() {
 		String path = "C:\\1\\Natrang.avi";
 		return path;
@@ -317,11 +354,7 @@ public class DemoApp implements CommListener {
 		return hashText;
 	}
 
-	@Override
-	public void onMessage(String msg) {
-		// TODO Auto-generated method stub
-		System.out.println("Files received");
-		System.out.println(msg);
-	}
+	
+	
 
 }

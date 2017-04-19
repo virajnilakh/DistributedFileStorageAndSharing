@@ -17,6 +17,7 @@ package gash.router.server.edges;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -44,6 +45,7 @@ import pipe.election.Election.LeaderStatus.LeaderState;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkState;
+import redis.clients.jedis.Jedis;
 import routing.Pipe.CommandMessage;
 
 public class EdgeMonitor implements EdgeListener, Runnable {
@@ -51,10 +53,11 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	private HashMap<Integer,Timer> timer=new HashMap<Integer,Timer>();
 	private static EdgeList outboundEdges;
 	private EdgeList inboundEdges;
-	private long dt = 50;
+	private long dt = 2000;
 	private ServerState state;
 	private boolean forever = true;
-	private int activeOutboundEdges=0;
+	private static int activeOutboundEdges=0;
+	private static int nodeCount=0;
 	public HashMap<Integer,EdgeInfo> getOutboundEdges() {
 		return outboundEdges.getMap();
 	}
@@ -68,13 +71,13 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		this.state = state;
 		this.state.setEmon(this);
 
-		if (state.getConf().getRouting() != null) {
+		/*if (state.getConf().getRouting() != null) {
 			
 			for (RoutingEntry e : state.getConf().getRouting()) {
 				
 				outboundEdges.addNode(e.getId(), e.getHost(), e.getPort());
 			}
-		}
+		}*/
 
 		// cannot go below 2 sec
 		if (state.getConf().getHeartbeatDt() > this.dt)
@@ -198,12 +201,43 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	@Override
 	public void run() {
 		while (forever) {
+			if(state.getAnyJedis().dbSize()>nodeCount){
+				Jedis j=state.getAnyJedis();
+				Set<String> list = j.keys("*"); 
+			      
+				 for(String l:list){
+					String[] node= j.get(l).split(":");
+					if(Integer.parseInt(l)==state.getNodeId()){
+						continue;
+					}
+					if(this.outboundEdges.map.get(Integer.parseInt(l)) == null){
+						outboundEdges.addNode(Integer.parseInt(l), node[0], Integer.parseInt(node[1]));
+					}
+					nodeCount++;
+				 }
+			}
+			state.getLocalhostJedis().select(1);
+			if(state.getLocalhostJedis().dbSize()==1){
+				state.becomeLeader();
+				state.setLeaderAddress(state.getIpAddress());
+				state.setLeaderId(state.getNodeId());
+				System.out.println("Node:"+state.getNodeId()+" is the Leader!!");
+				try{
+					state.getLocalhostJedis().select(0);
+					state.getLocalhostJedis().set("1", state.getIpAddress()+":4568");
+					System.out.println("---Redis updated---");
+					
+				}catch(Exception e){
+					System.out.println("---Problem with redis at HandleVoteReceived---");
+				}
+				state.getElecHandler().initElection();	
+			}
 			try {
 				for (final EdgeInfo ei : this.outboundEdges.map.values()) {
 					
 					
 					if (ei.isActive() && ei.getChannel() != null) {
-						WorkMessage wmhb=state.getEmon().createHB(state.getConf().getNodeId());
+						WorkMessage wmhb=createHB(state.getConf().getNodeId());
 						ei.getChannel().writeAndFlush(wmhb);
 						if(state.isLeader()){
 							WorkMessage wm = createHB(ei);
@@ -250,7 +284,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				                @Override
 				                public void operationComplete(Future<Void> future) throws Exception {
 				                    if (!f.isSuccess()) {
-				                        System.out.println("Test Connection failed");
+				                        //System.out.println("Test Connection failed");
 				                        future.cause();
 
 				                    }else{
@@ -287,9 +321,11 @@ public class EdgeMonitor implements EdgeListener, Runnable {
         }
         @Override
         public void run(){
-        	//System.out.println("Node "+nodeId+"dead");
+        	//	System.out.println("Node "+nodeId+"dead");
         	outboundEdges.map.get(nodeId).setChannel(null);;
         	outboundEdges.map.get(nodeId).setActive(false);
+        	activeOutboundEdges--;
+        	nodeCount--;
         	this.cancel();
         }
     }
