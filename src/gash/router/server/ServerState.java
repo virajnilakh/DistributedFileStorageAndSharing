@@ -88,16 +88,17 @@ public class ServerState {
 		}
 		try{
 			if(getJedisHandler2().ping().equals("PONG")){
-				getJedisHandler2().flushAll();
+				
 				getJedisHandler2().select(1);
+				getJedisHandler2().flushDB();
 				getJedisHandler2().set(nodeId+"","169.254.214.175:4567" );
 			}
 		}catch(Exception e){
 			System.out.println("Connection to redis failed at 169.254.56.202:4567");
 		}try{
 			if(getJedisHandler3().ping().equals("PONG")){
-				getJedisHandler3().flushAll();
 				getJedisHandler3().select(1);
+				getJedisHandler3().flushDB();
 				getJedisHandler3().set(nodeId+"","169.254.214.175:4567" );
 			}
 		}catch(Exception e){
