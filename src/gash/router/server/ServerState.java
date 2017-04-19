@@ -63,8 +63,8 @@ public class ServerState {
 		reqVote=new HandleVoteRequestState(this);
 		resLeader=new HandleLeaderResponseState(this);
 		voteReceived=new HandleVoteReceivedState(this);
-		jedisHandler1=new Jedis("10.0.0.130",6379);
-		jedisHandler2=new Jedis("169.254.56.202",6379);
+		jedisHandler1=new Jedis("169.254.214.175",6379);
+		jedisHandler2=new Jedis("169.254.5.213",6379);
 		jedisHandler3=new Jedis("169.254.80.87",6379);
 		setRedis();
 		/*try{
