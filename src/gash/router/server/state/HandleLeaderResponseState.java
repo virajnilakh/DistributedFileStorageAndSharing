@@ -15,8 +15,14 @@ public class HandleLeaderResponseState implements Handelable {
 		System.out.println("New Leader elected is "+wm.getLeaderStatus().getLeaderId()+"and "+wm.getLeaderStatus().getLeaderHost());
 		state.getElecHandler().getTimer().cancel();
 		state.getElecHandler().setTimer();
-		state.getJedisHandler1().set("1", wm.getLeaderStatus().getLeaderHost()+":4568");
-		System.out.println("---Redis updated---");
+		try{
+			state.getLocalhostJedis().select(0);
+			state.getLocalhostJedis().set("1", wm.getLeaderStatus().getLeaderHost()+":4568");
+			System.out.println("---Redis updated---");
+			
+		}catch(Exception e){
+			System.out.println("---Problem with redis at HandleLeaderResponse---");
+		}
 		state.setLeaderId(wm.getLeaderStatus().getLeaderId());
 		state.setLeaderAddress(wm.getLeaderStatus().getLeaderHost());
 		state.becomeFollower();
