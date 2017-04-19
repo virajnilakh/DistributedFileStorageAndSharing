@@ -35,6 +35,7 @@ import gash.router.client.CommConnection;
 import gash.router.client.CommInit;
 import gash.router.client.CommListener;
 import global.Constants;
+import global.Utility;
 import gash.router.client.MessageClient;
 import gash.router.client.WriteChannel;
 import gash.router.server.CommandInit;
@@ -55,9 +56,10 @@ import routing.Pipe.CommandMessage;
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
-	static Jedis jedisHandler1=new Jedis("169.254.214.175",6379);
-	static Jedis jedisHandler2=new Jedis("169.254.56.202",6379);
-	static Jedis jedisHandler3=new Jedis("169.254.80.87",6379);
+	static Jedis jedisHandler1 = new Jedis("169.254.214.175", 6379);
+	static Jedis jedisHandler2 = new Jedis("169.254.56.202", 6379);
+	static Jedis jedisHandler3 = new Jedis("169.254.80.87", 6379);
+
 	public Jedis getJedisHandler1() {
 		return jedisHandler1;
 	}
@@ -111,28 +113,29 @@ public class DemoApp implements CommListener {
 		Boolean mainAffirm = true;
 		Scanner reader = new Scanner(System.in);
 		try {
-			
-			try{
-				if(jedisHandler1.ping().equals("PONG")){
+
+			try {
+				if (jedisHandler1.ping().equals("PONG")) {
 					host = jedisHandler1.get("1").split(":")[0];
 					port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
-					 }
-			}catch(Exception e){
+				}
+			} catch (Exception e) {
 				System.out.println("Connection to redis failed at 169.254.214.175:4567");
 			}
-			try{
-				if(jedisHandler2.ping().equals("PONG")){
+			try {
+				if (jedisHandler2.ping().equals("PONG")) {
 					host = jedisHandler2.get("1").split(":")[0];
 					port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
-					 }
-			}catch(Exception e){
+				}
+			} catch (Exception e) {
 				System.out.println("Connection to redis failed at 169.254.56.202:4567");
-			}try{
-				if(jedisHandler3.ping().equals("PONG")){
+			}
+			try {
+				if (jedisHandler3.ping().equals("PONG")) {
 					host = jedisHandler3.get("1").split(":")[0];
 					port = Integer.parseInt(jedisHandler3.get("1").split(":")[1]);
-					 }
-			}catch(Exception e){
+				}
+			} catch (Exception e) {
 				System.out.println("Connection to redis failed at 169.254.80.87:4567");
 			}
 			EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -141,14 +144,14 @@ public class DemoApp implements CommListener {
 			b.group(workerGroup); // (2)
 			b.channel(NioSocketChannel.class); // (3)
 			b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-			b.handler(new CommInit( false));
+			b.handler(new CommInit(false));
 
 			// Start the client.
 			System.out.println("Connect to a node.");
 
 			ChannelFuture f = b.connect(host, port).sync(); // (5)
 			channel = f.channel();
-			
+
 			// do {
 			int option = 0;
 			System.out.println("Welcome to Gossamer Distributed");
@@ -234,7 +237,7 @@ public class DemoApp implements CommListener {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error occurred...");
-			//Thread.sleep(10 * 1000);
+			// Thread.sleep(10 * 1000);
 			e.printStackTrace();
 		} finally {
 			System.out.println("Exiting...");
@@ -246,6 +249,7 @@ public class DemoApp implements CommListener {
 		// System.out.flush();
 		// Thread.sleep(10 * 1000);
 	}
+
 	private static void SendReadRequest(String fileName, Channel channel2) {
 		// TODO Auto-generated method stub
 		CommandMessage msg = MessageClient.createReadMessage(fileName);
@@ -253,6 +257,7 @@ public class DemoApp implements CommListener {
 		System.out.println("Read request sent");
 
 	}
+
 	private static List<String> SendReadAllFileInfo(Channel channel) {
 		// TODO Auto-generated method stub
 		List<String> response = null;
@@ -261,7 +266,7 @@ public class DemoApp implements CommListener {
 		System.out.println("Read all files request sent");
 		return response;
 	}
-	
+
 	private static String runWriteTest() {
 		String path = "C:\\1\\Natrang.avi";
 		return path;
@@ -293,7 +298,7 @@ public class DemoApp implements CommListener {
 		try {
 			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
 			String name = file.getName();
-			String hash = getHashFileName(name);
+			String hash = Utility.getHashFileName(name);
 			int tmp = 0;
 			while ((tmp = bis.read(buffer)) > 0) {
 				try {
@@ -327,34 +332,5 @@ public class DemoApp implements CommListener {
 		}
 
 	}
-
-	private static String getHashFileName(String name) {
-		// TODO Auto-generated method stub
-
-		MessageDigest digest = null;
-		try {
-			digest = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		digest.reset();
-
-		digest.update(name.getBytes());
-		byte[] bs = digest.digest();
-
-		BigInteger bigInt = new BigInteger(1, bs);
-		String hashText = bigInt.toString(16);
-
-		// Zero pad until 32 chars
-		while (hashText.length() < 32) {
-			hashText = "0" + hashText;
-		}
-
-		return hashText;
-	}
-
-	
-	
 
 }
