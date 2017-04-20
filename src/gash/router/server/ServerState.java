@@ -57,7 +57,7 @@ public class ServerState {
 	
 	public ServerState() throws UnknownHostException{
 		//ipAddress=LocalAddress.getLocalHostLANAddress().getHostAddress();
-		ipAddress=InetAddress.getLocalHost().getHostAddress();
+		ipAddress=LocalAddress.getLocalHostLANAddress().getHostAddress();
 		//ipAddress="10.250.175.205";
 		System.out.println(LocalAddress.getLocalHostLANAddress().getHostAddress());
 		reqVote=new HandleVoteRequestState(this);
@@ -78,7 +78,7 @@ public class ServerState {
 		try{
 			if(getJedisHandler1().ping().equals("PONG")){
 				getJedisHandler1().select(1);
-				getJedisHandler1().flushDB();
+				//getJedisHandler1().flushDB();
 
 				nodeId=getJedisHandler1().dbSize().intValue()+1;
 				getJedisHandler1().set(nodeId+"",this.ipAddress+":4567" );
@@ -90,7 +90,7 @@ public class ServerState {
 			if(getJedisHandler2().ping().equals("PONG")){
 				
 				getJedisHandler2().select(1);
-				getJedisHandler2().flushDB();
+				//getJedisHandler2().flushDB();
 				getJedisHandler2().set(nodeId+"",this.ipAddress+":4567");
 			}
 		}catch(Exception e){
@@ -98,8 +98,35 @@ public class ServerState {
 		}try{
 			if(getJedisHandler3().ping().equals("PONG")){
 				getJedisHandler3().select(1);
-				getJedisHandler3().flushDB();
+				//getJedisHandler3().flushDB();
 				getJedisHandler3().set(nodeId+"",this.ipAddress+":4567" );
+			}
+		}catch(Exception e){
+			System.out.println("Connection to redis failed at 169.254.80.87:4567");
+		}
+		
+	}
+	public void delRedis(int id) {
+		// TODO Auto-generated method stub
+		try{
+			if(getJedisHandler1().ping().equals("PONG")){
+				getJedisHandler1().select(1);
+				getJedisHandler1().del(id+"");
+			}
+		}catch(Exception e){
+			System.out.println("Connection to redis failed at 169.254.214.175:4567");
+		}
+		try{
+			if(getJedisHandler2().ping().equals("PONG")){
+				getJedisHandler2().select(1);
+				getJedisHandler2().del(id+"");
+			}
+		}catch(Exception e){
+			System.out.println("Connection to redis failed at 169.254.56.202:4567");
+		}try{
+			if(getJedisHandler3().ping().equals("PONG")){
+				getJedisHandler3().select(1);
+				getJedisHandler3().del(id+"");
 			}
 		}catch(Exception e){
 			System.out.println("Connection to redis failed at 169.254.80.87:4567");
