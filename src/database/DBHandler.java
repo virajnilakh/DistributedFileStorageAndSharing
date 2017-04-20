@@ -14,7 +14,7 @@ public class DBHandler {
     
     public Connection makeConn(){
     	try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db","root", "root");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db","root", "admin");
 	        System.out.println("Successfully connected");
 
 		}catch (Exception e) {
@@ -59,7 +59,7 @@ public class DBHandler {
 	public ArrayList<ByteString> getChunks(String filename) {
         ArrayList<ByteString> allChunks = new ArrayList<ByteString>();
 		try {
-            String query = "select * from fileData where file_name=?";
+            String query = "select * from chunkData where file_name=?";
             PreparedStatement preparedStatement = conn.prepareStatement( query );
             preparedStatement.setString(1, filename);
             ResultSet resultSet = preparedStatement.executeQuery();

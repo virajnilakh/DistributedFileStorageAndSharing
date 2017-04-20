@@ -133,7 +133,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		// Read a specific file
 		String fileName = msg.getReqMsg().getRrb().getFilename();
 		String hash = Utility.getHashFileName(fileName);
-//		File file = new File(Constants.dataDir + fileName);
+		// File file = new File(Constants.dataDir + fileName);
 
 		ArrayList<ByteString> chunksFile = new ArrayList<ByteString>();
 		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -142,22 +142,23 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		int numChunks = 0;
 		byte[] buffer = new byte[sizeChunks];
 
-		System.out.println("No. of chunks: " + futuresList.size());
+
 
 		long start = System.currentTimeMillis();
 		System.out.print(start);
 		System.out.println("Start send");
 
-		//GET from Mysql DB
+		// GET from Mysql DB
 		DBHandler mysql_db = new DBHandler();
-		mysql_db.getChunks(fileName);
-		mysql_db.closeConn();
+		chunksFile = mysql_db.getChunks(fileName);
 
-		for (int i = 0; i < chunksFile.size(); i++) {
+		mysql_db.closeConn();
+		numChunks = chunksFile.size();
+		System.out.println("No. of chunks: " + numChunks);
+		for (int i = 0; i < numChunks; i++) {
 			CommandMessage commMsg = null;
 			try {
-				commMsg = MessageCreator.createWriteRequest(chunksFile.get(i), hash, fileName, numChunks,
-						i + 1);
+				commMsg = MessageCreator.createWriteRequest(chunksFile.get(i), hash, fileName, numChunks, i + 1);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -165,7 +166,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			WriteChannel myCallable = new WriteChannel(commMsg, channel);
 			futuresList.add(myCallable);
 		}
-		
+
 		try {
 			List<Future<Long>> futures = service.invokeAll(futuresList);
 		} catch (InterruptedException e) {
@@ -242,7 +243,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	 */
 	private void writeFileCmd(CommandMessage msg, Channel channel)
 			throws UnsupportedEncodingException, Exception, IOException, FileNotFoundException, InterruptedException {
-		
+
 		String file_id = msg.getReqMsg().getRwb().getFileId();
 		String file_name = msg.getReqMsg().getRwb().getFilename();
 		String file_ext = msg.getReqMsg().getRwb().getFileExt();
@@ -250,7 +251,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		int num_of_chunks = msg.getReqMsg().getRwb().getNumOfChunks();
 		byte[] chunk_data = msg.getReqMsg().getRwb().getChunk().getChunkData().toByteArray();
 		int chunk_size = msg.getReqMsg().getRwb().getChunk().getChunkSize();
-		
+
 		WorkMessage wm = WorkMessageCreator.SendWriteWorkMessage(msg);
 		System.out.println("File replicated");
 
@@ -330,12 +331,12 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			long end = System.currentTimeMillis();
 			System.out.println("End time");
 			System.out.println(end);
-			
-			//Push it to Mysql DB
+
+			// Push it to Mysql DB
 			DBHandler mysql_db = new DBHandler();
 			mysql_db.addChunk(file_id, file_name, file_ext, chunk_id, num_of_chunks, chunk_data, chunk_size);
 			mysql_db.closeConn();
-			
+
 			// Send acks
 			List<Future<Long>> futures = service.invokeAll(futuresList);
 			service.shutdown();
