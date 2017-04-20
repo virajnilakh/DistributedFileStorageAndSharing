@@ -42,6 +42,8 @@ import org.slf4j.LoggerFactory;
 import com.google.protobuf.ByteString;
 
 import gash.router.client.MessageClient;
+import gash.router.client.MessageCreator;
+import gash.router.client.MessageSender;
 import gash.router.client.WriteChannel;
 import gash.router.container.RoutingConf;
 import global.Constants;
@@ -55,6 +57,7 @@ import pipe.common.Common.Header;
 import pipe.common.Common.ReadResponse;
 import pipe.common.Common.Request;
 import pipe.common.Common.Response;
+import pipe.common.Common.Response.ResponseType;
 import pipe.common.Common.WriteBody;
 import pipe.common.Common.WriteResponse;
 import pipe.election.Election.LeaderStatus;
@@ -123,11 +126,11 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 						// System.out.println(temp);
 					}
 				}
-				// CommandMessage msg2 = createAllFilesResponse(fileNames);
-				String msg2 = createAllFilesResponse(fileNames);
+				CommandMessage msg2 = createAllFilesResponse(fileNames);
+				// String msg2 = createAllFilesResponse(fileNames);
 				channel.writeAndFlush(msg2);
 				System.out.println("Responses sent");
-			}else {
+			} else {
 
 				// Read a specific file
 				String fileName = msg.getReqMsg().getRrb().getFilename();
@@ -157,7 +160,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 					}
 
 					for (int i = 0; i < chunksFile.size(); i++) {
-						CommandMessage commMsg = MessageClient.sendWriteRequest(chunksFile.get(i), hash, name,
+						CommandMessage commMsg = MessageCreator.createWriteRequest(chunksFile.get(i), hash, name,
 								numChunks, i + 1);
 						WriteChannel myCallable = new WriteChannel(commMsg, channel);
 						futuresList.add(myCallable);
@@ -208,8 +211,13 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			Map<String, String> map = jedisHandler1.hgetAll(msg.getReqMsg().getRwb().getFileId());
 			String temp = map.get("chunks");
 
-			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "chunks",
-					temp + "," + String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()));
+			if (temp != null) {
+				jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "chunks",
+						temp + "," + String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()));
+			} else {
+				jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "chunks",
+						String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()));
+			}
 
 			CommandMessage commMsg = createAckWriteRequest(msg.getReqMsg().getRwb().getFileId(),
 					msg.getReqMsg().getRwb().getFilename(), msg.getReqMsg().getRwb().getChunk().getChunkId());
@@ -307,9 +315,10 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		}
 
 		System.out.flush();
-		
+
 	}
-	private static void sendReadCommand(File file,Channel channel) {
+
+	private static void sendReadCommand(File file, Channel channel) {
 		// TODO Auto-generated method stub
 
 		ArrayList<ByteString> chunksFile = new ArrayList<ByteString>();
@@ -335,7 +344,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			}
 
 			for (int i = 0; i < chunksFile.size(); i++) {
-				CommandMessage commMsg = MessageClient.sendWriteRequest(chunksFile.get(i), hash, name, numChunks,
+				CommandMessage commMsg = MessageCreator.createWriteRequest(chunksFile.get(i), hash, name, numChunks,
 						i + 1);
 				WriteChannel myCallable = new WriteChannel(commMsg, channel);
 				futuresList.add(myCallable);
@@ -356,6 +365,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		}
 
 	}
+
 	private WorkMessage SendWriteWorkMessage(CommandMessage msg) {
 		// TODO Auto-generated method stub
 
@@ -392,7 +402,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 	}
 
-	private String createAllFilesResponse(ArrayList<String> fileNames) {
+	private CommandMessage createAllFilesResponse(ArrayList<String> fileNames) {
 		// TODO Auto-generated method stub
 		Header.Builder header = Header.newBuilder();
 		// ToDO: Set actual Node Id and hash as well
@@ -402,22 +412,29 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		ReadResponse.Builder body = ReadResponse.newBuilder();
 		// body.setChunkId(chunkId, chunkId);
 		System.out.println("File names size:" + fileNames.size());
-		String fileName = "";
-		for (int i = 0; i < fileNames.size() - 1; i++) {
-			System.out.println(fileNames.get(i));
-			fileName += "," + fileNames.get(i);
+		int j = 0;
+		String filenames = "";
+		for (String name : fileNames) {
+			System.out.println(++j + ") " + name);
+			filenames += name;
+			// fileName += "," + fileNames.get(i);
+
 		}
-		// body.setFilename(0, fileName);
+
+		body.setFilename(filenames);
+		//body.setResponseType(Response.ResponseType.READFILENAMES);
+		
 		Response.Builder res = Response.newBuilder();
-		// res.setResponseType(Response.ResponseType.WRITEFILE);
+		res.setResponseType(ResponseType.READFILENAMES);
+		
 		// req.setRwb(body);
 		// res.setFilename(fileName);
 		res.setReadResponse(body);
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
 		comm.setResMsg(res);
-		// return comm.build();
-		return fileName;
+		return comm.build();
+		// return fileName;
 	}
 
 	public static CommandMessage createAckWriteRequest(String hash, String fileName, int chunkId) throws Exception {
@@ -444,6 +461,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		comm.setResMsg(res);
 		return comm.build();
 	}
+
 	private static String getHashFileName(String name) {
 		// TODO Auto-generated method stub
 

@@ -65,7 +65,7 @@ optional int64 chunk_size = 4;
 
 message ReadResponse{
 optional string file_id = 1;
-repeated string filename = 2;
+optional string filename = 2;
 optional string file_ext= 3;
 optional int32 num_of_chunks = 4;
 optional ChunkLocation chunk_location = 5;
@@ -85,13 +85,14 @@ required int32 port = 3;
  
 
 message Response{
-//optional string message=1;
+optional ResponseType responseType = 8;
 optional string filename=3; 
 enum ResponseType{
 READFILE = 1;
 WRITEFILE = 2;
 DELETEFILE = 3;
 UPDATEFILE = 4;
+READFILENAMES = 5;
 }
 enum Status{
 Success = 1;

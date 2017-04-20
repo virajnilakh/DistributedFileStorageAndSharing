@@ -37,6 +37,7 @@ import gash.router.client.CommListener;
 import global.Constants;
 import global.Utility;
 import gash.router.client.MessageClient;
+import gash.router.client.MessageSender;
 import gash.router.client.WriteChannel;
 import gash.router.server.CommandInit;
 import gash.router.server.WorkInit;
@@ -156,11 +157,12 @@ public class DemoApp implements CommListener {
 			int option = 0;
 			System.out.println("Welcome to Gossamer Distributed");
 			System.out.println("Please choose an option to continue: ");
-			System.out.println("1. Read all files");
-			System.out.println("2. Write a file");
-			System.out.println("3. Read files");
 
+			System.out.println("1. Write a file");
+			System.out.println("2. Read files");
+			System.out.println("3. Get File Names");
 			System.out.println("0. Exit");
+
 			option = reader.nextInt();
 			// option = 2;
 			// reader.nextLine();
@@ -174,11 +176,12 @@ public class DemoApp implements CommListener {
 			}
 			String path = "";
 			switch (option) {
-			case 1:
+			case 3:
 
 				System.out.println("Retreiving list of files stored...");
-				List<String> files = SendReadAllFileInfo(channel);
+				MessageSender.SendReadAllFileInfo(channel);
 				System.out.println("Please enter option of which file to fetch");
+
 				/*
 				 * for (int i = 0; i < files.size(); i++) { System.out.print(i +
 				 * "."); System.out.println(files.get(i)); }
@@ -193,7 +196,7 @@ public class DemoApp implements CommListener {
 				 * = "Y"; if (ans1.equals("Y")) { affirm = true; }
 				 */
 				break;
-			case 2:
+			case 1:
 				// For testing writes
 				// String path = runWriteTest();
 
@@ -221,14 +224,14 @@ public class DemoApp implements CommListener {
 				long begin = System.currentTimeMillis();
 				System.out.println("Begin time");
 				System.out.println(begin);
-				sendFile(file);
+				sendFile(file, channel);
 				System.out.println("File sent");
 				System.out.flush();
 				break;
-			case 3:
+			case 2:
 				System.out.println("Please enter name of file to fetch");
 				String fileName = reader.nextLine();
-				SendReadRequest(fileName, channel);
+				MessageSender.SendReadRequest(fileName, channel);
 				break;
 			default:
 				break;
@@ -250,29 +253,12 @@ public class DemoApp implements CommListener {
 		// Thread.sleep(10 * 1000);
 	}
 
-	private static void SendReadRequest(String fileName, Channel channel2) {
-		// TODO Auto-generated method stub
-		CommandMessage msg = MessageClient.createReadMessage(fileName);
-		channel.writeAndFlush(msg);
-		System.out.println("Read request sent");
-
-	}
-
-	private static List<String> SendReadAllFileInfo(Channel channel) {
-		// TODO Auto-generated method stub
-		List<String> response = null;
-		CommandMessage msg = MessageClient.CreateReadAllMessage();
-		channel.writeAndFlush(msg);
-		System.out.println("Read all files request sent");
-		return response;
-	}
-
 	private static String runWriteTest() {
 		String path = "C:\\1\\Natrang.avi";
 		return path;
 	}
 
-	private static void sendFile(File file) {
+	private static void sendFile(File file, Channel channel) {
 		// TODO Auto-generated method stub
 
 		/*
@@ -281,55 +267,7 @@ public class DemoApp implements CommListener {
 		 * ack
 		 */
 
-		sendReadCommand(file);
-
-	}
-
-	private static void sendReadCommand(File file) {
-		// TODO Auto-generated method stub
-
-		ArrayList<ByteString> chunksFile = new ArrayList<ByteString>();
-		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
-		int sizeChunks = Constants.sizeOfChunk;
-		int numChunks = 0;
-		byte[] buffer = new byte[sizeChunks];
-
-		try {
-			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-			String name = file.getName();
-			String hash = Utility.getHashFileName(name);
-			int tmp = 0;
-			while ((tmp = bis.read(buffer)) > 0) {
-				try {
-					ByteString bs = ByteString.copyFrom(buffer, 0, tmp);
-					chunksFile.add(bs);
-					numChunks++;
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-
-			for (int i = 0; i < chunksFile.size(); i++) {
-				CommandMessage commMsg = MessageClient.sendWriteRequest(chunksFile.get(i), hash, name, numChunks,
-						i + 1);
-				WriteChannel myCallable = new WriteChannel(commMsg, channel);
-				futuresList.add(myCallable);
-			}
-
-			System.out.println("No. of chunks: " + futuresList.size());
-
-			long start = System.currentTimeMillis();
-			System.out.print(start);
-			System.out.println("Start send");
-
-			List<Future<Long>> futures = service.invokeAll(futuresList);
-			System.out.println("Completed tasks");
-			service.shutdown();
-
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		MessageSender.sendReadCommand(file, channel);
 
 	}
 
