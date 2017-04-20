@@ -199,16 +199,19 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			} else if (msg.getLeaderStatus().getState() == LeaderState.LEADERALIVE) {
 				System.out.println(
 						"Heartbeat from leader " + msg.getLeaderStatus().getLeaderId() + "...Resetting the timmer:");
+				state.getEmon().getTries().put(msg.getLeaderStatus().getLeaderId(), 0);
+
 				state.getElecHandler().getTimer().cancel();
 				state.getElecHandler().setTimer();
 			} else if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
 				logger.info("heartbeat from " + msg.getHeader().getNodeId());
-				Timer t=state.getEmon().getTimer(msg.getHeader().getNodeId());
+				state.getEmon().getTries().put(msg.getHeader().getNodeId(), 0);
+				/*Timer t=state.getEmon().getTimer(msg.getHeader().getNodeId());
 				if(t!=null){
 				t.cancel();
 				t=null;
-				}
+				}*/
 				state.getEmon().setTimer(msg.getHeader().getNodeId());
 			} else if (msg.hasPing()) {
 				logger.info("ping from " + msg.getHeader().getNodeId());
