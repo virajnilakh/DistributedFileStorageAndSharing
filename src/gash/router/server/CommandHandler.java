@@ -45,6 +45,7 @@ import gash.router.client.MessageClient;
 import gash.router.client.WriteChannel;
 import gash.router.container.RoutingConf;
 import global.Constants;
+import global.Utility;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -143,7 +144,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				try {
 					BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
 					String name = file.getName();
-					String hash = getHashFileName(name);
+					String hash = Utility.getHashFileName(name);
 					int tmp = 0;
 					while ((tmp = bis.read(buffer)) > 0) {
 						try {
