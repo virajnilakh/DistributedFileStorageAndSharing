@@ -59,6 +59,7 @@ public class ServerState {
 		//ipAddress=LocalAddress.getLocalHostLANAddress().getHostAddress();
 		ipAddress=LocalAddress.getLocalHostLANAddress().getHostAddress();
 		//ipAddress="10.250.175.205";
+		
 		System.out.println(LocalAddress.getLocalHostLANAddress().getHostAddress());
 		reqVote=new HandleVoteRequestState(this);
 		resLeader=new HandleLeaderResponseState(this);
@@ -66,7 +67,7 @@ public class ServerState {
 		jedisHandler1=new Jedis("169.254.214.175",6379);
 		jedisHandler2=new Jedis("169.254.5.213",6379);
 		jedisHandler3=new Jedis("169.254.80.87",6379);
-		setRedis();
+		//setRedis();
 		/*try{
 			ipAddress=InetAddress.getLocalHost().getHostAddress();
 		}catch(Exception e){
