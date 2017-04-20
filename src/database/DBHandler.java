@@ -59,11 +59,7 @@ public class DBHandler {
 	public ArrayList<ByteString> getChunks(String fileid) {
         ArrayList<ByteString> allChunks = new ArrayList<ByteString>();
 		try {
-<<<<<<< HEAD
-            String query = "select * from chunkData where file_name=?";
-=======
             String query = "select * from chunkData where file_id=?";
->>>>>>> 7d1612d9ea4d69d1371ba5d690bbddf438a07a01
             PreparedStatement preparedStatement = conn.prepareStatement( query );
             preparedStatement.setString(1, fileid);
             ResultSet resultSet = preparedStatement.executeQuery();
