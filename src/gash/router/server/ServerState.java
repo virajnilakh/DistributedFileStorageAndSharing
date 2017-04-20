@@ -78,7 +78,7 @@ public class ServerState {
 		try{
 			if(getJedisHandler1().ping().equals("PONG")){
 				getJedisHandler1().select(1);
-				getJedisHandler1().flushDB();
+				//getJedisHandler1().flushDB();
 
 				nodeId=getJedisHandler1().dbSize().intValue()+1;
 				getJedisHandler1().set(nodeId+"",this.ipAddress+":4567" );
@@ -90,7 +90,7 @@ public class ServerState {
 			if(getJedisHandler2().ping().equals("PONG")){
 				
 				getJedisHandler2().select(1);
-				getJedisHandler2().flushDB();
+				//getJedisHandler2().flushDB();
 				getJedisHandler2().set(nodeId+"",this.ipAddress+":4567");
 			}
 		}catch(Exception e){
@@ -98,7 +98,7 @@ public class ServerState {
 		}try{
 			if(getJedisHandler3().ping().equals("PONG")){
 				getJedisHandler3().select(1);
-				getJedisHandler3().flushDB();
+				//getJedisHandler3().flushDB();
 				getJedisHandler3().set(nodeId+"",this.ipAddress+":4567" );
 			}
 		}catch(Exception e){
