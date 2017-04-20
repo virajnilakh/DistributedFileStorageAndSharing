@@ -13,6 +13,8 @@ public class HandleLeaderResponseState implements Handelable {
 	public synchronized void handleMessage(Channel channel, WorkMessage wm) {
 		// TODO Auto-generated method stub
 		System.out.println("New Leader elected is "+wm.getLeaderStatus().getLeaderId()+"and "+wm.getLeaderStatus().getLeaderHost());
+		System.out.println(
+				"Heartbeat from leader " + wm.getLeaderStatus().getLeaderId() + "...Resetting the timmer:");
 		state.getElecHandler().getTimer().cancel();
 		state.getElecHandler().setTimer();
 		try{

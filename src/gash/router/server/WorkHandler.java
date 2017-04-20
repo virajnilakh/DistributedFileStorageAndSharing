@@ -201,6 +201,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 						"Heartbeat from leader " + msg.getLeaderStatus().getLeaderId() + "...Resetting the timmer:");
 				state.getElecHandler().getTimer().cancel();
 				state.getElecHandler().setTimer();
+				state.setLeaderId(msg.getLeaderStatus().getLeaderId());
+				state.setLeaderAddress(msg.getLeaderStatus().getLeaderHost());
+				state.becomeFollower();
+				state.setTimeout(0);
 			} else if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
 				logger.info("heartbeat from " + msg.getHeader().getNodeId());

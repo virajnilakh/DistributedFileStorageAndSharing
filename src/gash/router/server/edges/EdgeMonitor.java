@@ -202,7 +202,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	@Override
 	public void run() {
 		while (forever) {
-			if(state.getAnyJedis().dbSize()>nodeCount){
+			if(state.getAnyJedis().dbSize()>nodeCount+1){
 				Jedis j=state.getAnyJedis();
 				Set<String> list = j.keys("*"); 
 			      
@@ -339,7 +339,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	}
 
 	public void setTimer(int nodeId) {
-		int randomTimeout=(2000+(new Random()).nextInt(3500))*7;
+		int randomTimeout=(2000+(new Random()).nextInt(3500))*4;
         Timer t=new Timer();
         t.schedule(new DeadFollowerTimer(nodeId,state),(long)randomTimeout,(long)randomTimeout);
 		timer.put(nodeId,t );
