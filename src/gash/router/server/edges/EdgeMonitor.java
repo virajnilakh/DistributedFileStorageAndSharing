@@ -330,7 +330,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
         	//outboundEdges.map.remove(nodeId);
         	//state.delRedis(nodeId);
         	//activeOutboundEdges--;
-        	nodeCount--;
+        	//nodeCount--;
         	this.cancel();
         }
     }
