@@ -106,6 +106,33 @@ public class ServerState {
 		}
 		
 	}
+	public void delRedis(int id) {
+		// TODO Auto-generated method stub
+		try{
+			if(getJedisHandler1().ping().equals("PONG")){
+				getJedisHandler1().select(1);
+				getJedisHandler1().del(id+"");
+			}
+		}catch(Exception e){
+			System.out.println("Connection to redis failed at 169.254.214.175:4567");
+		}
+		try{
+			if(getJedisHandler2().ping().equals("PONG")){
+				getJedisHandler2().select(1);
+				getJedisHandler2().del(id+"");
+			}
+		}catch(Exception e){
+			System.out.println("Connection to redis failed at 169.254.56.202:4567");
+		}try{
+			if(getJedisHandler3().ping().equals("PONG")){
+				getJedisHandler3().select(1);
+				getJedisHandler3().del(id+"");
+			}
+		}catch(Exception e){
+			System.out.println("Connection to redis failed at 169.254.80.87:4567");
+		}
+		
+	}
 	public int getNodeId() {
 		return nodeId;
 	}

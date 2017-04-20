@@ -28,6 +28,7 @@ import gash.router.container.RoutingConf.RoutingEntry;
 import gash.router.election.ElectionHandler;
 import gash.router.server.CommandInit;
 import gash.router.server.ServerState;
+import gash.router.server.ServerState.State;
 import gash.router.server.WorkInit;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -289,7 +290,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 				                    }else{
 				                    	setTimer(ei.getRef());
-
+				                    	
 				                    	ei.setChannel(f.channel());
 							            ei.setActive(true);
 							            activeOutboundEdges++;
@@ -316,14 +317,18 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	}
 	private static class DeadFollowerTimer extends TimerTask{
 		private int nodeId;
-        public DeadFollowerTimer(int nodeId){
+		private ServerState state;
+        public DeadFollowerTimer(int nodeId,ServerState s){
         	this.nodeId=nodeId;
+        	state=s;
         }
         @Override
         public void run(){
         	//	System.out.println("Node "+nodeId+"dead");
-        	outboundEdges.map.get(nodeId).setChannel(null);;
+        	outboundEdges.map.get(nodeId).setChannel(null);
         	outboundEdges.map.get(nodeId).setActive(false);
+        	outboundEdges.map.remove(nodeId);
+        	state.delRedis(nodeId);
         	activeOutboundEdges--;
         	nodeCount--;
         	this.cancel();
@@ -336,7 +341,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	public void setTimer(int nodeId) {
 		int randomTimeout=(2000+(new Random()).nextInt(3500))*7;
         Timer t=new Timer();
-        t.schedule(new DeadFollowerTimer(nodeId),(long)randomTimeout,(long)randomTimeout);
+        t.schedule(new DeadFollowerTimer(nodeId,state),(long)randomTimeout,(long)randomTimeout);
 		timer.put(nodeId,t );
 	}
 	@Override
