@@ -14,16 +14,17 @@ import global.Constants;
 import routing.Pipe.CommandMessage;
 
 public class MessageHandler {
-
+	
+	protected static ArrayList<CommandMessage> lstMsg = new ArrayList<CommandMessage>();
+	protected static ArrayList<ByteString> chunkedFile = new ArrayList<ByteString>();
+	
 	/**
 	 * @param msg
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */
 	public static void handleRead(CommandMessage msg) throws IOException, FileNotFoundException {
-		ArrayList<CommandMessage> lstMsg = new ArrayList<CommandMessage>();
-		ArrayList<ByteString> chunkedFile = new ArrayList<ByteString>();
-
+		System.out.println("Receiving chunks");
 		lstMsg.add(msg);
 
 		if (lstMsg.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
