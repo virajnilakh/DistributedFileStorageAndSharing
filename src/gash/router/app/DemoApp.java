@@ -139,20 +139,24 @@ public class DemoApp implements CommListener {
 			} catch (Exception e) {
 				System.out.println("Connection to redis failed at 169.254.80.87:4567");
 			}
-			EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-			Bootstrap b = new Bootstrap(); // (1)
-			b.group(workerGroup); // (2)
-			b.channel(NioSocketChannel.class); // (3)
-			b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-			b.handler(new CommInit(false));
+			MessageClient msgClient = new MessageClient(host, port);
+			DemoApp app = new DemoApp(msgClient);
 
-			// Start the client.
-			System.out.println("Connect to a node.");
-
-			ChannelFuture f = b.connect(host, port).sync(); // (5)
-			channel = f.channel();
-
+			/*
+			 * Commented in favor of usage of MessageClient EventLoopGroup
+			 * workerGroup = new NioEventLoopGroup();
+			 * 
+			 * Bootstrap b = new Bootstrap(); // (1) b.group(workerGroup); //
+			 * (2) b.channel(NioSocketChannel.class); // (3)
+			 * b.option(ChannelOption.SO_KEEPALIVE, true); // (4) b.handler(new
+			 * CommInit(false));
+			 * 
+			 * // Start the client. System.out.println("Connect to a node.");
+			 * 
+			 * ChannelFuture f = b.connect(host, port).sync(); // (5) channel =
+			 * f.channel();
+			 */
 			// do {
 			int option = 0;
 			System.out.println("Welcome to Gossamer Distributed");
@@ -179,7 +183,7 @@ public class DemoApp implements CommListener {
 			case 3:
 
 				System.out.println("Retreiving list of files stored...");
-				MessageSender.SendReadAllFileInfo(channel);
+				MessageSender.SendReadAllFileInfo();
 				System.out.println("Please enter option of which file to fetch");
 
 				/*
@@ -231,7 +235,7 @@ public class DemoApp implements CommListener {
 			case 2:
 				System.out.println("Please enter name of file to fetch");
 				String fileName = reader.nextLine();
-				MessageSender.SendReadRequest(fileName, channel);
+				MessageSender.SendReadRequest(fileName);
 				break;
 			default:
 				break;
@@ -267,7 +271,7 @@ public class DemoApp implements CommListener {
 		 * ack
 		 */
 
-		MessageSender.sendReadCommand(file, channel);
+		MessageSender.sendReadCommand(file);
 
 	}
 

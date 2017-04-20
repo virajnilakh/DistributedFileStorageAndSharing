@@ -150,7 +150,8 @@ public class CommConnection {
 
 		group = new NioEventLoopGroup();
 		try {
-			CommandInit si = new CommandInit(null, false);
+			//CommandInit si = new CommandInit(null, false);
+			CommInit si= new CommInit(false);
 			Bootstrap b = new Bootstrap();
 			b.group(group).channel(NioSocketChannel.class).handler(si);
 			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
@@ -158,8 +159,8 @@ public class CommConnection {
 			b.option(ChannelOption.SO_KEEPALIVE, true);
 
 			// Make the connection attempt.
-			channel = b.connect(host, port).syncUninterruptibly();
-
+			//channel = b.connect(host, port).syncUninterruptibly();
+			channel = b.connect(host, port).sync();
 			// want to monitor the connection to the server s.t. if we loose the
 			// connection, we can try to re-establish it.
 			ClientClosedListener ccl = new ClientClosedListener(this);

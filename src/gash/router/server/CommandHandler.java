@@ -90,6 +90,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	public CommandHandler(RoutingConf conf) {
 		if (conf != null) {
 			this.conf = conf;
+
 		}
 	}
 
@@ -102,7 +103,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	 * @throws Exception
 	 */
 	public void handleMessage(CommandMessage msg, Channel channel) throws Exception {
-
+		
+		System.out.println("Message recieved");
+		
 		if (msg == null) {
 			System.out.println("ERROR: Unexpected content - " + msg);
 			return;

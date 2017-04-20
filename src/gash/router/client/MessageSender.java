@@ -17,8 +17,10 @@ import io.netty.channel.Channel;
 import routing.Pipe.CommandMessage;
 
 public class MessageSender {
+	static Channel channel = CommConnection.getInstance().connect();
 
-	public static void SendReadRequest(String fileName, Channel channel) {
+
+	public static void SendReadRequest(String fileName) {
 		// TODO Auto-generated method stub
 		CommandMessage msg = MessageCreator.createReadMessage(fileName);
 		channel.writeAndFlush(msg);
@@ -26,17 +28,18 @@ public class MessageSender {
 
 	}
 
-	public static void SendReadAllFileInfo(Channel channel) {
+	public static void SendReadAllFileInfo() {
 		// TODO Auto-generated method stub
+		// Channel channel = CommConnection.getInstance().connect();
 		List<String> response = null;
 		CommandMessage msg = MessageCreator.CreateReadAllMessage();
 		channel.writeAndFlush(msg);
 		System.out.println("Read all files request sent");
 	}
 
-	public static void sendReadCommand(File file, Channel channel) {
+	public static void sendReadCommand(File file) {
 		// TODO Auto-generated method stub
-
+		// Channel channel = CommConnection.getInstance().connect();
 		ArrayList<ByteString> chunksFile = new ArrayList<ByteString>();
 		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
@@ -62,7 +65,7 @@ public class MessageSender {
 			for (int i = 0; i < chunksFile.size(); i++) {
 				CommandMessage commMsg = MessageCreator.createWriteRequest(chunksFile.get(i), hash, name, numChunks,
 						i + 1);
-				WriteChannel myCallable = new WriteChannel(commMsg, channel);
+				WriteChannel myCallable = new WriteChannel(commMsg,channel);
 				futuresList.add(myCallable);
 			}
 
