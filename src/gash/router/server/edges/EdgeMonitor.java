@@ -331,6 +331,9 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			}
 		}
 	}
+	public synchronized HashMap<Integer, Integer> getTries() {
+		return tries;
+	}
 	private static class DeadFollowerTimer extends TimerTask{
 		private int nodeId;
 		private ServerState state;
