@@ -39,7 +39,7 @@ public class ServerState {
 	private Jedis jedisHandler1=null;
 	private Jedis jedisHandler2=null;
 	private Jedis jedisHandler3=null;
-	private int nodeId=0;
+	//private int nodeId=0;
 	private RoutingConf conf;
 	private static EdgeMonitor emon;
 	private TaskList tasks;
@@ -80,8 +80,8 @@ public class ServerState {
 				getJedisHandler1().select(1);
 				//getJedisHandler1().flushDB();
 
-				nodeId=getJedisHandler1().dbSize().intValue()+1;
-				getJedisHandler1().set(nodeId+"",this.ipAddress+":4567" );
+				//nodeId=getJedisHandler1().dbSize().intValue()+1;
+				getJedisHandler1().set(this.getConf().getNodeId()+"",this.ipAddress+":4567" );
 			}
 		}catch(Exception e){
 			System.out.println("Connection to redis failed at 169.254.214.175:4567");
@@ -91,7 +91,7 @@ public class ServerState {
 				
 				getJedisHandler2().select(1);
 				//getJedisHandler2().flushDB();
-				getJedisHandler2().set(nodeId+"",this.ipAddress+":4567");
+				getJedisHandler2().set(this.getConf().getNodeId()+"",this.ipAddress+":4567");
 			}
 		}catch(Exception e){
 			System.out.println("Connection to redis failed at 169.254.56.202:4567");
@@ -99,7 +99,7 @@ public class ServerState {
 			if(getJedisHandler3().ping().equals("PONG")){
 				getJedisHandler3().select(1);
 				//getJedisHandler3().flushDB();
-				getJedisHandler3().set(nodeId+"",this.ipAddress+":4567" );
+				getJedisHandler3().set(this.getConf().getNodeId()+"",this.ipAddress+":4567" );
 			}
 		}catch(Exception e){
 			System.out.println("Connection to redis failed at 169.254.80.87:4567");
@@ -133,12 +133,12 @@ public class ServerState {
 		}
 		
 	}
-	public int getNodeId() {
+	/*public int getNodeId() {
 		return nodeId;
 	}
 	public void setNodeId(int nodeId) {
 		this.nodeId = nodeId;
-	}
+	}*/
 	public Jedis getAnyJedis(){
 		try{
 			if(getJedisHandler1().ping().equals("PONG")){
