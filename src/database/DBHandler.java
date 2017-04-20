@@ -1,5 +1,8 @@
 package database;
 import java.sql.*;
+import java.util.ArrayList;
+
+import com.google.protobuf.ByteString;
 	 
 public class DBHandler {
  
@@ -53,25 +56,26 @@ public class DBHandler {
         }
     }
     
-	public int getChunk(String filename) {
-		DBManager file_name = new DBManager();
-        try {
-            String query = "select num_of_chunks from fileData where file_name=?";
+	public ArrayList<ByteString> getChunks(String filename) {
+        ArrayList<ByteString> allChunks = new ArrayList<ByteString>();
+		try {
+            String query = "select * from fileData where file_name=?";
             PreparedStatement preparedStatement = conn.prepareStatement( query );
             preparedStatement.setString(1, filename);
             ResultSet resultSet = preparedStatement.executeQuery();
+
             while( resultSet.next() ) {
-            	file_name.setNumOfChunks(resultSet.getInt("num_of_chunks"));            	
-            	System.out.println("-----> " + filename + " has " + resultSet.getString("num_of_chunks") + " chunks!");
+            	ByteString eachChunk = ByteString.copyFrom(resultSet.getBytes("chunk_data"));
+            	allChunks.add(eachChunk);
             }
             preparedStatement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return file_name.getNumOfChunks();
+        return allChunks;
     }
 		
-    public void closeConnection() {
+    public void closeConn() {
         if( conn == null )
             return;
         try {
