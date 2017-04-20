@@ -59,6 +59,8 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	private boolean forever = true;
 	private static int activeOutboundEdges=0;
 	private static int nodeCount=0;
+	private HashMap<Integer,Integer> tries=new HashMap<Integer,Integer>();
+
 	public HashMap<Integer,EdgeInfo> getOutboundEdges() {
 		return outboundEdges.getMap();
 	}
@@ -261,49 +263,63 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 						
 					} else {
 						// TODO create a client to the node
-						logger.info("trying to connect to node " + ei.getRef());
-						String host = ei.getHost();
-				        int port = ei.getPort();
-				        EventLoopGroup workerGroup = new NioEventLoopGroup();
+						if(!tries.containsKey(ei.getRef())){
+							tries.put(ei.getRef(), 1);
+						}else{
+							if(tries.get(ei.getRef())>5){
+								outboundEdges.map.remove(ei.getRef());
+					        	state.delRedis(ei.getRef());
+					        	activeOutboundEdges--;
+					        	nodeCount--;
+							}else{
+								tries.put(ei.getRef(), tries.get(ei.getRef())+1);
+								logger.info("trying to connect to node " + ei.getRef());
+								String host = ei.getHost();
+						        int port = ei.getPort();
+						        EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-				        try {
-				            Bootstrap b = new Bootstrap(); // (1)
-				            b.group(workerGroup); // (2)
-				            b.channel(NioSocketChannel.class); // (3)
-				            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-				            b.handler(new WorkInit(state,false));
+						        try {
+						            Bootstrap b = new Bootstrap(); // (1)
+						            b.group(workerGroup); // (2)
+						            b.channel(NioSocketChannel.class); // (3)
+						            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+						            b.handler(new WorkInit(state,false));
 
-				            // Start the client.
-				            //System.out.println("Connect to a node.");
+						            // Start the client.
+						            //System.out.println("Connect to a node.");
+						            
+						            final ChannelFuture f = b.connect(host, port);
+						            /*ei.setChannel(f.channel());
+						            ei.setActive(true);
+						            activeOutboundEdges++;*/
+						            f.addListener(new FutureListener<Void>() {
 
-				            final ChannelFuture f = b.connect(host, port);
-				            /*ei.setChannel(f.channel());
-				            ei.setActive(true);
-				            activeOutboundEdges++;*/
-				            f.addListener(new FutureListener<Void>() {
+						                @Override
+						                public void operationComplete(Future<Void> future) throws Exception {
+						                    if (!f.isSuccess()) {
+						                        //System.out.println("Test Connection failed");
+						                        future.cause();
 
-				                @Override
-				                public void operationComplete(Future<Void> future) throws Exception {
-				                    if (!f.isSuccess()) {
-				                        //System.out.println("Test Connection failed");
-				                        future.cause();
-
-				                    }else{
-				                    	setTimer(ei.getRef());
-				                    	
-				                    	ei.setChannel(f.channel());
-							            ei.setActive(true);
-							            activeOutboundEdges++;
-				                    }
-				                }
-				            });			            
-				            
-				            // Wait until the connection is closed.
-				            //f.channel().closeFuture().sync();
-				        } catch(Exception e) {
-				        	e.printStackTrace();
-				            //workerGroup.shutdownGracefully();
-				        }
+						                    }else{
+						                    	//setTimer(ei.getRef());
+						                    	
+						                    	ei.setChannel(f.channel());
+									            ei.setActive(true);
+									            tries.put(ei.getRef(), 0);
+									            activeOutboundEdges++;
+						                    }
+						                }
+						            });			            
+						            
+						            // Wait until the connection is closed.
+						            //f.channel().closeFuture().sync();
+						        } catch(Exception e) {
+						        	e.printStackTrace();
+						            //workerGroup.shutdownGracefully();
+						        }
+							}
+						}
+						
 
 					}
 				}
@@ -326,10 +342,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
         public void run(){
         	//	System.out.println("Node "+nodeId+"dead");
         	
-        	outboundEdges.map.remove(nodeId);
-        	state.delRedis(nodeId);
-        	activeOutboundEdges--;
-        	nodeCount--;
+        	
         	this.cancel();
         }
     }
