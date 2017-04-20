@@ -150,7 +150,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		//GET from Mysql DB
 		DBHandler mysql_db = new DBHandler();
-		mysql_db.getChunks(fileName);
+		chunksFile = mysql_db.getChunks(hash);
 		mysql_db.closeConn();
 
 		for (int i = 0; i < chunksFile.size(); i++) {

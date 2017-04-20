@@ -56,12 +56,12 @@ public class DBHandler {
         }
     }
     
-	public ArrayList<ByteString> getChunks(String filename) {
+	public ArrayList<ByteString> getChunks(String fileid) {
         ArrayList<ByteString> allChunks = new ArrayList<ByteString>();
 		try {
-            String query = "select * from fileData where file_name=?";
+            String query = "select * from chunkData where file_id=?";
             PreparedStatement preparedStatement = conn.prepareStatement( query );
-            preparedStatement.setString(1, filename);
+            preparedStatement.setString(1, fileid);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while( resultSet.next() ) {
