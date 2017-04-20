@@ -142,8 +142,6 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		int numChunks = 0;
 		byte[] buffer = new byte[sizeChunks];
 
-
-
 		long start = System.currentTimeMillis();
 		System.out.print(start);
 		System.out.println("Start send");
