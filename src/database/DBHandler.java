@@ -23,19 +23,31 @@ public class DBHandler {
  
     public void addChunk(String fileid, String filename, String fileext, int chunkid, int numOfChunks, byte[] chunkdata, int chunksize) {
         try {
-            String query = "insert into filestorage (file_id, file_name, file_ext, chunk_id, num_of_chunks, chunk_data, chunk_size) values (?,?,?,?,?,?,?)";
+        	conn.setAutoCommit(false);
+            String query = "insert into fileData (file_id, file_name, file_ext, num_of_chunks) values (?,?,?,?)";
             PreparedStatement preparedStatement = conn.prepareStatement( query );
             preparedStatement.setString( 1, fileid);
             preparedStatement.setString( 2, filename);
             preparedStatement.setString( 3, fileext);
-            preparedStatement.setInt( 4, chunkid);
-            preparedStatement.setInt( 5, numOfChunks );
-            preparedStatement.setBytes( 6, chunkdata);
-            preparedStatement.setInt( 7, chunksize);
-            
-            System.out.println("----> Wrote " + numOfChunks + " chunks for file = " + filename);
+            preparedStatement.setInt( 4, numOfChunks);
             preparedStatement.execute();
             preparedStatement.close();
+            
+            while(numOfChunks > 0){
+	            String query2 = "insert into chunkData (file_id, chunk_id, chunk_data, chunk_size) values (?,?,?,?)";
+	            PreparedStatement preparedStatement2 = conn.prepareStatement( query2 );
+	            preparedStatement2.setString( 1, fileid);
+	            preparedStatement2.setInt( 2, chunkid);
+	            preparedStatement2.setBytes( 3, chunkdata);
+	            preparedStatement2.setInt( 4, chunksize);
+	            preparedStatement2.execute();
+	            preparedStatement2.close();
+	            numOfChunks -= 1;
+	            if(numOfChunks == 0){
+	            	conn.commit();
+	            }
+             }
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -44,7 +56,7 @@ public class DBHandler {
 	public int getChunk(String filename) {
 		DBManager file_name = new DBManager();
         try {
-            String query = "select * from filestorage where file_name=?";
+            String query = "select num_of_chunks from fileData where file_name=?";
             PreparedStatement preparedStatement = conn.prepareStatement( query );
             preparedStatement.setString(1, filename);
             ResultSet resultSet = preparedStatement.executeQuery();
