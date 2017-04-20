@@ -192,7 +192,7 @@ public class MessageServer {
 
 			state = new ServerState();
 			state.setConf(conf);
-
+			state.setRedis();
 			TaskList tasks = new TaskList(new NoOpBalancer());
 			state.setTasks(tasks);
 			
