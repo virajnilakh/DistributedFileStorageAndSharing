@@ -14,10 +14,10 @@ import global.Constants;
 import routing.Pipe.CommandMessage;
 
 public class MessageHandler {
-	
+
 	protected static ArrayList<CommandMessage> lstMsg = new ArrayList<CommandMessage>();
 	protected static ArrayList<ByteString> chunkedFile = new ArrayList<ByteString>();
-	
+
 	/**
 	 * @param msg
 	 * @throws IOException
@@ -26,20 +26,23 @@ public class MessageHandler {
 	public static void handleRead(CommandMessage msg) throws IOException, FileNotFoundException {
 		System.out.println("Receiving chunks");
 		lstMsg.add(msg);
-
+		System.out.println("ChunkId Before sort:" + msg.getReqMsg().getRwb().getChunk().getChunkId());
+		// System.out.println("List Message size is" + lstMsg.size());
 		if (lstMsg.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
 			System.out.println("All chunks received");
 			// Sorting
 			Collections.sort(lstMsg, new Comparator<CommandMessage>() {
 				@Override
-				public int compare(CommandMessage msg1, CommandMessage msg2) {
-					return Integer.compare(msg1.getReqMsg().getRwb().getChunk().getChunkId(),
-							msg2.getReqMsg().getRwb().getChunk().getChunkId());
+				public int compare(CommandMessage o1, CommandMessage o2) {
+					return o1.getReqMsg().getRwb().getChunk().getChunkId()
+							- o2.getReqMsg().getRwb().getChunk().getChunkId();
 				}
 			});
 
 			System.out.println("All chunks sorted");
 			for (CommandMessage message : lstMsg) {
+				System.out.println("ChunkId:" + message.getReqMsg().getRwb().getChunk().getChunkId());
+				System.out.println("ChunkSize:" + message.getReqMsg().getRwb().getChunk().getChunkSize());
 				chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
 			}
 			System.out.println("Chunked file created");
@@ -56,6 +59,7 @@ public class MessageHandler {
 			file.createNewFile();
 			System.out.println("File created in ClientStuff dir");
 			FileOutputStream outputStream = new FileOutputStream(file);
+			System.out.println(chunkedFile.size());
 			ByteString bs = ByteString.copyFrom(chunkedFile);
 			outputStream.write(bs.toByteArray());
 			outputStream.flush();

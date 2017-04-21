@@ -29,14 +29,15 @@ import routing.Pipe.CommandMessage;
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
-	static Jedis jedisHandler1 = new Jedis(Constants.jedis1, Constants.redisPort);
-	static Jedis jedisHandler2 = new Jedis(Constants.jedis2, Constants.redisPort);
-	static Jedis jedisHandler3 = new Jedis(Constants.jedis3, Constants.redisPort);
 
-	public Jedis getJedisHandler1() {
-		return jedisHandler1;
-	}
-
+	/*
+	 * static Jedis jedisHandler1 = new Jedis(Constants.jedis1,
+	 * Constants.redisPort); static Jedis jedisHandler2 = new
+	 * Jedis(Constants.jedis2, Constants.redisPort); static Jedis jedisHandler3
+	 * = new Jedis(Constants.jedis3, Constants.redisPort);
+	 * 
+	 * public Jedis getJedisHandler1() { return jedisHandler1; }
+	 */
 	public DemoApp(MessageClient mc) {
 		init(mc);
 	}
@@ -80,42 +81,34 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String host = Constants.localhost;
+		// String host = Constants.localhost;
+		String host = "169.254.80.87";
 		int port = Constants.workPort;
 
 		Boolean affirm = true;
 		Boolean mainAffirm = true;
 		Scanner reader = new Scanner(System.in);
 		try {
-
-			try {
-				if (jedisHandler1.ping().equals("PONG")) {
-					jedisHandler1.select(0);
-					host = jedisHandler1.get("1").split(":")[0];
-					port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
-				}
-			} catch (Exception e) {
-				System.out.println("Connection to redis failed at 169.254.214.175:4567");
-			}
-			try {
-				if (jedisHandler2.ping().equals("PONG")) {
-					jedisHandler2.select(0);
-					host = jedisHandler2.get("1").split(":")[0];
-					port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
-				}
-			} catch (Exception e) {
-				System.out.println("Connection to redis failed at 169.254.56.202:4567");
-			}
-			try {
-				if (jedisHandler3.ping().equals("PONG")) {
-					jedisHandler3.select(0);
-					host = jedisHandler3.get("1").split(":")[0];
-					port = Integer.parseInt(jedisHandler3.get("1").split(":")[1]);
-				}
-			} catch (Exception e) {
-				System.out.println("Connection to redis failed at 169.254.80.87:4567");
-			}
-
+			/*
+			 * try { if (jedisHandler1.ping().equals("PONG")) {
+			 * jedisHandler1.select(0); host =
+			 * jedisHandler1.get("1").split(":")[0]; port =
+			 * Integer.parseInt(jedisHandler1.get("1").split(":")[1]); } } catch
+			 * (Exception e) { System.out.
+			 * println("Connection to redis failed at 169.254.214.175:4567"); }
+			 * try { if (jedisHandler2.ping().equals("PONG")) {
+			 * jedisHandler2.select(0); host =
+			 * jedisHandler2.get("1").split(":")[0]; port =
+			 * Integer.parseInt(jedisHandler2.get("1").split(":")[1]); } } catch
+			 * (Exception e) { System.out.
+			 * println("Connection to redis failed at 169.254.56.202:4567"); }
+			 * try { if (jedisHandler3.ping().equals("PONG")) {
+			 * jedisHandler3.select(0); host =
+			 * jedisHandler3.get("1").split(":")[0]; port =
+			 * Integer.parseInt(jedisHandler3.get("1").split(":")[1]); } } catch
+			 * (Exception e) { System.out.
+			 * println("Connection to redis failed at 169.254.80.87:4567"); }
+			 */
 			MessageClient msgClient = new MessageClient(host, port);
 			DemoApp app = new DemoApp(msgClient);
 
@@ -188,7 +181,7 @@ public class DemoApp implements CommListener {
 					if (ans2.equals("Y")) {
 						affirm = true;
 					}
-					reader.close();
+					// reader.close();
 					File file = new File(path);
 					long begin = System.currentTimeMillis();
 					System.out.println("Begin time");
