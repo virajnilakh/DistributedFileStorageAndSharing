@@ -52,6 +52,8 @@ public class CommConnection {
 
 	// our surge protection using a in-memory cache for messages
 	LinkedBlockingDeque<CommandMessage> outbound;
+	
+	public LinkedBlockingDeque<WriteChannel> outboundWriteQueue;
 
 	// message processing is delegated to a threading model
 	private CommWorker worker;
@@ -103,7 +105,13 @@ public class CommConnection {
 		// enqueue message
 		outbound.put(req);
 	}
-
+	
+	public void enqueueWrite(WriteChannel req) throws Exception {
+		// enqueue message
+		outboundWriteQueue.put(req);
+	}
+	
+	
 	/**
 	 * messages pass through this method (no queueing). We use a blackbox design
 	 * as much as possible to ensure we can replace the underlining
@@ -147,11 +155,13 @@ public class CommConnection {
 
 		// the queue to support client-side surging
 		outbound = new LinkedBlockingDeque<CommandMessage>();
-
+		
+		outboundWriteQueue=new LinkedBlockingDeque<WriteChannel>();
+		
 		group = new NioEventLoopGroup();
 		try {
-			//CommandInit si = new CommandInit(null, false);
-			CommInit si= new CommInit(false);
+			// CommandInit si = new CommandInit(null, false);
+			CommInit si = new CommInit(false);
 			Bootstrap b = new Bootstrap();
 			b.group(group).channel(NioSocketChannel.class).handler(si);
 			b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000);
@@ -159,8 +169,8 @@ public class CommConnection {
 			b.option(ChannelOption.SO_KEEPALIVE, true);
 
 			// Make the connection attempt.
-			//channel = b.connect(host, port).syncUninterruptibly();
-			channel = b.connect(host, port).sync();
+			channel = b.connect(host, port).syncUninterruptibly();
+			// channel = b.connect(host, port).sync();
 			// want to monitor the connection to the server s.t. if we loose the
 			// connection, we can try to re-establish it.
 			ClientClosedListener ccl = new ClientClosedListener(this);

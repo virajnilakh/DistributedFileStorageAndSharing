@@ -19,7 +19,6 @@ import routing.Pipe.CommandMessage;
 public class MessageSender {
 	static Channel channel = CommConnection.getInstance().connect();
 
-
 	public static void SendReadRequest(String fileName) {
 		// TODO Auto-generated method stub
 		CommandMessage msg = MessageCreator.createReadMessage(fileName);
@@ -65,17 +64,19 @@ public class MessageSender {
 			for (int i = 0; i < chunksFile.size(); i++) {
 				CommandMessage commMsg = MessageCreator.createWriteRequest(chunksFile.get(i), hash, name, numChunks,
 						i + 1);
-				WriteChannel myCallable = new WriteChannel(commMsg,channel);
-				futuresList.add(myCallable);
+
+				WriteChannel myCallable = new WriteChannel(commMsg, channel);
+				CommConnection.getInstance().enqueueWrite(myCallable);
+				// futuresList.add(myCallable);
 			}
 
-			System.out.println("No. of chunks: " + futuresList.size());
+			// System.out.println("No. of chunks: " + futuresList.size());
 
 			long start = System.currentTimeMillis();
 			System.out.print(start);
 			System.out.println("Start send");
 
-			List<Future<Long>> futures = service.invokeAll(futuresList);
+			List<Future<Long>> futures = service.invokeAll(CommConnection.getInstance().outboundWriteQueue);
 			System.out.println("Completed tasks");
 			service.shutdown();
 
