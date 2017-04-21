@@ -20,6 +20,13 @@ public class WriteChannel implements Callable<Long> {
 	/* Needs refactoring */
 	@Override
 	public Long call() {
+
+		try {
+			CommConnection.getInstance().dequeueWrite(message);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		channel.writeAndFlush(message);
 		return (long) 1;
 	}

@@ -110,6 +110,17 @@ public class CommConnection {
 		outboundWriteQueue.put(req);
 	}
 
+	public void clearQueue() throws Exception {
+		// enqueue message
+		outboundWriteQueue.clear();
+		outbound.clear();
+	}
+
+	public void dequeueWrite(CommandMessage req) throws Exception {
+		// enqueue message
+		outboundWriteQueue.remove(req);
+	}
+
 	/**
 	 * messages pass through this method (no queueing). We use a blackbox design
 	 * as much as possible to ensure we can replace the underlining

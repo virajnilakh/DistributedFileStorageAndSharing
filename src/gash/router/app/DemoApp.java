@@ -18,6 +18,7 @@ package gash.router.app;
 import java.io.File;
 import java.util.Scanner;
 
+import gash.router.client.CommConnection;
 import gash.router.client.CommListener;
 import gash.router.client.MessageClient;
 import gash.router.client.MessageSender;
@@ -81,8 +82,8 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// String host = Constants.localhost;
-		String host = "169.254.80.87";
+		String host = Constants.localhost;
+		// String host = "169.254.80.87";
 		int port = Constants.workPort;
 
 		Boolean affirm = true;
@@ -126,6 +127,8 @@ public class DemoApp implements CommListener {
 				// option = 2;
 				// reader.nextLine();
 				System.out.println("You entered " + option);
+				CommConnection.getInstance().clearQueue();
+				System.out.println("Queue size is " + CommConnection.getInstance().outboundWriteQueue.size());
 				System.out.println("Press Y to continue or any other key to cancel");
 				String ans = "";
 				ans = reader.nextLine();

@@ -28,6 +28,8 @@ public class MessageHandler {
 		lstMsg.add(msg);
 		System.out.println("ChunkId Before sort:" + msg.getReqMsg().getRwb().getChunk().getChunkId());
 		// System.out.println("List Message size is" + lstMsg.size());
+		System.out.println("List msg size:" + lstMsg.size());
+		System.out.println("No of chunks:" + msg.getReqMsg().getRwb().getNumOfChunks());
 		if (lstMsg.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
 			System.out.println("All chunks received");
 			// Sorting
@@ -65,9 +67,13 @@ public class MessageHandler {
 			outputStream.flush();
 			outputStream.close();
 
+			System.out.println("Cleaning up");
 			// Cleanup
 			chunkedFile = new ArrayList<ByteString>();
 			lstMsg = new ArrayList<CommandMessage>();
+
+			System.out.println("New chunkedFile size:" + chunkedFile.size());
+			System.out.println("New lstMsg size:" + lstMsg.size());
 			// futuresList = new ArrayList<WriteChannel>();
 
 		}
