@@ -152,10 +152,12 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		hb.setTime(System.currentTimeMillis());
 		LeaderStatus.Builder status=LeaderStatus.newBuilder();
 		status.setLeaderId(state.getConf().getNodeId());
+		status.setLeaderHost(state.getIpAddress());
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
 		wb.setHeader(hb);
 		wb.setSecret(0);
 		wb.setBeat(bb);
+		
 		if (state.getLeaderId() == 0) {
 			status.setState(LeaderState.LEADERUNKNOWN);
 			wb.setLeaderStatus(status);
