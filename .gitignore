@@ -1,2 +1,5 @@
 *.class
 /classes/
+*.conf
+*.rdb
+/src/database/DBHandler.java
