@@ -2,4 +2,4 @@
 /classes/
 *.conf
 *.rdb
-**/src/database/DBHandler.java
+**/src/database/**

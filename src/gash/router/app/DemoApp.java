@@ -90,6 +90,7 @@ public class DemoApp implements CommListener {
 
 			try {
 				if (jedisHandler1.ping().equals("PONG")) {
+					jedisHandler1.select(0);
 					host = jedisHandler1.get("1").split(":")[0];
 					port = Integer.parseInt(jedisHandler1.get("1").split(":")[1]);
 				}
@@ -98,6 +99,7 @@ public class DemoApp implements CommListener {
 			}
 			try {
 				if (jedisHandler2.ping().equals("PONG")) {
+					jedisHandler2.select(0);
 					host = jedisHandler2.get("1").split(":")[0];
 					port = Integer.parseInt(jedisHandler2.get("1").split(":")[1]);
 				}
@@ -106,6 +108,7 @@ public class DemoApp implements CommListener {
 			}
 			try {
 				if (jedisHandler3.ping().equals("PONG")) {
+					jedisHandler3.select(0);
 					host = jedisHandler3.get("1").split(":")[0];
 					port = Integer.parseInt(jedisHandler3.get("1").split(":")[1]);
 				}
