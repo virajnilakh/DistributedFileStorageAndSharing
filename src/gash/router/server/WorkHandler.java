@@ -199,6 +199,14 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 						"Heartbeat from leader " + msg.getLeaderStatus().getLeaderId() + "...Resetting the timmer:");
 				state.getElecHandler().getTimer().cancel();
 				state.getElecHandler().setTimer();
+				try{
+					state.getLocalhostJedis().select(0);
+					state.getLocalhostJedis().set("1", msg.getLeaderStatus().getLeaderHost()+":4568");
+					System.out.println("---Redis updated---");
+					
+				}catch(Exception e){
+					System.out.println("---Problem with redis at voteReceived in WorkHandler---");
+				}
 				state.setLeaderId(msg.getLeaderStatus().getLeaderId());
 				state.setLeaderAddress(msg.getLeaderStatus().getLeaderHost());
 				state.becomeFollower();
