@@ -21,7 +21,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gash.router.server.CommandInit;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -52,7 +51,7 @@ public class CommConnection {
 
 	// our surge protection using a in-memory cache for messages
 	LinkedBlockingDeque<CommandMessage> outbound;
-	
+
 	public LinkedBlockingDeque<WriteChannel> outboundWriteQueue;
 
 	// message processing is delegated to a threading model
@@ -105,13 +104,12 @@ public class CommConnection {
 		// enqueue message
 		outbound.put(req);
 	}
-	
+
 	public void enqueueWrite(WriteChannel req) throws Exception {
 		// enqueue message
 		outboundWriteQueue.put(req);
 	}
-	
-	
+
 	/**
 	 * messages pass through this method (no queueing). We use a blackbox design
 	 * as much as possible to ensure we can replace the underlining
@@ -155,9 +153,9 @@ public class CommConnection {
 
 		// the queue to support client-side surging
 		outbound = new LinkedBlockingDeque<CommandMessage>();
-		
-		outboundWriteQueue=new LinkedBlockingDeque<WriteChannel>();
-		
+
+		outboundWriteQueue = new LinkedBlockingDeque<WriteChannel>();
+
 		group = new NioEventLoopGroup();
 		try {
 			// CommandInit si = new CommandInit(null, false);

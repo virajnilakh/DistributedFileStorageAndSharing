@@ -14,7 +14,7 @@ public class HandleLeaderResponseState implements Handelable {
 		// TODO Auto-generated method stub
 		System.out.println("New Leader elected is "+wm.getLeaderStatus().getLeaderId()+"and "+wm.getLeaderStatus().getLeaderHost());
 		System.out.println(
-				"Heartbeat from leader " + wm.getLeaderStatus().getLeaderId() + "...Resetting the timmer:");
+				"Heartbeat from leader " + wm.getLeaderStatus().getLeaderId() + "...Resetting the timer:");
 		state.getElecHandler().getTimer().cancel();
 		state.getElecHandler().setTimer();
 		try{

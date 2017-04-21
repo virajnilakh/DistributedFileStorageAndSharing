@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,6 @@ import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkState;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
-import routing.Pipe.CommandMessage;
 
 /**
  * The message handler processes json messages that are delimited by a 'newline'

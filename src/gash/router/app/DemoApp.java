@@ -15,51 +15,23 @@
  */
 package gash.router.app;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.logging.Logger;
 
-import com.google.protobuf.ByteString;
-
-import gash.router.client.CommConnection;
-import gash.router.client.CommInit;
 import gash.router.client.CommListener;
-import global.Constants;
-import global.Utility;
 import gash.router.client.MessageClient;
 import gash.router.client.MessageSender;
-import gash.router.client.WriteChannel;
-import gash.router.server.CommandInit;
-import gash.router.server.WorkInit;
-import io.netty.bootstrap.Bootstrap;
+import global.Constants;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import pipe.common.Common.Header;
-import pipe.common.Common.ReadBody;
-import pipe.common.Common.Request;
 import redis.clients.jedis.Jedis;
 import routing.Pipe.CommandMessage;
 
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
-	static Jedis jedisHandler1 = new Jedis("169.254.214.175", 6379);
-	static Jedis jedisHandler2 = new Jedis("169.254.56.202", 6379);
-	static Jedis jedisHandler3 = new Jedis("169.254.80.87", 6379);
+	static Jedis jedisHandler1 = new Jedis(Constants.jedis1, Constants.redisPort);
+	static Jedis jedisHandler2 = new Jedis(Constants.jedis2, Constants.redisPort);
+	static Jedis jedisHandler3 = new Jedis(Constants.jedis3, Constants.redisPort);
 
 	public Jedis getJedisHandler1() {
 		return jedisHandler1;
@@ -108,8 +80,9 @@ public class DemoApp implements CommListener {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String host = "127.0.0.1";
-		int port = 4568;
+		String host = Constants.localhost;
+		int port = Constants.workPort;
+
 		Boolean affirm = true;
 		Boolean mainAffirm = true;
 		Scanner reader = new Scanner(System.in);
@@ -143,104 +116,93 @@ public class DemoApp implements CommListener {
 			MessageClient msgClient = new MessageClient(host, port);
 			DemoApp app = new DemoApp(msgClient);
 
-			/*
-			 * Commented in favor of usage of MessageClient EventLoopGroup
-			 * workerGroup = new NioEventLoopGroup();
-			 * 
-			 * Bootstrap b = new Bootstrap(); // (1) b.group(workerGroup); //
-			 * (2) b.channel(NioSocketChannel.class); // (3)
-			 * b.option(ChannelOption.SO_KEEPALIVE, true); // (4) b.handler(new
-			 * CommInit(false));
-			 * 
-			 * // Start the client. System.out.println("Connect to a node.");
-			 * 
-			 * ChannelFuture f = b.connect(host, port).sync(); // (5) channel =
-			 * f.channel();
-			 */
-			// do {
-			int option = 0;
-			System.out.println("Welcome to Gossamer Distributed");
-			System.out.println("Please choose an option to continue: ");
+			do {
+				int option = 0;
+				System.out.println("Welcome to Gossamer Distributed");
+				System.out.println("Please choose an option to continue: ");
 
-			System.out.println("1. Write a file");
-			System.out.println("2. Read files");
-			System.out.println("3. Get File Names");
-			System.out.println("0. Exit");
+				System.out.println("1. Write a file");
+				System.out.println("2. Read files");
+				System.out.println("3. Get File Names");
+				System.out.println("0. Exit");
 
-			option = reader.nextInt();
-			// option = 2;
-			// reader.nextLine();
-			System.out.println("You entered " + option);
-			System.out.println("Press Y to continue or any other key to cancel");
-			String ans = "";
-			ans = reader.nextLine();
-			// ans = "Y";
-			if (ans.equals("Y")) {
-				mainAffirm = false;
-			}
-			String path = "";
-			switch (option) {
-			case 3:
-
-				System.out.println("Retreiving list of files stored...");
-				MessageSender.SendReadAllFileInfo();
-				System.out.println("Please enter option of which file to fetch");
-
-				/*
-				 * for (int i = 0; i < files.size(); i++) { System.out.print(i +
-				 * "."); System.out.println(files.get(i)); }
-				 * 
-				 * int fileOption = reader.nextInt();
-				 * 
-				 * System.out.println("You entered " + files.get(fileOption));
-				 * 
-				 * System.out.
-				 * println("Press Y to continue or any other key to cancel" );
-				 * affirm = false; String ans1 = ""; ans1 = reader.next(); ans1
-				 * = "Y"; if (ans1.equals("Y")) { affirm = true; }
-				 */
-				break;
-			case 1:
-				// For testing writes
-				// String path = runWriteTest();
-
-				System.out.println("Please enter directory (path) to upload:");
-
-				path = reader.nextLine();
-				// path = "C:\\Songs\\1.mp4";
-				// path = "C:\\JS\\test\\test.js";
-				// path = "C:\\Songs\\2.mp4";
-
-				System.in.read();
-
-				System.out.println("You entered" + path);
-
+				option = reader.nextInt();
+				// option = 2;
+				// reader.nextLine();
+				System.out.println("You entered " + option);
 				System.out.println("Press Y to continue or any other key to cancel");
-				affirm = false;
-				String ans2 = "";
-				ans2 = reader.next();
-				ans2 = "Y";
-				if (ans2.equals("Y")) {
-					affirm = true;
+				String ans = "";
+				ans = reader.nextLine();
+				// ans = "Y";
+				if (ans.equals("Y")) {
+					mainAffirm = false;
 				}
-				reader.close();
-				File file = new File(path);
-				long begin = System.currentTimeMillis();
-				System.out.println("Begin time");
-				System.out.println(begin);
-				sendFile(file, channel);
-				System.out.println("File sent");
-				System.out.flush();
-				break;
-			case 2:
-				System.out.println("Please enter name of file to fetch");
-				String fileName = reader.nextLine();
-				MessageSender.SendReadRequest(fileName);
-				break;
-			default:
-				break;
-			}
-			// } while (true);
+				String path = "";
+				switch (option) {
+				case 3:
+
+					System.out.println("Retreiving list of files stored...");
+					MessageSender.SendReadAllFileInfo();
+					System.out.println("Please enter option of which file to fetch");
+
+					/*
+					 * for (int i = 0; i < files.size(); i++) {
+					 * System.out.print(i + ".");
+					 * System.out.println(files.get(i)); }
+					 * 
+					 * int fileOption = reader.nextInt();
+					 * 
+					 * System.out.println("You entered " +
+					 * files.get(fileOption));
+					 * 
+					 * System.out.
+					 * println("Press Y to continue or any other key to cancel"
+					 * ); affirm = false; String ans1 = ""; ans1 =
+					 * reader.next(); ans1 = "Y"; if (ans1.equals("Y")) { affirm
+					 * = true; }
+					 */
+					break;
+				case 1:
+					// For testing writes
+					// String path = runWriteTest();
+
+					System.out.println("Please enter directory (path) to upload:");
+
+					path = reader.nextLine();
+					// path = "C:\\Songs\\1.mp4";
+					// path = "C:\\JS\\test\\test.js";
+					// path = "C:\\Songs\\2.mp4";
+
+					System.in.read();
+
+					System.out.println("You entered" + path);
+
+					System.out.println("Press Y to continue or any other key to cancel");
+					affirm = false;
+					String ans2 = "";
+					ans2 = reader.next();
+					ans2 = "Y";
+					if (ans2.equals("Y")) {
+						affirm = true;
+					}
+					reader.close();
+					File file = new File(path);
+					long begin = System.currentTimeMillis();
+					System.out.println("Begin time");
+					System.out.println(begin);
+					sendFile(file, channel);
+					System.out.println("File sent");
+					System.out.flush();
+					break;
+				case 2:
+					System.out.println("Please enter name of file to fetch");
+					String fileName = reader.nextLine();
+					MessageSender.SendReadRequest(fileName);
+					break;
+				default:
+					break;
+				}
+			} while (true);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("Error occurred...");
