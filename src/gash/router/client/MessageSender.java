@@ -49,6 +49,7 @@ public class MessageSender {
 		try {
 			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
 			String name = file.getName();
+			long filesize = file.length();
 			String hash = Utility.getHashFileName(name);
 			int tmp = 0;
 			while ((tmp = bis.read(buffer)) > 0) {
@@ -63,7 +64,7 @@ public class MessageSender {
 
 			for (int i = 0; i < chunksFile.size(); i++) {
 				CommandMessage commMsg = MessageCreator.createWriteRequest(chunksFile.get(i), hash, name, numChunks,
-						i + 1);
+						i + 1, filesize);
 
 				WriteChannel myCallable = new WriteChannel(commMsg, channel);
 				CommConnection.getInstance().enqueueWrite(myCallable);

@@ -54,7 +54,7 @@ public class MessageCreator {
 	}
 
 	public static CommandMessage createWriteRequest(ByteString bs, String hash, String fileName, int chunkCount,
-			int chunkId) throws Exception {
+			int chunkId, long filesize) throws Exception {
 
 		Header.Builder header = Header.newBuilder();
 		header.setNodeId(99);
@@ -72,6 +72,7 @@ public class MessageCreator {
 		body.setFileId(hash);
 		body.setNumOfChunks(chunkCount);
 		body.setChunk(chunk);
+		body.setFileSize(filesize);
 
 		Request.Builder req = Request.newBuilder();
 		req.setRequestType(Request.RequestType.WRITEFILE);
