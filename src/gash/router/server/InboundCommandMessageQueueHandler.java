@@ -49,7 +49,9 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 	public void run() {
 		// TODO Auto-generated method stub
 		while(true){
-			CommandMessage msg=QueueHandler.dequeueInboundCommandMessage();
+			CommandAndChannel cch=QueueHandler.dequeueInboundCommandAndChannel();
+			CommandMessage msg=cch.getMsg();
+			Channel channel=cch.getChannel();
 			System.out.println("Message recieved");
 			
 			if (msg == null) {
@@ -59,16 +61,16 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 
 			if (msg.getReqMsg().getRequestType() == Request.RequestType.READFILE) {
 				if (msg.getReqMsg().getRrb().getFilename().equals("*")) {
-					readFileNamesCmd(msg, ServerState.getClientChannel());
+					readFileNamesCmd(msg, channel);
 				} else {
-					readFileCmd(msg,  ServerState.getClientChannel());
+					readFileCmd(msg,  channel);
 				}
 			}
 
 			if (msg.getReqMsg().getRequestType() == Request.RequestType.WRITEFILE) {
 
 				try {
-					writeFileCmd(msg,  ServerState.getClientChannel());
+					writeFileCmd(msg,  channel);
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -87,7 +89,7 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 				}
 			}
 
-			pingCmd(msg,  ServerState.getClientChannel());
+			pingCmd(msg,  channel);
 
 			System.out.flush();
 		}
@@ -175,7 +177,7 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			QueueHandler.enqueueOutboundCommandMessage(commMsg);
+			QueueHandler.enqueueOutboundCommandAndChannel(commMsg,channel);
 			//WriteChannel myCallable = new WriteChannel(commMsg, channel);
 			//futuresList.add(myCallable);
 		}

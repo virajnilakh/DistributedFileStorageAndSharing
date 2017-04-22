@@ -2,30 +2,33 @@ package gash.router.server;
 
 import java.util.concurrent.LinkedBlockingDeque;
 
+import io.netty.channel.Channel;
 import pipe.work.Work.WorkMessage;
 import routing.Pipe.CommandMessage;
 
+
 public class QueueHandler implements Runnable {
 	private ServerState state;
-	private static LinkedBlockingDeque<CommandMessage> cmdMsgInboundQueue = new LinkedBlockingDeque<CommandMessage>();
-	private static LinkedBlockingDeque<CommandMessage> cmdMsgOutboundQueue = new LinkedBlockingDeque<CommandMessage>();
-	private static LinkedBlockingDeque<WorkMessage> workMsgInboundQueue = new LinkedBlockingDeque<WorkMessage>();
-	public static LinkedBlockingDeque<WorkMessage> getWorkMsgInboundQueue() {
+	private static LinkedBlockingDeque<CommandAndChannel> cmdMsgInboundQueue = new LinkedBlockingDeque<CommandAndChannel>();
+	private static LinkedBlockingDeque<CommandAndChannel> cmdMsgOutboundQueue = new LinkedBlockingDeque<CommandAndChannel>();
+	private static LinkedBlockingDeque<WorkAndChannel> workMsgInboundQueue = new LinkedBlockingDeque<WorkAndChannel>();
+
+	public static LinkedBlockingDeque<WorkAndChannel> getWorkMsgInboundQueue() {
 		return workMsgInboundQueue;
 	}
 
-	public static void setWorkMsgInboundQueue(LinkedBlockingDeque<WorkMessage> workMsgInboundQueue) {
+	public static void setWorkMsgInboundQueue(LinkedBlockingDeque<WorkAndChannel> workMsgInboundQueue) {
 		QueueHandler.workMsgInboundQueue = workMsgInboundQueue;
 	}
 
-	public static LinkedBlockingDeque<WorkMessage> getWorkMsgOutboundQueue() {
+	public static LinkedBlockingDeque<WorkAndChannel> getWorkMsgOutboundQueue() {
 		return workMsgOutboundQueue;
 	}
 
-	public static void setWorkMsgOutboundQueue(LinkedBlockingDeque<WorkMessage> workMsgOutboundQueue) {
-		QueueHandler.workMsgOutboundQueue = workMsgOutboundQueue;
+	public static void setWorkMsgOutboundQueue(LinkedBlockingDeque<WorkAndChannel> wm) {
+		workMsgOutboundQueue = wm;
 	}
-	private static LinkedBlockingDeque<WorkMessage> workMsgOutboundQueue = new LinkedBlockingDeque<WorkMessage>();
+	private static LinkedBlockingDeque<WorkAndChannel> workMsgOutboundQueue = new LinkedBlockingDeque<WorkAndChannel>();
 	
 	QueueHandler(ServerState state){
 		this.state = state;
@@ -42,30 +45,31 @@ public class QueueHandler implements Runnable {
 			
 	}
 
-	public static LinkedBlockingDeque<CommandMessage> getCmdMsgInboundQueue() {
+	public static LinkedBlockingDeque<CommandAndChannel> getCmdMsgInboundQueue() {
 		return cmdMsgInboundQueue;
 	}
 
-	public static void setCmdMsgInboundQueue(LinkedBlockingDeque<CommandMessage> cmdMsgInboundQueue) {
+	public static void setCmdMsgInboundQueue(LinkedBlockingDeque<CommandAndChannel> cmdMsgInboundQueue) {
 		QueueHandler.cmdMsgInboundQueue = cmdMsgInboundQueue;
 	}
 
-	public static LinkedBlockingDeque<CommandMessage> getCmdMsgOutboundQueue() {
+	public static LinkedBlockingDeque<CommandAndChannel> getCmdMsgOutboundQueue() {
 		return cmdMsgOutboundQueue;
 	}
 
-	public static void setCmdMsgOutboundQueue(LinkedBlockingDeque<CommandMessage> cmdMsgOutboundQueue) {
+	public static void setCmdMsgOutboundQueue(LinkedBlockingDeque<CommandAndChannel> cmdMsgOutboundQueue) {
 		QueueHandler.cmdMsgOutboundQueue = cmdMsgOutboundQueue;
 	}
 
-	public static void enqueueInboundCommandMessage(CommandMessage msg) {
+	public static void enqueueInboundCommandAndChannel(CommandMessage msg,Channel channel) {
+		CommandAndChannel cch=new CommandAndChannel(msg,channel);
 		// TODO Auto-generated method stub
-		cmdMsgInboundQueue.add(msg);
+		cmdMsgInboundQueue.add(cch);
 	}
 
-	public static CommandMessage dequeueInboundCommandMessage() {
+	public static CommandAndChannel dequeueInboundCommandAndChannel() {
 		// TODO Auto-generated method stub
-		CommandMessage msg=null;
+		CommandAndChannel msg=null;
 		try {
 			msg= cmdMsgInboundQueue.take();
 		} catch (InterruptedException e) {
@@ -74,14 +78,45 @@ public class QueueHandler implements Runnable {
 		}
 		return msg;
 	}
-	public static void enqueueOutboundCommandMessage(CommandMessage msg) {
+	public static void enqueueInboundWorkAndChannel(WorkMessage msg,Channel channel){
+		WorkAndChannel wch=new WorkAndChannel(msg,channel);
+		workMsgInboundQueue.add(wch);
+	}
+	public static void enqueueOutboundWorkAndChannel(WorkMessage msg,Channel channel){
+		WorkAndChannel wch=new WorkAndChannel(msg,channel);
+		workMsgOutboundQueue.add(wch);
+	}
+	public static WorkAndChannel dequeueInboundWorkAndChannel(){
+		WorkAndChannel msg=null;
+		try {
+			msg= workMsgInboundQueue.take();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return msg;
+		
+	}
+	public static WorkAndChannel dequeueOutboundWorkAndChannel(){
+		WorkAndChannel msg=null;
+		try {
+			msg= workMsgOutboundQueue.take();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return msg;
+		
+	}
+	public static void enqueueOutboundCommandAndChannel(CommandMessage msg,Channel channel) {
+		CommandAndChannel cch=new CommandAndChannel(msg,channel);
 		// TODO Auto-generated method stub
-		cmdMsgOutboundQueue.add(msg);
+		cmdMsgOutboundQueue.add(cch);
 	}
 
-	public static CommandMessage dequeueOutboundCommandMessage() {
+	public static CommandAndChannel dequeueOutboundCommandAndChannel() {
 		// TODO Auto-generated method stub
-		CommandMessage msg=null;
+		CommandAndChannel msg=null;
 		try {
 			msg= cmdMsgInboundQueue.take();
 		} catch (InterruptedException e) {
@@ -90,5 +125,7 @@ public class QueueHandler implements Runnable {
 		}
 		return msg;
 	}
+
+	
 
 }

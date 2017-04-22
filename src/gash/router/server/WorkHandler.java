@@ -87,6 +87,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	 */
 	
 	public void handleMessage(WorkMessage msg, Channel channel) throws IOException {
+		if(msg!=null){
+			//QueueHandler.enqueueInboundWorkMessage(msg,channel);
+
+		}
 		if (msg == null) {
 			// TODO add logging
 			System.out.println("ERROR: Unexpected content  - " + msg);

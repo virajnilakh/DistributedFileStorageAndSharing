@@ -1,17 +1,18 @@
 package gash.router.server;
 
 import io.netty.channel.Channel;
+import pipe.work.Work.WorkMessage;
 import routing.Pipe.CommandMessage;
 
-public class OutboundCommandMessageQueueHandler implements Runnable{
-	
+public class OutboundWorkMessageQueueuHandler implements Runnable{
+
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 		while(true){
-			CommandAndChannel cch=QueueHandler.dequeueOutboundCommandAndChannel();
-			CommandMessage msg=cch.getMsg();
-			Channel channel=cch.getChannel();
+			WorkAndChannel wch=QueueHandler.dequeueOutboundWorkAndChannel();
+			WorkMessage msg=wch.getMsg();
+			Channel channel=wch.getChannel();
 			if(msg!=null){
 				channel.writeAndFlush(msg);
 			}

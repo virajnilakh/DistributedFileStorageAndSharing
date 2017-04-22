@@ -27,6 +27,7 @@ import gash.router.client.CommConnection;
 import gash.router.container.RoutingConf.RoutingEntry;
 import gash.router.election.ElectionHandler;
 import gash.router.server.CommandInit;
+import gash.router.server.QueueHandler;
 import gash.router.server.ServerState;
 import gash.router.server.ServerState.State;
 import gash.router.server.WorkInit;
@@ -104,6 +105,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				Channel ch=ei.getChannel();
 				ChannelFuture cf =null;
 				if(ch!=null){
+					//QueueHandler.enqueueOutboundWorkAndChannel(msg, ch);
 					cf= ch.write(msg);
 					ch.flush();
 					if (cf.isDone() && !cf.isSuccess()) {

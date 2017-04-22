@@ -94,7 +94,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		if(ServerState.getClientChannel()==null){
 			ServerState.setClientChannel(channel);
 		}
-		//QueueHandler.enqueueCommandMessage(msg);
+		if(msg!=null){
+		//QueueHandler.enqueueCommandMessage(msg,channel);
+		}
 		
 
 
