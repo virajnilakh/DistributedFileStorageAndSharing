@@ -27,7 +27,7 @@ public class HandleVoteReceivedState implements Handelable{
 				state.getEmon().broadcast(response);
 				try{
 					state.getLocalhostJedis().select(0);
-					state.getLocalhostJedis().set("1", wm.getLeaderStatus().getLeaderHost()+":4568");
+					state.getLocalhostJedis().set("2", state.getIpAddress()+":4568");
 					System.out.println("---Redis updated---");
 					
 				}catch(Exception e){

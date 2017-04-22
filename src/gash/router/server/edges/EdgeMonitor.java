@@ -204,6 +204,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	@Override
 	public void run() {
 		while (forever) {
+			
 			if(state.getAnyJedis().dbSize()>nodeCount+1){
 				Jedis j=state.getAnyJedis();
 				Set<String> list = j.keys("*"); 
@@ -227,7 +228,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				System.out.println("Node:"+state.getConf().getNodeId()+" is the Leader!!");
 				try{
 					state.getLocalhostJedis().select(0);
-					state.getLocalhostJedis().set("1", state.getIpAddress()+":4568");
+					state.getLocalhostJedis().set("2", state.getIpAddress()+":4568");
 					System.out.println("---Redis updated---");
 					
 				}catch(Exception e){
@@ -306,6 +307,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				        	e.printStackTrace();
 				            //workerGroup.shutdownGracefully();
 				        }
+				        
 
 					}
 				}
@@ -314,6 +316,32 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+			if(state.next==null){
+				
+				EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+		        try {
+		        	String host=state.getLocalhostJedis().get(1+"").split(":")[0];
+					int port=Integer.parseInt(state.getLocalhostJedis().get(1+"").split(":")[1]);
+		            Bootstrap b = new Bootstrap(); // (1)
+		            b.group(workerGroup); // (2)
+		            b.channel(NioSocketChannel.class); // (3)
+		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+		            b.handler(new WorkInit(state,false));
+
+		            // Start the client.
+		            //System.out.println("Connect to a node.");
+
+		             ChannelFuture cha = b.connect(host, port).sync();
+		             state.setNext(cha.channel());
+		            /*ei.setChannel(f.channel());
+		            ei.setActive(true);
+		            activeOutboundEdges++;*/
+		             
+		        }catch(Exception e){
+		        	System.out.println("Failed to connect to next");
+		        }
 			}
 		}
 	}

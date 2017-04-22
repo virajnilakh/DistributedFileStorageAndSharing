@@ -19,7 +19,7 @@ public class HandleLeaderResponseState implements Handelable {
 		state.getElecHandler().setTimer();
 		try{
 			state.getLocalhostJedis().select(0);
-			state.getLocalhostJedis().set("1", wm.getLeaderStatus().getLeaderHost()+":4568");
+			state.getLocalhostJedis().set("2", wm.getLeaderStatus().getLeaderHost()+":4568");
 			System.out.println("---Redis updated---");
 			
 		}catch(Exception e){

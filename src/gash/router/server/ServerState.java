@@ -24,6 +24,14 @@ public class ServerState {
 	public enum State {
 		Follower, Leader, Candidate;
 	}
+	private static Channel clientChannel=null;
+	public static Channel getClientChannel() {
+		return clientChannel;
+	}
+
+	public static void setClientChannel(Channel clientChannel) {
+		ServerState.clientChannel = clientChannel;
+	}
 
 	private Handelable requestHandler;
 	private ElectionHandler elecHandler = new ElectionHandler(this);
@@ -40,6 +48,23 @@ public class ServerState {
 
 	public Jedis getLocalhostJedis() {
 		return localhostJedis;
+	}
+	public static Channel next=null;
+	private static Jedis nextJedis = null;
+	public static Channel getNext() {
+		return next;
+	}
+
+	public static void setNext(Channel next) {
+		ServerState.next = next;
+	}
+
+	public static Jedis getNextJedis() {
+		return nextJedis;
+	}
+
+	public static void setNextJedis(Jedis nextJedis) {
+		ServerState.nextJedis = nextJedis;
 	}
 
 	private Jedis jedisHandler1 = null;
@@ -64,13 +89,13 @@ public class ServerState {
 	public ServerState() throws UnknownHostException {
 		// ipAddress=LocalAddress.getLocalHostLANAddress().getHostAddress();
 		 ipAddress = LocalAddress.getLocalHostLANAddress().getHostAddress();
-		//ipAddress = "10.250.175.205";
+		//ipAddress = "169.254.80.87";
 
 		System.out.println(LocalAddress.getLocalHostLANAddress().getHostAddress());
 		reqVote = new HandleVoteRequestState(this);
 		resLeader = new HandleLeaderResponseState(this);
 		voteReceived = new HandleVoteReceivedState(this);
-
+		nextJedis=new Jedis(Constants.next, Constants.redisPort);
 		jedisHandler1 = new Jedis(Constants.jedis1, Constants.redisPort);
 		jedisHandler2 = new Jedis(Constants.jedis2, Constants.redisPort);
 		jedisHandler3 = new Jedis(Constants.jedis3, Constants.redisPort);

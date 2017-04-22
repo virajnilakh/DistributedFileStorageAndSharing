@@ -1,18 +1,3 @@
-/**
- * Copyright 2016 Gash.
- *
- * This file and intellectual content is protected under the Apache License, version 2.0
- * (the "License"); you may not use this file except in compliance with the
- * License.  You may obtain a copy of the License at:
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
 package gash.router.server;
 
 import java.io.File;
@@ -39,14 +24,10 @@ import database.DBHandler;
 import gash.router.client.MessageCreator;
 import gash.router.client.WriteChannel;
 import gash.router.container.RoutingConf;
-import gash.router.server.ServerState;
 import global.Constants;
 import global.Utility;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
-import pipe.common.Common.Header;
 import pipe.common.Common.Request;
 import pipe.work.Work.WorkMessage;
 import redis.clients.jedis.Jedis;
@@ -55,15 +36,7 @@ import redis.clients.jedis.ScanResult;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import routing.Pipe.CommandMessage;
 
-/**
- * The message handler processes json messages that are delimited by a 'newline'
- * 
- * TODO replace println with logging!
- * 
- * @author gash
- * 
- */
-public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> {
+public class InboundCommandMessageQueueHandler implements Runnable{
 	protected static Logger logger = LoggerFactory.getLogger("cmd");
 	protected RoutingConf conf;
 	protected ArrayList<ByteString> chunkedFile = new ArrayList<ByteString>();
@@ -71,73 +44,95 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	private static Jedis jedisHandler1 = new Jedis("localhost", 6379);
 	List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
 	ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
-	public CommandHandler(RoutingConf conf) {
-		if (conf != null) {
-			this.conf = conf;
-
-		}
-	}
-
-	/**
-	 * override this method to provide processing behavior. This implementation
-	 * mimics the routing we see in annotating classes to support a RESTful-like
-	 * behavior (e.g., jax-rs).
-	 * 
-	 * @param msg
-	 * @throws Exception
-	 */
-	public void handleMessage(CommandMessage msg, Channel channel) throws Exception {
-		if(ServerState.getClientChannel()==null){
-			ServerState.setClientChannel(channel);
-		}
-		//QueueHandler.enqueueCommandMessage(msg);
-		
-		System.out.println("Message recieved");
-		
-		if (msg == null) {
-			System.out.println("ERROR: Unexpected content - " + msg);
-			return;
-		}
-		if(msg.getPing()){
-			System.out.println("Received ping from cluster 1");
-			CommandMessage ping=createCommandPing();
-			ServerState.getNext().writeAndFlush(ping);
-		}
-		if (msg.getReqMsg().getRequestType() == Request.RequestType.READFILE) {
-			if (msg.getReqMsg().getRrb().getFilename().equals("*")) {
-				readFileNamesCmd(msg, channel);
-			} else {
-				readFileCmd(msg, channel);
-			}
-		}
-
-		if (msg.getReqMsg().getRequestType() == Request.RequestType.WRITEFILE) {
-
-			writeFileCmd(msg, channel);
-		}
-
-		pingCmd(msg, channel);
-
-		System.out.flush();
-
-	}
-
-	private CommandMessage createCommandPing() {
+	@Override
+	public void run() {
 		// TODO Auto-generated method stub
-		CommandMessage.Builder command = CommandMessage.newBuilder();
-		Boolean ping=true;
-		command.setPing(ping);
-		
-		Header.Builder header= Header.newBuilder();
-		header.setNodeId(2);
-		header.setTime(0);
-		command.setHeader(header);
-		
-		
-		return command.build();
-	}
+		while(true){
+			CommandMessage msg=QueueHandler.dequeueInboundCommandMessage();
+			System.out.println("Message recieved");
+			
+			if (msg == null) {
+				System.out.println("ERROR: Unexpected content - " + msg);
+				return;
+			}
 
+			if (msg.getReqMsg().getRequestType() == Request.RequestType.READFILE) {
+				if (msg.getReqMsg().getRrb().getFilename().equals("*")) {
+					readFileNamesCmd(msg, ServerState.getClientChannel());
+				} else {
+					readFileCmd(msg,  ServerState.getClientChannel());
+				}
+			}
+
+			if (msg.getReqMsg().getRequestType() == Request.RequestType.WRITEFILE) {
+
+				try {
+					writeFileCmd(msg,  ServerState.getClientChannel());
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			pingCmd(msg,  ServerState.getClientChannel());
+
+			System.out.flush();
+		}
+		
+	}
+	private void pingCmd(CommandMessage msg, Channel channel) {
+		try {
+			if (msg.hasPing()) {
+				logger.info("ping from " + msg.getHeader().getNodeId());
+			} else if (msg.hasMessage()) {
+				logger.info(msg.getMessage());
+			} else {
+			}
+
+		} catch (Exception e) {
+			// TODO add logging
+			Failure.Builder eb = Failure.newBuilder();
+			eb.setId(conf.getNodeId());
+			eb.setRefId(msg.getHeader().getNodeId());
+			eb.setMessage(e.getMessage());
+			CommandMessage.Builder rb = CommandMessage.newBuilder(msg);
+			rb.setErr(eb);
+			channel.write(rb.build());
+		}
+	}
+	private void storeRedisData(CommandMessage msg) {
+		jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "name", msg.getReqMsg().getRwb().getFilename());
+		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileId());
+		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileExt());
+		// Uncomment to store chunk data
+		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()),storeStr);
+		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getChunk().getChunkData());
+		jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "numChunks",
+				String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
+
+		Map<String, String> map = jedisHandler1.hgetAll(msg.getReqMsg().getRwb().getFileId());
+		String temp = map.get("chunks");
+
+		if (temp != null) {
+			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "chunks",
+					temp + "," + String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()));
+		} else {
+			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "chunks",
+					String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()));
+		}
+	}
 	private void readFileCmd(CommandMessage msg, Channel channel) {
 		// TODO Auto-generated method stub
 
@@ -173,8 +168,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			WriteChannel myCallable = new WriteChannel(commMsg, channel);
-			futuresList.add(myCallable);
+			QueueHandler.enqueueOutboundCommandMessage(commMsg);
+			//WriteChannel myCallable = new WriteChannel(commMsg, channel);
+			//futuresList.add(myCallable);
 		}
 
 		try {
@@ -216,41 +212,6 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		System.out.println("Responses sent");
 
 	}
-
-	/**
-	 * @param msg
-	 * @param channel
-	 */
-	private void pingCmd(CommandMessage msg, Channel channel) {
-		try {
-			if (msg.hasPing()) {
-				logger.info("ping from " + msg.getHeader().getNodeId());
-			} else if (msg.hasMessage()) {
-				logger.info(msg.getMessage());
-			} else {
-			}
-
-		} catch (Exception e) {
-			// TODO add logging
-			Failure.Builder eb = Failure.newBuilder();
-			eb.setId(conf.getNodeId());
-			eb.setRefId(msg.getHeader().getNodeId());
-			eb.setMessage(e.getMessage());
-			CommandMessage.Builder rb = CommandMessage.newBuilder(msg);
-			rb.setErr(eb);
-			channel.write(rb.build());
-		}
-	}
-
-	/**
-	 * @param msg
-	 * @param channel
-	 * @throws UnsupportedEncodingException
-	 * @throws Exception
-	 * @throws IOException
-	 * @throws FileNotFoundException
-	 * @throws InterruptedException
-	 */
 	private void writeFileCmd(CommandMessage msg, Channel channel)
 			throws UnsupportedEncodingException, Exception, IOException, FileNotFoundException, InterruptedException {
 
@@ -357,53 +318,6 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			futuresList = new ArrayList<WriteChannel>();
 
 		}
-	}
-
-	/**
-	 * @param msg
-	 */
-	private void storeRedisData(CommandMessage msg) {
-		jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "name", msg.getReqMsg().getRwb().getFilename());
-		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileId());
-		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileExt());
-		// Uncomment to store chunk data
-		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()),storeStr);
-		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getChunk().getChunkData());
-		jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "numChunks",
-				String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
-
-		Map<String, String> map = jedisHandler1.hgetAll(msg.getReqMsg().getRwb().getFileId());
-		String temp = map.get("chunks");
-
-		if (temp != null) {
-			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "chunks",
-					temp + "," + String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()));
-		} else {
-			jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(), "chunks",
-					String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()));
-		}
-	}
-
-	/**
-	 * 
-	 * a message was received from the server. Here we dispatch the message to
-	 * the client's thread pool to minimize the time it takes to process other
-	 * messages.
-	 * 
-	 * @param ctx
-	 *            The channel the message was received from
-	 * @param msg
-	 *            The message
-	 */
-	@Override
-	protected void channelRead0(ChannelHandlerContext ctx, CommandMessage msg) throws Exception {
-		handleMessage(msg, ctx.channel());
-	}
-
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		logger.error("Unexpected exception from downstream.", cause);
-		ctx.close();
 	}
 
 }

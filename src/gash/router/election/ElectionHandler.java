@@ -155,6 +155,11 @@ public class ElectionHandler{
             /*if(getHasVoted()){
                 timer.cancel();
             }*/
+        	if(state.isCandidate()){
+        		state.becomeFollower();
+				state.setCurrentTerm(state.getCurrentTerm()-1);
+
+        	}
             if(state.isFollower()){
                 try{
                     System.out.println("---Timer timed out---");
