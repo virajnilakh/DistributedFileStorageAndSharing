@@ -63,6 +63,7 @@ public class MessageHandler {
 			FileOutputStream outputStream = new FileOutputStream(file);
 			System.out.println(chunkedFile.size());
 			ByteString bs = ByteString.copyFrom(chunkedFile);
+
 			outputStream.write(bs.toByteArray());
 			outputStream.flush();
 			outputStream.close();

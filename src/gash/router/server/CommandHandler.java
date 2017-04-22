@@ -88,9 +88,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	 * @throws Exception
 	 */
 	public void handleMessage(CommandMessage msg, Channel channel) throws Exception {
-		
+
 		System.out.println("Message recieved");
-		
+
 		if (msg == null) {
 			System.out.println("ERROR: Unexpected content - " + msg);
 			return;
@@ -120,7 +120,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		// Read a specific file
 		String fileName = msg.getReqMsg().getRrb().getFilename();
-		//long filesize = msg.getReqMsg().getRrb().getFil
+		// long filesize = msg.getReqMsg().getRrb().getFil
 		long filesize = 0; // TODO: update this
 		String fileId = Utility.getHashFileName(fileName);
 		// File file = new File(Constants.dataDir + fileName);
@@ -128,8 +128,8 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		ArrayList<ByteString> chunksFile = new ArrayList<ByteString>();
 		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
-		int sizeChunks = Constants.sizeOfChunk;
-		byte[] buffer = new byte[sizeChunks];
+		double sizeChunks = Constants.sizeOfChunk;
+		byte[] buffer = new byte[(int) sizeChunks];
 
 		long start = System.currentTimeMillis();
 		System.out.print(start);
@@ -139,14 +139,19 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		DBHandler mysql_db = new DBHandler();
 		ArrayList<Chunk> chunks = new ArrayList<Chunk>();
 		chunks = mysql_db.getChunks(fileId);
-		
-		int numChunks = chunksFile.size();
+		futuresList = new ArrayList<WriteChannel>();
+		int numChunks = chunks.size();
+		System.out.println("After db");
 		System.out.println("No. of chunks: " + chunks.size());
-		for (int i = 0; i < chunks.size(); i++) {
+		for (int i = 0; i < numChunks; i++) {
 			CommandMessage commMsg = null;
 			try {
 				Chunk chunk = chunks.get(i);
-				commMsg = MessageCreator.createWriteRequest(ByteString.copyFrom(chunk.getChunkData()), fileId, fileName, numChunks, chunk.getChunkId(), filesize);
+				System.out.println("i"+i);
+				System.out.println("ChunkSize after db:"+ ByteString.copyFrom(chunk.getChunkData()).size());
+				System.out.println("ChunkID after db:"+ chunk.getChunkId());
+				commMsg = MessageCreator.createWriteRequest(ByteString.copyFrom(chunk.getChunkData()), fileId, fileName,
+						numChunks, chunk.getChunkId(), filesize);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -245,7 +250,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		DBHandler mysql_db = new DBHandler();
 		mysql_db.addChunk(file_id, chunk_id, chunk_data, chunk_size, num_of_chunks);
 		mysql_db.closeConn();
-					
+
 		WorkMessage wm = WorkMessageCreator.SendWriteWorkMessage(msg);
 		System.out.println("File replicated");
 
@@ -260,7 +265,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		System.out.println(lstMsg.size());
 		String storeStr = new String(msg.getReqMsg().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
 		System.out.println("No. of chunks" + String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
-		storeRedisData(msg);
+		// storeRedisData(msg);
 
 		CommandMessage commMsg = WorkMessageCreator.createAckWriteRequest(file_id,
 				msg.getReqMsg().getRwb().getFilename(), msg.getReqMsg().getRwb().getChunk().getChunkId());
@@ -332,8 +337,8 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			mysql_db2.closeConn();
 
 			// Send acks
-			//List<Future<Long>> futures = service.invokeAll(futuresList);
-			//service.shutdown();
+			// List<Future<Long>> futures = service.invokeAll(futuresList);
+			// service.shutdown();
 
 			// Cleanup
 			chunkedFile = new ArrayList<ByteString>();

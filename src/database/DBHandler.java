@@ -20,7 +20,7 @@ public class DBHandler {
 
 	public Connection makeConn() {
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db", "root", "root");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db", "root", "admin");
 			System.out.println("Successfully connected");
 
 		} catch (Exception e) {
@@ -124,7 +124,7 @@ public class DBHandler {
 	public ArrayList<Chunk> getChunks(String fileid) {
 		/*DBManager entireRow = new DBManager();*/
 		ArrayList<Chunk> allChunks = new ArrayList<Chunk>();
-		Chunk eachChunk = new Chunk();
+		
 		try {
 			String query = "select * from chunkData where file_id=?";
 			PreparedStatement preparedStatement = conn.prepareStatement(query);
@@ -132,6 +132,7 @@ public class DBHandler {
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next()) {
+				Chunk eachChunk = new Chunk();
 				eachChunk.setChunkId(resultSet.getInt("chunk_id"));
 				//int eachChunk = ByteString.copyFrom(resultSet.getBytes("chunk_data"));
 				eachChunk.setChunkData(resultSet.getBytes("chunk_data"));

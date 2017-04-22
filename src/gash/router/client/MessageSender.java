@@ -42,9 +42,9 @@ public class MessageSender {
 		ArrayList<ByteString> chunksFile = new ArrayList<ByteString>();
 		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
-		int sizeChunks = Constants.sizeOfChunk;
+		double sizeChunks = Constants.sizeOfChunk;
 		int numChunks = 0;
-		byte[] buffer = new byte[sizeChunks];
+		byte[] buffer = new byte[(int) sizeChunks];
 
 		try {
 			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
