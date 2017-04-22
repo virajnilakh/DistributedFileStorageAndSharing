@@ -99,14 +99,19 @@ public class ServerState {
 		jedisHandler1 = new Jedis(Constants.jedis1, Constants.redisPort);
 		jedisHandler2 = new Jedis(Constants.jedis2, Constants.redisPort);
 		jedisHandler3 = new Jedis(Constants.jedis3, Constants.redisPort);
-
+		
 		// setRedis();
 		/*
 		 * try{ ipAddress=InetAddress.getLocalHost().getHostAddress();
 		 * }catch(Exception e){ e.printStackTrace(); }
 		 */
 	}
-
+	public void startAllThreads(){
+		new Thread(new InboundCommandMessageQueueHandler()).start();
+		new Thread(new InboundWorkMessageQueueHandler()).start();
+		new Thread(new OutboundCommandMessageQueueHandler()).start();
+		new Thread(new OutboundWorkMessageQueueHandler()).start();
+	}
 	public void setRedis() {
 		// TODO Auto-generated method stub
 		try {
