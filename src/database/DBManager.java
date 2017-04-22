@@ -1,12 +1,15 @@
 package database;
 
+import com.google.protobuf.ByteString;
+
 public class DBManager {
 	private String fileId;
 	private String filename;
     private String fileExt;
-    private int chunkId;
+    private int filesize;
+	private int chunkId;
     private int numOfChunks;
-    private byte[] chunkData;
+    private ByteString chunkData;
     private int chunkSize;
     
    
@@ -38,7 +41,14 @@ public class DBManager {
 	public void setFileExt(String fileExt) {
 		this.fileExt = fileExt;
 	}
+	
+    public int getFilesize() {
+		return filesize;
+	}
 
+	public void setFilesize(int filesize) {
+		this.filesize = filesize;
+	}
 
 	public int getChunkId() {
 		return chunkId;
@@ -59,13 +69,12 @@ public class DBManager {
 		this.numOfChunks = numOfChunks;
 	}
 
-
-	public byte[] getChunkData() {
+	public ByteString getChunkData() {
 		return chunkData;
 	}
 
 
-	public void setChunkData(byte[] chunkData) {
+	public void setChunkData(ByteString chunkData) {
 		this.chunkData = chunkData;
 	}
 
