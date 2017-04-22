@@ -90,26 +90,26 @@ public class DemoApp implements CommListener {
 		Boolean mainAffirm = true;
 		Scanner reader = new Scanner(System.in);
 		try {
-			/*
-			 * try { if (jedisHandler1.ping().equals("PONG")) {
-			 * jedisHandler1.select(0); host =
-			 * jedisHandler1.get("1").split(":")[0]; port =
-			 * Integer.parseInt(jedisHandler1.get("1").split(":")[1]); } } catch
-			 * (Exception e) { System.out.
-			 * println("Connection to redis failed at 169.254.214.175:4567"); }
-			 * try { if (jedisHandler2.ping().equals("PONG")) {
-			 * jedisHandler2.select(0); host =
-			 * jedisHandler2.get("1").split(":")[0]; port =
-			 * Integer.parseInt(jedisHandler2.get("1").split(":")[1]); } } catch
-			 * (Exception e) { System.out.
-			 * println("Connection to redis failed at 169.254.56.202:4567"); }
-			 * try { if (jedisHandler3.ping().equals("PONG")) {
-			 * jedisHandler3.select(0); host =
-			 * jedisHandler3.get("1").split(":")[0]; port =
-			 * Integer.parseInt(jedisHandler3.get("1").split(":")[1]); } } catch
-			 * (Exception e) { System.out.
-			 * println("Connection to redis failed at 169.254.80.87:4567"); }
-			 */
+			
+			  try { if (jedisHandler1.ping().equals("PONG")) {
+			  jedisHandler1.select(0); host =
+			  jedisHandler1.get("2").split(":")[0]; port =
+			  Integer.parseInt(jedisHandler1.get("2").split(":")[1]); } } catch
+			  (Exception e) { System.out.
+			  println("Connection to redis failed at 169.254.214.175:4567"); }
+			  try { if (jedisHandler2.ping().equals("PONG")) {
+			  jedisHandler2.select(0); host =
+			  jedisHandler2.get("2").split(":")[0]; port =
+			  Integer.parseInt(jedisHandler2.get("2").split(":")[1]); } } catch
+			  (Exception e) { System.out.
+			  println("Connection to redis failed at 169.254.56.202:4567"); }
+			  try { if (jedisHandler3.ping().equals("PONG")) {
+			  jedisHandler3.select(0); host =
+			  jedisHandler3.get("2").split(":")[0]; port =
+			  Integer.parseInt(jedisHandler3.get("2").split(":")[1]); } } catch
+			  (Exception e) { System.out.
+			  println("Connection to redis failed at 169.254.80.87:4567"); }
+			 
 			MessageClient msgClient = new MessageClient(host, port);
 			DemoApp app = new DemoApp(msgClient);
 

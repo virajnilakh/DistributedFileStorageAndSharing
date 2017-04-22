@@ -88,10 +88,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	
 	public void handleMessage(WorkMessage msg, Channel channel) throws IOException {
 		if(msg!=null){
-			//QueueHandler.enqueueInboundWorkMessage(msg,channel);
+			QueueHandler.enqueueInboundWorkAndChannel(msg,channel);
 
 		}
-		if (msg == null) {
+		/*if (msg == null) {
 			// TODO add logging
 			System.out.println("ERROR: Unexpected content  - " + msg);
 			return;
@@ -251,7 +251,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			channel.write(rb.build());
 		}
 
-		System.out.flush();
+		System.out.flush();*/
 
 	}
 

@@ -29,6 +29,7 @@ import global.Constants;
 import global.Utility;
 import io.netty.channel.Channel;
 import pipe.common.Common.Failure;
+import pipe.common.Common.Header;
 import pipe.common.Common.Request;
 import pipe.work.Work.WorkMessage;
 import redis.clients.jedis.Jedis;
@@ -50,6 +51,7 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 		// TODO Auto-generated method stub
 		while(true){
 			CommandAndChannel cch=QueueHandler.dequeueInboundCommandAndChannel();
+			
 			CommandMessage msg=cch.getMsg();
 			Channel channel=cch.getChannel();
 			System.out.println("Message recieved");
@@ -58,7 +60,11 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 				System.out.println("ERROR: Unexpected content - " + msg);
 				return;
 			}
-
+			if(msg.getPing()){
+				System.out.println("Received ping from cluster 1");
+				CommandMessage ping=createCommandPing();
+				ServerState.getNext().writeAndFlush(ping);
+			}
 			if (msg.getReqMsg().getRequestType() == Request.RequestType.READFILE) {
 				if (msg.getReqMsg().getRrb().getFilename().equals("*")) {
 					readFileNamesCmd(msg, channel);
@@ -94,6 +100,20 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 			System.out.flush();
 		}
 		
+	}
+	private CommandMessage createCommandPing() {
+		// TODO Auto-generated method stub
+		CommandMessage.Builder command = CommandMessage.newBuilder();
+		Boolean ping=true;
+		command.setPing(ping);
+		
+		Header.Builder header= Header.newBuilder();
+		header.setNodeId(2);
+		header.setTime(0);
+		command.setHeader(header);
+		
+		
+		return command.build();
 	}
 	private void pingCmd(CommandMessage msg, Channel channel) {
 		try {
@@ -217,7 +237,9 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 		}
 		CommandMessage msg2 = WorkMessageCreator.createAllFilesResponse(fileNames);
 		// String msg2 = createAllFilesResponse(fileNames);
-		channel.writeAndFlush(msg2);
+		//channel.writeAndFlush(msg2);
+		QueueHandler.enqueueOutboundCommandAndChannel(msg2,channel);
+
 		System.out.println("Responses sent");
 
 	}

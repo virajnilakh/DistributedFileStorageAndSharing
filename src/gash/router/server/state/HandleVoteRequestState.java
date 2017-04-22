@@ -42,8 +42,8 @@ public class HandleVoteRequestState implements Handelable{
     			
     		}else{
     			WorkMessage hb=state.getElecHandler().buildLeaderResponse(state.getConf().getNodeId(), state.getCurrentTerm());
-    			//QueueHandler.enqueueOutboundWorkAndChannel(hb, channel);
-    			channel.writeAndFlush(hb);
+    			QueueHandler.enqueueOutboundWorkAndChannel(hb, channel);
+    			//channel.writeAndFlush(hb);
     		}
     		break;
     	default:
@@ -56,9 +56,9 @@ public void vote(Channel channel,ElectionMessage electionMessage){
 	state.getElecHandler().setVote2TermMap(electionMessage.getTerm(),true);
     state.getElecHandler().setHasVoted(true);
     System.out.println("Voted for "+electionMessage.getInfo().getCandidateID());
-	//QueueHandler.enqueueOutboundWorkAndChannel(vote, channel);
+	QueueHandler.enqueueOutboundWorkAndChannel(vote, channel);
 
-    ChannelFuture cf = channel.writeAndFlush(vote);
-    cf.awaitUninterruptibly();
+    //ChannelFuture cf = channel.writeAndFlush(vote);
+    //cf.awaitUninterruptibly();
 }
 }

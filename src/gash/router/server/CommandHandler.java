@@ -95,13 +95,13 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			ServerState.setClientChannel(channel);
 		}
 		if(msg!=null){
-		//QueueHandler.enqueueCommandMessage(msg,channel);
+			QueueHandler.enqueueInboundCommandAndChannel(msg,channel);
 		}
 		
 
 
 
-		System.out.println("Message recieved");
+		/*System.out.println("Message recieved");
 
 		if (msg == null) {
 			System.out.println("ERROR: Unexpected content - " + msg);
@@ -127,7 +127,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		pingCmd(msg, channel);
 
-		System.out.flush();
+		System.out.flush();*/
 
 	}
 

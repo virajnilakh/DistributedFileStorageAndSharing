@@ -105,9 +105,9 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				Channel ch=ei.getChannel();
 				ChannelFuture cf =null;
 				if(ch!=null){
-					//QueueHandler.enqueueOutboundWorkAndChannel(msg, ch);
-					cf= ch.write(msg);
-					ch.flush();
+					QueueHandler.enqueueOutboundWorkAndChannel(msg, ch);
+					//cf= ch.write(msg);
+					//ch.flush();
 					if (cf.isDone() && !cf.isSuccess()) {
 						logger.info("failed to send vote to server");
 
@@ -125,6 +125,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			Channel ch=ei.getChannel();
 			ChannelFuture cf =null;
 			if(ch!=null){
+				
 				System.out.println("Broadcast cmd msg");
 				cf= ch.write(msg);
 				ch.flush();
@@ -244,12 +245,14 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					
 					if (ei.isActive() && ei.getChannel() != null) {
 						WorkMessage wmhb=createHB(state.getConf().getNodeId());
-						ei.getChannel().writeAndFlush(wmhb);
+						QueueHandler.enqueueOutboundWorkAndChannel(wmhb, ei.getChannel());
+						//ei.getChannel().writeAndFlush(wmhb);
 						if(state.isLeader()){
 							WorkMessage wm = createHB(ei);
 							System.out.println("---Leader "+state.getLeaderId()+" sending heartbeat---");
+							QueueHandler.enqueueOutboundWorkAndChannel(wm, ei.getChannel());
 
-							ei.getChannel().writeAndFlush(wm);
+							//ei.getChannel().writeAndFlush(wm);
 						}
 						if(activeOutboundEdges==outboundEdges.map.size() && state.getLeaderId()==0){
 							state.getElecHandler().initElection();

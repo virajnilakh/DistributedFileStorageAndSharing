@@ -199,7 +199,8 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 					boolean p = msg.getPing();
 					WorkMessage.Builder rb = WorkMessage.newBuilder();
 					rb.setPing(true);
-					channel.write(rb.build());
+					QueueHandler.enqueueInboundWorkAndChannel(rb.build(), channel);
+					//channel.write(rb.build());
 				} else if (msg.hasErr()) {
 					Failure err = msg.getErr();
 					logger.error("failure from " + msg.getHeader().getNodeId());
