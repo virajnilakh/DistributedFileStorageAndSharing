@@ -90,42 +90,51 @@ public class DemoApp implements CommListener {
 		Boolean mainAffirm = true;
 		Scanner reader = new Scanner(System.in);
 		try {
-			
-			  try { if (jedisHandler1.ping().equals("PONG")) {
-			  jedisHandler1.select(0); host =
-			  jedisHandler1.get("2").split(":")[0]; port =
-			  Integer.parseInt(jedisHandler1.get("2").split(":")[1]); } } catch
-			  (Exception e) { System.out.
-			  println("Connection to redis failed at 169.254.214.175:4567"); }
-			  try { if (jedisHandler2.ping().equals("PONG")) {
-			  jedisHandler2.select(0); host =
-			  jedisHandler2.get("2").split(":")[0]; port =
-			  Integer.parseInt(jedisHandler2.get("2").split(":")[1]); } } catch
-			  (Exception e) { System.out.
-			  println("Connection to redis failed at 169.254.56.202:4567"); }
-			  try { if (jedisHandler3.ping().equals("PONG")) {
-			  jedisHandler3.select(0); host =
-			  jedisHandler3.get("2").split(":")[0]; port =
-			  Integer.parseInt(jedisHandler3.get("2").split(":")[1]); } } catch
-			  (Exception e) { System.out.
-			  println("Connection to redis failed at 169.254.80.87:4567"); }
-			 
+
+			try {
+				if (jedisHandler1.ping().equals("PONG")) {
+					jedisHandler1.select(0);
+					host = jedisHandler1.get("2").split(":")[0];
+					port = Integer.parseInt(jedisHandler1.get("2").split(":")[1]);
+				}
+			} catch (Exception e) {
+				System.out.println("Connection to redis failed at 169.254.214.175:4567");
+			}
+			try {
+				if (jedisHandler2.ping().equals("PONG")) {
+					jedisHandler2.select(0);
+					host = jedisHandler2.get("2").split(":")[0];
+					port = Integer.parseInt(jedisHandler2.get("2").split(":")[1]);
+				}
+			} catch (Exception e) {
+				System.out.println("Connection to redis failed at 169.254.56.202:4567");
+			}
+			try {
+				if (jedisHandler3.ping().equals("PONG")) {
+					jedisHandler3.select(0);
+					host = jedisHandler3.get("2").split(":")[0];
+					port = Integer.parseInt(jedisHandler3.get("2").split(":")[1]);
+				}
+			} catch (Exception e) {
+				System.out.println("Connection to redis failed at 169.254.80.87:4567");
+			}
+
 			MessageClient msgClient = new MessageClient(host, port);
 			DemoApp app = new DemoApp(msgClient);
 
 			do {
 				int option = 0;
 				System.out.println("Welcome to Gossamer Distributed");
+				System.out.println("Press any key to continue: ");
+				System.in.read();
+
+				System.out.println("[1] Write - Write a file to the cluster");
+				System.out.println("[2] Read  - Read file from cluster");
+				System.out.println("[3] Fetch - Fetch File Names stored in cluster");
+				System.out.println("[0] Exit  - Exit cluster");
 				System.out.println("Please choose an option to continue: ");
 
-				System.out.println("1. Write a file");
-				System.out.println("2. Read files");
-				System.out.println("3. Get File Names");
-				System.out.println("0. Exit");
-
 				option = reader.nextInt();
-				// option = 2;
-				// reader.nextLine();
 				System.out.println("You entered " + option);
 				CommConnection.getInstance().clearQueue();
 				System.out.println("Queue size is " + CommConnection.getInstance().outboundWriteQueue.size());
@@ -162,17 +171,9 @@ public class DemoApp implements CommListener {
 					 */
 					break;
 				case 1:
-					// For testing writes
-					// String path = runWriteTest();
-
 					System.out.println("Please enter directory (path) to upload:");
 
 					path = reader.nextLine();
-					// path = "C:\\Songs\\1.mp4";
-					// path = "C:\\JS\\test\\test.js";
-					// path = "C:\\Songs\\2.mp4";
-
-					System.in.read();
 
 					System.out.println("You entered" + path);
 
@@ -184,7 +185,7 @@ public class DemoApp implements CommListener {
 					if (ans2.equals("Y")) {
 						affirm = true;
 					}
-					// reader.close();
+
 					File file = new File(path);
 					long begin = System.currentTimeMillis();
 					System.out.println("Begin time");
@@ -209,18 +210,8 @@ public class DemoApp implements CommListener {
 			e.printStackTrace();
 		} finally {
 			System.out.println("Exiting...");
-			// Thread.sleep(10 * 1000);
-
+			reader.close();
 		}
-
-		// System.out.println("\n** exiting in 10 seconds. **");
-		// System.out.flush();
-		// Thread.sleep(10 * 1000);
-	}
-
-	private static String runWriteTest() {
-		String path = "C:\\1\\Natrang.avi";
-		return path;
 	}
 
 	private static void sendFile(File file, Channel channel) {
