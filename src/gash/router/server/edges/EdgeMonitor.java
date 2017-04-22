@@ -108,10 +108,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					QueueHandler.enqueueOutboundWorkAndChannel(msg, ch);
 					//cf= ch.write(msg);
 					//ch.flush();
-					if (cf.isDone() && !cf.isSuccess()) {
+					/*if (cf.isDone() && !cf.isSuccess()) {
 						logger.info("failed to send vote to server");
 
-					}
+					}*/
 				}else{
 					ei.setActive(false);
 					activeOutboundEdges--;

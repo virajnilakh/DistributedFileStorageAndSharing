@@ -42,6 +42,9 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 	protected ServerState state;
 	protected boolean debug = false;
 	protected RoutingConf conf;
+	public InboundWorkMessageQueueHandler(ServerState s){
+		state=s;
+	}
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
