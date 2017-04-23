@@ -21,7 +21,7 @@ public class DBHandler {
 	public Connection makeConn() {
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db", "root", "test");
-			System.out.println("Successfully connected");
+			//System.out.println("Successfully connected");
 
 		} catch (Exception e) {
 			System.err.println("Got an exception! ");
@@ -151,7 +151,7 @@ public class DBHandler {
 			return;
 		try {
 			conn.close();
-			System.out.println("Connection closed!");
+			//System.out.println("Connection closed!");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
