@@ -172,15 +172,15 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		chunks = mysql_db.getChunks(fileId);
 		futuresList = new ArrayList<WriteChannel>();
 		int numChunks = chunks.size();
-		System.out.println("After db");
-		System.out.println("No. of chunks: " + chunks.size());
+		//System.out.println("After db");
+		//System.out.println("No. of chunks: " + chunks.size());
 		for (int i = 0; i < numChunks; i++) {
 			CommandMessage commMsg = null;
 			try {
 				Chunk chunk = chunks.get(i);
-				System.out.println("i"+i);
-				System.out.println("ChunkSize after db:"+ ByteString.copyFrom(chunk.getChunkData()).size());
-				System.out.println("ChunkID after db:"+ chunk.getChunkId());
+				//System.out.println("i"+i);
+				//System.out.println("ChunkSize after db:"+ ByteString.copyFrom(chunk.getChunkData()).size());
+				//System.out.println("ChunkID after db:"+ chunk.getChunkId());
 				commMsg = MessageCreator.createWriteRequest(ByteString.copyFrom(chunk.getChunkData()), fileId, fileName,
 						numChunks, chunk.getChunkId(), filesize);
 			} catch (Exception e) {
