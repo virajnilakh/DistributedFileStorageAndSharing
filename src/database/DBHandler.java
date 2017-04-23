@@ -20,7 +20,7 @@ public class DBHandler {
 
 	public Connection makeConn() {
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db", "root", "test");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db", "root", "root");
 			//System.out.println("Successfully connected");
 
 		} catch (Exception e) {
@@ -35,6 +35,7 @@ public class DBHandler {
 			if (checkFileExists(fileid)){
 				deletePrevious(fileid);
 			}
+			conn.setAutoCommit(false);
 			String query2 = "insert into chunkData (file_id, chunk_id, chunk_data, chunk_size) values (?,?,?,?)";
 			PreparedStatement preparedStatement2 = conn.prepareStatement(query2);
 			preparedStatement2.setString(1, fileid);
@@ -71,6 +72,7 @@ public class DBHandler {
 	
 	public void deletePrevious(String fileid){
 		try {
+			conn.setAutoCommit(false);
 			//System.out.println("The file you're trying to write already EXISTS in MySQL. Now the NEW would replace OLD!");
 			String deleteQuery1 = "delete from filedata where file_id = ?";
 			String deleteQuery2 = "delete from chunkdata where file_id =?";
@@ -89,6 +91,7 @@ public class DBHandler {
 	
 	public void deletePreviousFile(String fileid){
 		try {
+			conn.setAutoCommit(false);
 			String deleteQuery1 = "delete from filedata where file_id = ?";
 			PreparedStatement preparedStatement2 = conn.prepareStatement(deleteQuery1); // delete from filedata
 			preparedStatement2.setString(1, fileid);
