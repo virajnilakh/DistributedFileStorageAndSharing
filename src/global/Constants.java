@@ -7,7 +7,7 @@ public class Constants {
 	public static String clientDir = "C:\\ClientStuff\\";
 
 	public static String jedis1 = "169.254.214.175";
-	public static String jedis2 = "169.254.5.213";
+	public static String jedis2 = "169.254.56.202";
 	public static String jedis3 = "169.254.80.87";
 
 	
