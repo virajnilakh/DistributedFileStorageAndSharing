@@ -54,7 +54,7 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 			
 			CommandMessage msg=cch.getMsg();
 			Channel channel=cch.getChannel();
-			System.out.println("Message recieved");
+			//System.out.println("Message recieved");
 			
 			if (msg == null) {
 				System.out.println("ERROR: Unexpected content - " + msg);
@@ -173,8 +173,8 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 		byte[] buffer = new byte[(int) sizeChunks];
 
 		long start = System.currentTimeMillis();
-		System.out.print(start);
-		System.out.println("Start send");
+		//System.out.print(start);
+		//System.out.println("Start send");
 
 		// GET from Mysql DB
 		DBHandler mysql_db = new DBHandler();
@@ -263,17 +263,17 @@ public class InboundCommandMessageQueueHandler implements Runnable{
 		WorkMessage wm = WorkMessageCreator.SendWriteWorkMessage(msg);
 		System.out.println("File replicated");
 
-		System.out.println("Message received :" + msg.getReqMsg().getRwb().getChunk().getChunkId());
+		//System.out.println("Message received :" + msg.getReqMsg().getRwb().getChunk().getChunkId());
 		PrintUtil.printCommand(msg);
 
 		lstMsg.add(msg);
 		ServerState.getEmon().broadcast(wm);
 		System.out.println("Message broadcasted");
 
-		System.out.println("List size is: ");
-		System.out.println(lstMsg.size());
+		//System.out.println("List size is: ");
+		//System.out.println(lstMsg.size());
 		String storeStr = new String(msg.getReqMsg().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
-		System.out.println("No. of chunks" + String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
+		//System.out.println("No. of chunks" + String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
 		// storeRedisData(msg);
 
 		CommandMessage commMsg = WorkMessageCreator.createAckWriteRequest(file_id,

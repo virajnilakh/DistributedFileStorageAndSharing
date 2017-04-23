@@ -62,8 +62,8 @@ public class MessageCreator {
 		header.setDestination(-1);
 
 		Chunk.Builder chunk = Chunk.newBuilder();
-		System.out.println("Chunk Id while creating:" + chunkId);
-		System.out.println("Chunk Size:" + bs.size());
+		//System.out.println("Chunk Id while creating:" + chunkId);
+		//System.out.println("Chunk Size:" + bs.size());
 		chunk.setChunkId(chunkId);
 		chunk.setChunkData(bs);
 		chunk.setChunkSize(bs.size());

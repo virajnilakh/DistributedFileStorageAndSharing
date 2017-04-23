@@ -164,7 +164,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		long start = System.currentTimeMillis();
 		System.out.print(start);
-		System.out.println("Start send");
+		//System.out.println("Start send");
 
 		// GET from Mysql DB
 		DBHandler mysql_db = new DBHandler();
@@ -212,7 +212,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		// Use "0" to do a full iteration of the collection.
 		ScanResult<String> scanResult = jedisHandler1.scan("0", params);
 		List<String> keys = scanResult.getResult();
-		System.out.println("Key count " + keys.size());
+		//System.out.println("Key count " + keys.size());
 		Iterator<String> it = keys.iterator();
 		ArrayList<String> fileNames = new ArrayList<String>();
 		while (it.hasNext()) {
@@ -285,17 +285,17 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		WorkMessage wm = WorkMessageCreator.SendWriteWorkMessage(msg);
 		System.out.println("File replicated");
 
-		System.out.println("Message received :" + msg.getReqMsg().getRwb().getChunk().getChunkId());
+		//System.out.println("Message received :" + msg.getReqMsg().getRwb().getChunk().getChunkId());
 		PrintUtil.printCommand(msg);
 
 		lstMsg.add(msg);
 		ServerState.getEmon().broadcast(wm);
 		System.out.println("Message broadcasted");
 
-		System.out.println("List size is: ");
-		System.out.println(lstMsg.size());
+		//System.out.println("List size is: ");
+		//System.out.println(lstMsg.size());
 		String storeStr = new String(msg.getReqMsg().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
-		System.out.println("No. of chunks" + String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
+		//System.out.println("No. of chunks" + String.valueOf(msg.getReqMsg().getRwb().getNumOfChunks()));
 		// storeRedisData(msg);
 
 		CommandMessage commMsg = WorkMessageCreator.createAckWriteRequest(file_id,
@@ -307,17 +307,17 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		if (lstMsg.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
 
-			System.out.println("Checking if chunks exist");
+			//System.out.println("Checking if chunks exist");
 			try {
 				if (!jedisHandler1.exists(file_id)) {
 					// return null;
-					System.out.println("Does not exists");
+					//System.out.println("Does not exists");
 				}
-				System.out.println("Printing map");
+				//System.out.println("Printing map");
 
 				Map<String, String> map1 = jedisHandler1.hgetAll(file_id);
 
-				System.out.println(new PrettyPrintingMap<String, String>(map1));
+				//System.out.println(new PrettyPrintingMap<String, String>(map1));
 
 			} catch (JedisConnectionException exception) {
 				// Do stuff
@@ -325,7 +325,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				// Clean up
 			}
 
-			System.out.println("All chunks received");
+			//System.out.println("All chunks received");
 			// Sorting
 			Collections.sort(lstMsg, new Comparator<CommandMessage>() {
 				@Override
@@ -335,7 +335,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				}
 			});
 
-			System.out.println("All chunks sorted");
+			//System.out.println("All chunks sorted");
 			for (CommandMessage message : lstMsg) {
 				chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
 			}
@@ -357,10 +357,10 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			outputStream.write(bs.toByteArray());
 			outputStream.flush();
 			outputStream.close();
-			System.out.println("File created");
+		//	System.out.println("File created");
 			long end = System.currentTimeMillis();
-			System.out.println("End time");
-			System.out.println(end);
+			//System.out.println("End time");
+			//System.out.println(end);
 
 			// Pushing file to Mysql DB
 			DBHandler mysql_db2 = new DBHandler();

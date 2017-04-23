@@ -62,11 +62,11 @@ public class WorkMessageCreator {
 		header.setDestination(-1);
 		ReadResponse.Builder body = ReadResponse.newBuilder();
 		// body.setChunkId(chunkId, chunkId);
-		System.out.println("File names size:" + fileNames.size());
+		//System.out.println("File names size:" + fileNames.size());
 		int j = 0;
 		String filenames = "";
 		for (String name : fileNames) {
-			System.out.println(++j + ") " + name);
+			//System.out.println(++j + ") " + name);
 			filenames += name;
 			// fileName += "," + fileNames.get(i);
 

@@ -24,12 +24,12 @@ public class MessageHandler {
 	 * @throws FileNotFoundException
 	 */
 	public static void handleRead(CommandMessage msg) throws IOException, FileNotFoundException {
-		System.out.println("Receiving chunks");
+		//System.out.println("Receiving chunks");
 		lstMsg.add(msg);
-		System.out.println("ChunkId Before sort:" + msg.getReqMsg().getRwb().getChunk().getChunkId());
+		//System.out.println("ChunkId Before sort:" + msg.getReqMsg().getRwb().getChunk().getChunkId());
 		// System.out.println("List Message size is" + lstMsg.size());
-		System.out.println("List msg size:" + lstMsg.size());
-		System.out.println("No of chunks:" + msg.getReqMsg().getRwb().getNumOfChunks());
+		//System.out.println("List msg size:" + lstMsg.size());
+		//System.out.println("No of chunks:" + msg.getReqMsg().getRwb().getNumOfChunks());
 		if (lstMsg.size() == msg.getReqMsg().getRwb().getNumOfChunks()) {
 			System.out.println("All chunks received");
 			// Sorting
@@ -43,8 +43,8 @@ public class MessageHandler {
 
 			System.out.println("All chunks sorted");
 			for (CommandMessage message : lstMsg) {
-				System.out.println("ChunkId:" + message.getReqMsg().getRwb().getChunk().getChunkId());
-				System.out.println("ChunkSize:" + message.getReqMsg().getRwb().getChunk().getChunkSize());
+				//System.out.println("ChunkId:" + message.getReqMsg().getRwb().getChunk().getChunkId());
+				//System.out.println("ChunkSize:" + message.getReqMsg().getRwb().getChunk().getChunkSize());
 				chunkedFile.add(message.getReqMsg().getRwb().getChunk().getChunkData());
 			}
 			System.out.println("Chunked file created");
@@ -61,20 +61,20 @@ public class MessageHandler {
 			file.createNewFile();
 			System.out.println("File created in ClientStuff dir");
 			FileOutputStream outputStream = new FileOutputStream(file);
-			System.out.println(chunkedFile.size());
+			//System.out.println(chunkedFile.size());
 			ByteString bs = ByteString.copyFrom(chunkedFile);
 
 			outputStream.write(bs.toByteArray());
 			outputStream.flush();
 			outputStream.close();
 
-			System.out.println("Cleaning up");
+			//System.out.println("Cleaning up");
 			// Cleanup
 			chunkedFile = new ArrayList<ByteString>();
 			lstMsg = new ArrayList<CommandMessage>();
 
-			System.out.println("New chunkedFile size:" + chunkedFile.size());
-			System.out.println("New lstMsg size:" + lstMsg.size());
+			//System.out.println("New chunkedFile size:" + chunkedFile.size());
+			//System.out.println("New lstMsg size:" + lstMsg.size());
 			// futuresList = new ArrayList<WriteChannel>();
 
 		}

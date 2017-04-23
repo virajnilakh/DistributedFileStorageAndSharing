@@ -33,7 +33,7 @@ public class MessageSender {
 		List<String> response = null;
 		CommandMessage msg = MessageCreator.CreateReadAllMessage();
 		channel.writeAndFlush(msg);
-		System.out.println("Read all files request sent");
+		//System.out.println("Read all files request sent");
 	}
 
 	public static void sendReadCommand(File file) {
@@ -75,7 +75,7 @@ public class MessageSender {
 
 			long start = System.currentTimeMillis();
 			System.out.print(start);
-			System.out.println("Start send");
+			//System.out.println("Start send");
 
 			List<Future<Long>> futures = service.invokeAll(CommConnection.getInstance().outboundWriteQueue);
 			System.out.println("Completed tasks");

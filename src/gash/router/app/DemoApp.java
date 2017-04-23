@@ -188,8 +188,8 @@ public class DemoApp implements CommListener {
 
 					File file = new File(path);
 					long begin = System.currentTimeMillis();
-					System.out.println("Begin time");
-					System.out.println(begin);
+					//System.out.println("Begin time");
+					//System.out.println(begin);
 					sendFile(file, channel);
 					System.out.println("File sent");
 					System.out.flush();

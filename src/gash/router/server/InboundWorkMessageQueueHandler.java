@@ -183,8 +183,8 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 		byte[] buffer = new byte[(int) sizeChunks];
 
 		long start = System.currentTimeMillis();
-		System.out.print(start);
-		System.out.println("Start send");
+		//System.out.print(start);
+		//System.out.println("Start send");
 
 		// GET from Mysql DB
 		DBHandler mysql_db = new DBHandler();
@@ -234,7 +234,7 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 		// Use "0" to do a full iteration of the collection.
 		ScanResult<String> scanResult = jedisHandler1.scan("0", params);
 		List<String> keys = scanResult.getResult();
-		System.out.println("Key count " + keys.size());
+		//System.out.println("Key count " + keys.size());
 		Iterator<String> it = keys.iterator();
 		ArrayList<String> fileNames = new ArrayList<String>();
 		while (it.hasNext()) {
@@ -289,10 +289,10 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 		// ServerState.getEmon().broadcast(wm);
 		// System.out.println("Message broadcasted");
 
-		System.out.println("List size is: ");
-		System.out.println(lstMsg.size());
+	//	System.out.println("List size is: ");
+		//System.out.println(lstMsg.size());
 		String storeStr = new String(msg.getReq().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
-		System.out.println("No. of chunks" + String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
+		//System.out.println("No. of chunks" + String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
 		// storeRedisData(msg);
 
 		CommandMessage commMsg = WorkMessageCreator.createAckWriteRequest(file_id, msg.getReq().getRwb().getFilename(),
