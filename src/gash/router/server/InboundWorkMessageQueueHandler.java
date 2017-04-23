@@ -70,7 +70,9 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 				return;
 			}
 
-			if (msg.getReq().getRequestType() == Request.RequestType.READFILE) {
+			if (msg.getHeader().hasElection()) {
+				handleElectionMsg(msg, channel);
+			} else if (msg.getReq().getRequestType() == Request.RequestType.READFILE) {
 				if (msg.getReq().getRrb().getFilename().equals("*")) {
 					readFileNamesCmd(msg, channel);
 				} else {
@@ -78,7 +80,7 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 				}
 			}
 
-			if (msg.getReq().getRequestType() == Request.RequestType.WRITEFILE) {
+			else if (msg.getReq().getRequestType() == Request.RequestType.WRITEFILE) {
 
 				try {
 					writeFileCmd(msg, channel);
@@ -103,67 +105,74 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 			if (debug)
 				PrintUtil.printWork(msg);
 
-			// TODO How can you implement this without if-else statements?
-			try {
-				if (msg.getHeader().hasElection()) {
-					System.out.println("Processing the message:");
-					state.handleMessage(channel, msg);
-				} else if (msg.getLeaderStatus().getState() == LeaderState.LEADERALIVE) {
-					System.out.println("Heartbeat from leader " + msg.getLeaderStatus().getLeaderId()
-							+ "...Resetting the timmer:");
-					state.getElecHandler().getTimer().cancel();
-					state.getElecHandler().setTimer();
-					try {
-						state.getLocalhostJedis().select(0);
-						state.getLocalhostJedis().set("2", msg.getLeaderStatus().getLeaderHost() + ":4568");
-						System.out.println("---Redis updated---");
-
-					} catch (Exception e) {
-						System.out.println("---Problem with redis at voteReceived in WorkHandler---");
-					}
-					state.setLeaderId(msg.getLeaderStatus().getLeaderId());
-					state.setLeaderAddress(msg.getLeaderStatus().getLeaderHost());
-					state.becomeFollower();
-					state.setTimeout(0);
-				} else if (msg.hasBeat()) {
-					Heartbeat hb = msg.getBeat();
-					logger.info("heartbeat from " + msg.getHeader().getNodeId());
-					Timer t = state.getEmon().getTimer(msg.getHeader().getNodeId());
-					if (t != null) {
-						t.cancel();
-						t = null;
-					}
-					state.getEmon().setTimer(msg.getHeader().getNodeId());
-				} else if (msg.hasPing()) {
-					logger.info("ping from " + msg.getHeader().getNodeId());
-					boolean p = msg.getPing();
-					WorkMessage.Builder rb = WorkMessage.newBuilder();
-					rb.setPing(true);
-					//QueueHandler.enqueueInboundWorkAndChannel(rb.build(), channel);
-					channel.write(rb.build());
-				} else if (msg.hasErr()) {
-					Failure err = msg.getErr();
-					logger.error("failure from " + msg.getHeader().getNodeId());
-					// PrintUtil.printFailure(err);
-				} else if (msg.hasTask()) {
-					Task t = msg.getTask();
-				} else if (msg.hasState()) {
-					WorkState s = msg.getState();
-				}
-			} catch (Exception e) {
-				// TODO add logging
-				Failure.Builder eb = Failure.newBuilder();
-				eb.setId(state.getConf().getNodeId());
-				eb.setRefId(msg.getHeader().getNodeId());
-				eb.setMessage(e.getMessage());
-				WorkMessage.Builder rb = WorkMessage.newBuilder(msg);
-				rb.setErr(eb);
-				channel.write(rb.build());
-			}
-
 			System.out.flush();
 		}
 
+	}
+
+	/**
+	 * @param msg
+	 * @param channel
+	 */
+	private void handleElectionMsg(WorkMessage msg, Channel channel) {
+		// TODO How can you implement this without if-else statements?
+		try {
+			if (msg.getHeader().hasElection()) {
+				System.out.println("Processing the message:");
+				state.handleMessage(channel, msg);
+			} else if (msg.getLeaderStatus().getState() == LeaderState.LEADERALIVE) {
+				System.out.println(
+						"Heartbeat from leader " + msg.getLeaderStatus().getLeaderId() + "...Resetting the timmer:");
+				state.getElecHandler().getTimer().cancel();
+				state.getElecHandler().setTimer();
+				try {
+					state.getLocalhostJedis().select(0);
+					state.getLocalhostJedis().set("2", msg.getLeaderStatus().getLeaderHost() + ":4568");
+					System.out.println("---Redis updated---");
+
+				} catch (Exception e) {
+					System.out.println("---Problem with redis at voteReceived in WorkHandler---");
+				}
+				state.setLeaderId(msg.getLeaderStatus().getLeaderId());
+				state.setLeaderAddress(msg.getLeaderStatus().getLeaderHost());
+				state.becomeFollower();
+				state.setTimeout(0);
+			} else if (msg.hasBeat()) {
+				Heartbeat hb = msg.getBeat();
+				logger.info("heartbeat from " + msg.getHeader().getNodeId());
+				Timer t = state.getEmon().getTimer(msg.getHeader().getNodeId());
+				if (t != null) {
+					t.cancel();
+					t = null;
+				}
+				state.getEmon().setTimer(msg.getHeader().getNodeId());
+			} else if (msg.hasPing()) {
+				logger.info("ping from " + msg.getHeader().getNodeId());
+				boolean p = msg.getPing();
+				WorkMessage.Builder rb = WorkMessage.newBuilder();
+				rb.setPing(true);
+				// QueueHandler.enqueueInboundWorkAndChannel(rb.build(),
+				// channel);
+				channel.write(rb.build());
+			} else if (msg.hasErr()) {
+				Failure err = msg.getErr();
+				logger.error("failure from " + msg.getHeader().getNodeId());
+				// PrintUtil.printFailure(err);
+			} else if (msg.hasTask()) {
+				Task t = msg.getTask();
+			} else if (msg.hasState()) {
+				WorkState s = msg.getState();
+			}
+		} catch (Exception e) {
+			// TODO add logging
+			Failure.Builder eb = Failure.newBuilder();
+			eb.setId(state.getConf().getNodeId());
+			eb.setRefId(msg.getHeader().getNodeId());
+			eb.setMessage(e.getMessage());
+			WorkMessage.Builder rb = WorkMessage.newBuilder(msg);
+			rb.setErr(eb);
+			channel.write(rb.build());
+		}
 	}
 
 	private void readFileCmd(WorkMessage msg, Channel channel) {
@@ -171,6 +180,10 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 
 		// Read a specific file
 		String fileName = msg.getReq().getRrb().getFilename();
+		if (fileName == "") {
+			System.out.println("Filename is empty");
+			return;
+		}
 		// long filesize = msg.getReqMsg().getRrb().getFil
 		long filesize = 0; // TODO: update this
 		String fileId = Utility.getHashFileName(fileName);
@@ -183,8 +196,8 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 		byte[] buffer = new byte[(int) sizeChunks];
 
 		long start = System.currentTimeMillis();
-		//System.out.print(start);
-		//System.out.println("Start send");
+		// System.out.print(start);
+		// System.out.println("Start send");
 
 		// GET from Mysql DB
 		DBHandler mysql_db = new DBHandler();
@@ -192,15 +205,16 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 		chunks = mysql_db.getChunks(fileId);
 		futuresList = new ArrayList<WriteChannel>();
 		int numChunks = chunks.size();
-		//System.out.println("After db");
-		//System.out.println("No. of chunks: " + chunks.size());
+		// System.out.println("After db");
+		// System.out.println("No. of chunks: " + chunks.size());
 		for (int i = 0; i < numChunks; i++) {
 			CommandMessage commMsg = null;
 			try {
 				Chunk chunk = chunks.get(i);
-				//System.out.println("i" + i);
-				//System.out.println("ChunkSize after db:" + ByteString.copyFrom(chunk.getChunkData()).size());
-				//System.out.println("ChunkID after db:" + chunk.getChunkId());
+				// System.out.println("i" + i);
+				// System.out.println("ChunkSize after db:" +
+				// ByteString.copyFrom(chunk.getChunkData()).size());
+				// System.out.println("ChunkID after db:" + chunk.getChunkId());
 				commMsg = MessageCreator.createWriteRequest(ByteString.copyFrom(chunk.getChunkData()), fileId, fileName,
 						numChunks, chunk.getChunkId(), filesize);
 			} catch (Exception e) {
@@ -208,8 +222,8 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 				e.printStackTrace();
 			}
 			QueueHandler.enqueueOutboundCommandAndChannel(commMsg, channel);
-			//WriteChannel myCallable = new WriteChannel(commMsg, channel);
-			//futuresList.add(myCallable);
+			// WriteChannel myCallable = new WriteChannel(commMsg, channel);
+			// futuresList.add(myCallable);
 		}
 		mysql_db.closeConn();
 		try {
@@ -234,7 +248,7 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 		// Use "0" to do a full iteration of the collection.
 		ScanResult<String> scanResult = jedisHandler1.scan("0", params);
 		List<String> keys = scanResult.getResult();
-		//System.out.println("Key count " + keys.size());
+		// System.out.println("Key count " + keys.size());
 		Iterator<String> it = keys.iterator();
 		ArrayList<String> fileNames = new ArrayList<String>();
 		while (it.hasNext()) {
@@ -289,10 +303,11 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 		// ServerState.getEmon().broadcast(wm);
 		// System.out.println("Message broadcasted");
 
-	//	System.out.println("List size is: ");
-		//System.out.println(lstMsg.size());
+		// System.out.println("List size is: ");
+		// System.out.println(lstMsg.size());
 		String storeStr = new String(msg.getReq().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
-		//System.out.println("No. of chunks" + String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
+		// System.out.println("No. of chunks" +
+		// String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
 		// storeRedisData(msg);
 
 		CommandMessage commMsg = WorkMessageCreator.createAckWriteRequest(file_id, msg.getReq().getRwb().getFilename(),
