@@ -49,7 +49,7 @@ public class InboundWorkMessageQueueHandler implements Runnable {
  		            b.handler(new CommandInit(null,false));
  
  		            // Start the client.
- 		            //System.out.println("Connect to a node.");
+ 		            System.out.println("===============Stole Read Request From Leader=============================");
  
  		             ChannelFuture cha = b.connect(host, port).sync();
  		            readFileCmd(msg, cha.channel());

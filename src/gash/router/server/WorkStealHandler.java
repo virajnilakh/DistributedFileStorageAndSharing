@@ -24,7 +24,7 @@ public class WorkStealHandler implements Runnable{
 					EdgeMonitor.sendToNode(msg,state.getLeaderId());
 				}
 				
-				Thread.sleep(2000);
+				Thread.sleep(7000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
