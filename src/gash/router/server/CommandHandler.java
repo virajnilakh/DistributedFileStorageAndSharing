@@ -143,9 +143,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
  		            //System.out.println("===============Stole Read Request From Leader=============================");
  
  		             ChannelFuture cha = b.connect(host, port).sync();
-				readFileCmd(msg, channel);
+				readFileCmd(msg, cha.channel());
  		        }catch(Exception e){
- 		        	
+ 		        	System.out.println("Leader failed to send read file to client");
  		        }
 			}
 		}
