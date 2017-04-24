@@ -8,6 +8,7 @@ import discovery.LocalAddress;
 import global.Constants;
 import pipe.common.Common.Chunk;
 import pipe.common.Common.Header;
+import pipe.common.Common.Node;
 import pipe.common.Common.ReadBody;
 import pipe.common.Common.Request;
 import pipe.common.Common.TaskType;
@@ -47,12 +48,16 @@ public class MessageCreator {
 
 		ReadBody.Builder body = ReadBody.newBuilder();
 		body.setFilename(fileName);
-		body.setClientAddress(LocalAddress.getLocalHostLANAddress().getHostAddress()+":"+Constants.clientPort);
+		
+		//body.setClientAddress(LocalAddress.getLocalHostLANAddress().getHostAddress()+":"+Constants.clientPort);
 		Request.Builder req = Request.newBuilder();
 		// req.setRequestType(Request.RequestType.READFILE);
 		req.setRequestType(TaskType.REQUESTREADFILE);
 		req.setRrb(body);
-
+		Node.Builder node=Node.newBuilder();
+		node.setHost(LocalAddress.getLocalHostLANAddress().getHostAddress());
+		node.setPort(Constants.clientPort);
+		req.setClient(node);
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
 		comm.setReq(req);
