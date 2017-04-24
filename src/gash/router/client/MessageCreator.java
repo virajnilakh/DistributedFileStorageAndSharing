@@ -55,6 +55,7 @@ public class MessageCreator {
 		req.setRequestType(TaskType.REQUESTREADFILE);
 		req.setRrb(body);
 		Node.Builder node=Node.newBuilder();
+		node.setNodeId(0);
 		node.setHost(LocalAddress.getLocalHostLANAddress().getHostAddress());
 		node.setPort(Constants.clientPort);
 		req.setClient(node);
