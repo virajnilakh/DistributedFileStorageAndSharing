@@ -108,8 +108,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		if (msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
 			QueueHandler.enqueueInboundCommandAndChannel(msg,channel);
 		}else if (msg.getPing()) {
-			// System.out.println("Received ping from cluster 1");
-			if (!ServerState.isRoundTrip() && msg.getHeader().getDestination() == Constants.clusterId) {
+			 System.out.println("Received ping from cluster 1");
+			 ServerState.getNext().writeAndFlush(msg);
+			/*if (!ServerState.isRoundTrip() && msg.getHeader().getDestination() == Constants.clusterId) {
 				ServerState.setRoundTrip(true);
 				CommandMessage ping = createCommandPing(msg.getHeader().getDestination());
 				ServerState.getNext().writeAndFlush(ping);
@@ -120,7 +121,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			} else {
 				CommandMessage ping = createCommandPing(msg.getHeader().getDestination());
 				ServerState.getNext().writeAndFlush(ping);
-			}
+			}*/
 
 		}
 

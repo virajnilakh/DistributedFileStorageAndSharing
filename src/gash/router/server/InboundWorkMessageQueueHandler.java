@@ -40,8 +40,8 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 				EventLoopGroup workerGroup = new NioEventLoopGroup();
 				 
  		        try {
- 		        	String host=msg.getReq().getRrb().getClientAddress().split(":")[0];
- 					int port=Integer.parseInt(msg.getReq().getRrb().getClientAddress().split(":")[1]);
+ 		        	String host=msg.getReq().getClient().getHost();
+ 					int port=msg.getReq().getClient().getPort();
  		            Bootstrap b = new Bootstrap(); // (1)
  		            b.group(workerGroup); // (2)
  		            b.channel(NioSocketChannel.class); // (3)
