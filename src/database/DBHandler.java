@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import com.google.protobuf.ByteString;
 
-import gash.router.server.LogHandler;
+//import gash.router.server.LogHandler;
 
 public class DBHandler {
 
@@ -47,8 +47,8 @@ public class DBHandler {
 			preparedStatement2.close();
 			numOfChunks -= 1;
 
-			LogHandler.getInstance();
-			LogHandler.tryLogCreate(query2);
+			//LogHandler.getInstance();
+			//LogHandler.tryLogCreate(query2);
 
 			conn.commit();
 
@@ -92,9 +92,9 @@ public class DBHandler {
 			preparedStatement3.setString(1, fileid);
 			preparedStatement2.execute();
 			preparedStatement3.execute();
-			LogHandler.getInstance();
-			LogHandler.tryLogCreate(deleteQuery1);
-			LogHandler.tryLogCreate(deleteQuery1);
+			//LogHandler.getInstance();
+			//LogHandler.tryLogCreate(deleteQuery1);
+			//LogHandler.tryLogCreate(deleteQuery1);
 			conn.commit();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -111,8 +111,8 @@ public class DBHandler {
 																						// filedata
 			preparedStatement2.setString(1, fileid);
 			preparedStatement2.execute();
-			LogHandler.getInstance();
-			LogHandler.tryLogCreate(deleteQuery1);
+			//LogHandler.getInstance();
+			//LogHandler.tryLogCreate(deleteQuery1);
 			conn.commit();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -135,8 +135,8 @@ public class DBHandler {
 			preparedStatement4.setLong(5, filesize);
 			preparedStatement4.execute();
 			preparedStatement4.close();
-			LogHandler.getInstance();
-			LogHandler.tryLogCreate(query);
+			//LogHandler.getInstance();
+			//LogHandler.tryLogCreate(query);
 
 			conn.commit();
 
