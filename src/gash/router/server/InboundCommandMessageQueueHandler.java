@@ -53,34 +53,37 @@ public class InboundCommandMessageQueueHandler implements Runnable {
 				if (msg.getReq().getRrb().getFilename().equals("*")) {
 					// readFileNamesCmd(msg, channel);
 				} else {
-
 					DBHandler mysql_db = new DBHandler();
 					String fileId = Utility.getHashFileName(msg.getReq().getRrb().getFilename());
 
 					if (mysql_db.checkFileExists(fileId)) {
-						EventLoopGroup workerGroup = new NioEventLoopGroup();
-						 
-		 		        try {
-		 		        	String host=msg.getReq().getClient().getHost();
-		 					int port=msg.getReq().getClient().getPort();
-		 		            Bootstrap b = new Bootstrap(); // (1)
-		 		            b.group(workerGroup); // (2)
-		 		            b.channel(NioSocketChannel.class); // (3)
-		 		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-		 		            b.handler(new CommandInit(null,false));
-		 
-		 		            // Start the client.
-		 		            //System.out.println("===============Stole Read Request From Leader=============================");
-		 
-		 		             ChannelFuture cha = b.connect(host, port).sync();
-						readFileCmd(msg, cha.channel());
-		 		        }catch(Exception e){
-		 		        	System.out.println("Leader unable to connect to client for proceesing read request");
-		 		        }
-					} else {
-						// ToDo: Fill else to create workmessage and send back
-						// as if leader has stolen from this follower
+						readFileCmd(msg, channel);
+
+					}else{
+						ServerState.getNext().writeAndFlush(msg);
 					}
+					
+					/*
+					 * EventLoopGroup workerGroup = new NioEventLoopGroup();
+					 * 
+					 * try { String host=msg.getReq().getClient().getHost(); int
+					 * port=msg.getReq().getClient().getPort(); Bootstrap b =
+					 * new Bootstrap(); // (1) b.group(workerGroup); // (2)
+					 * b.channel(NioSocketChannel.class); // (3)
+					 * b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+					 * b.handler(new CommandInit(null,false));
+					 * 
+					 * // Start the client. //System.out.
+					 * println("===============Stole Read Request From Leader============================="
+					 * );
+					 * 
+					 * ChannelFuture cha = b.connect(host, port).sync();
+					 * readFileCmd(msg, cha.channel()); }catch(Exception e){
+					 * System.out.
+					 * println("Leader unable to connect to client for proceesing read request"
+					 * ); }
+					 */
+
 				}
 			}
 

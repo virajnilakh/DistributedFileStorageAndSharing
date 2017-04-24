@@ -26,7 +26,10 @@ import pipe.work.Work.WorkMessage;
 import routing.Pipe.CommandMessage;
 
 public class InboundWorkMessageQueueHandler implements Runnable {
-
+	ServerState state=null;
+	public InboundWorkMessageQueueHandler(ServerState s){
+		state=s;
+	}
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
@@ -37,25 +40,53 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 			if (msg.getReq().getRrb().getFilename().equals("*")) {
 				//readFileNamesCmd(msg, channel);
 			} else {
-				EventLoopGroup workerGroup = new NioEventLoopGroup();
-				 
- 		        try {
- 		        	String host=msg.getReq().getClient().getHost();
- 					int port=msg.getReq().getClient().getPort();
- 		            Bootstrap b = new Bootstrap(); // (1)
- 		            b.group(workerGroup); // (2)
- 		            b.channel(NioSocketChannel.class); // (3)
- 		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
- 		            b.handler(new CommandInit(null,false));
- 
- 		            // Start the client.
- 		            System.out.println("===============Stole Read Request From Leader=============================");
- 
- 		             ChannelFuture cha = b.connect(host, port).sync();
- 		            readFileCmd(msg, cha.channel());
- 		        }catch(Exception e){
- 		        	System.out.println("Problem to connecting to client on steal node");
- 		        }
+				DBHandler mysql_db = new DBHandler();
+				String fileId = Utility.getHashFileName(msg.getReq().getRrb().getFilename());
+
+				if (mysql_db.checkFileExists(fileId)) {
+					EventLoopGroup workerGroup = new NioEventLoopGroup();
+					 
+	 		        try {
+	 		        	String host=msg.getReq().getClient().getHost();
+	 					int port=msg.getReq().getClient().getPort();
+	 		            Bootstrap b = new Bootstrap(); // (1)
+	 		            b.group(workerGroup); // (2)
+	 		            b.channel(NioSocketChannel.class); // (3)
+	 		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+	 		            b.handler(new CommandInit(null,false));
+	 
+	 		            // Start the client.
+	 		            if(!state.isLeader()){
+		 		            System.out.println("===============Stole Read Request From Leader=============================");
+	 		            }
+	 
+	 		             ChannelFuture cha = b.connect(host, port).sync();
+	 		            readFileCmd(msg, cha.channel());
+	 		        }catch(Exception e){
+	 		        	System.out.println("Problem to connecting to client on steal node");
+	 		        }
+				}else{
+					EventLoopGroup workerGroup = new NioEventLoopGroup();
+					 
+	 		        try {
+	 		        	String host=state.getLocalhostJedis().get(Constants.clusterId+"").split(":")[0];
+	 					int port=Integer.parseInt(state.getLocalhostJedis().get(Constants.clusterId+"").split(":")[1]);
+	 		            Bootstrap b = new Bootstrap(); // (1)
+	 		            b.group(workerGroup); // (2)
+	 		            b.channel(NioSocketChannel.class); // (3)
+	 		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+	 		            b.handler(new CommandInit(null,false));
+	 
+	 		            // Start the client.
+	 		            System.out.println("===============Stole Read Request From Leader=============================");
+	 
+	 		             ChannelFuture cha = b.connect(host, port).sync();
+	 		            readFileCmd(msg, cha.channel());
+	 		        }catch(Exception e){
+	 		        	System.out.println("Problem to connecting to client on steal node");
+	 		        }
+				}
+				
 				
 			}
 			

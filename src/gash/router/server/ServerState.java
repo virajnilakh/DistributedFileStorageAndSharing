@@ -131,7 +131,7 @@ public class ServerState {
 
 	public void startAllThreads() {
 		new Thread(new InboundCommandMessageQueueHandler()).start();
-		new Thread(new InboundWorkMessageQueueHandler()).start();
+		new Thread(new InboundWorkMessageQueueHandler(this)).start();
 		new Thread(new OutboundCommandMessageQueueHandler(this)).start();
 		new Thread(new OutboundWorkMessageQueueHandler()).start();
 		new Thread(new WorkStealHandler(this)).start();
