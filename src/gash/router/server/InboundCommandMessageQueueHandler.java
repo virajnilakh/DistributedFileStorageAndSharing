@@ -16,7 +16,13 @@ import gash.router.client.WriteChannel;
 import gash.router.server.edges.EdgeMonitor;
 import global.Constants;
 import global.Utility;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import pipe.common.Common.Header;
 import pipe.common.Common.ReadBody;
 import pipe.common.Common.Request;
@@ -52,7 +58,25 @@ public class InboundCommandMessageQueueHandler implements Runnable {
 					String fileId = Utility.getHashFileName(msg.getReq().getRrb().getFilename());
 
 					if (mysql_db.checkFileExists(fileId)) {
-						readFileCmd(msg, channel);
+						EventLoopGroup workerGroup = new NioEventLoopGroup();
+						 
+		 		        try {
+		 		        	String host=msg.getReq().getRrb().getClientAddress().split(":")[0];
+		 					int port=Integer.parseInt(msg.getReq().getRrb().getClientAddress().split(":")[1]);
+		 		            Bootstrap b = new Bootstrap(); // (1)
+		 		            b.group(workerGroup); // (2)
+		 		            b.channel(NioSocketChannel.class); // (3)
+		 		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+		 		            b.handler(new CommandInit(null,false));
+		 
+		 		            // Start the client.
+		 		            //System.out.println("===============Stole Read Request From Leader=============================");
+		 
+		 		             ChannelFuture cha = b.connect(host, port).sync();
+						readFileCmd(msg, cha.channel());
+		 		        }catch(Exception e){
+		 		        	System.out.println("Leader unable to connect to client for proceesing read request");
+		 		        }
 					} else {
 						// ToDo: Fill else to create workmessage and send back
 						// as if leader has stolen from this follower

@@ -128,27 +128,11 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			if (msg.getReq().getRrb().getFilename().equals("*")) {
 				readFileNamesCmd(msg, channel);
 			} else {
-				EventLoopGroup workerGroup = new NioEventLoopGroup();
-				 
- 		        try {
- 		        	String host=msg.getReq().getRrb().getClientAddress().split(":")[0];
- 					int port=Integer.parseInt(msg.getReq().getRrb().getClientAddress().split(":")[1]);
- 		            Bootstrap b = new Bootstrap(); // (1)
- 		            b.group(workerGroup); // (2)
- 		            b.channel(NioSocketChannel.class); // (3)
- 		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
- 		            b.handler(new CommandInit(null,false));
- 
- 		            // Start the client.
- 		            //System.out.println("===============Stole Read Request From Leader=============================");
- 
- 		             ChannelFuture cha = b.connect(host, port).sync();
-				readFileCmd(msg, cha.channel());
- 		        }catch(Exception e){
- 		        	System.out.println("Leader failed to send read file to client");
+				
+				readFileCmd(msg, channel);
  		        }
 			}
-		}
+		
 
 		if (msg.getReq().getRequestType() == TaskType.REQUESTWRITEFILE) {
 
