@@ -2,3 +2,15 @@ CREATE DATABASE cmpe275db;
 CREATE TABLE fileData (file_id VARCHAR(40), file_name VARCHAR(100),
 file_ext VARCHAR(20), num_of_chunks INT, file_size LONG);
 CREATE TABLE chunkData (file_id VARCHAR(40), chunk_id INT, chunk_data MEDIUMBLOB, chunk_size INT);
+
+==== Drop Tables ====
+DROP TABLE filedata;
+DROP TABLE chunkdata;
+
+======DELETE rows================
+DELETE from filedata;
+DELETE from chunkdata;
+
+==== Testing Write ====
+SELECT * from filedata; 
+SELECT file_id, chunk_id, chunk_size from chunkdata;
