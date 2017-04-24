@@ -3,8 +3,8 @@ package gash.router.server;
 import io.netty.channel.Channel;
 import routing.Pipe.CommandMessage;
 
-public class OutboundCommandMessageQueueHandler implements Runnable{
-	
+public class OutboundCommandMessageQueueHandler implements Runnable {
+
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub

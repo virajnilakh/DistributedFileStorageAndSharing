@@ -16,6 +16,7 @@
 package gash.router.app;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import gash.router.client.CommConnection;
@@ -26,6 +27,17 @@ import global.Constants;
 import io.netty.channel.Channel;
 import redis.clients.jedis.Jedis;
 import routing.Pipe.CommandMessage;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import pipe.common.Common.Header;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ServerBootstrap;
+import gash.router.server.CommandInit;
+import gash.router.client.CommInit;
+import java.util.HashMap;
 
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
@@ -83,7 +95,7 @@ public class DemoApp implements CommListener {
 	 */
 	public static void main(String[] args) {
 		String host = Constants.localhost;
-		// String host = "169.254.80.87";
+		// String host = "169.254.214.175";
 		int port = Constants.workPort;
 
 		Boolean affirm = true;
@@ -94,8 +106,8 @@ public class DemoApp implements CommListener {
 			try {
 				if (jedisHandler1.ping().equals("PONG")) {
 					jedisHandler1.select(0);
-					host = jedisHandler1.get("2").split(":")[0];
-					port = Integer.parseInt(jedisHandler1.get("2").split(":")[1]);
+					host = jedisHandler1.get(String.valueOf(Constants.clusterId)).split(":")[0];
+					port = Integer.parseInt(jedisHandler1.get(String.valueOf(Constants.clusterId)).split(":")[1]);
 				}
 			} catch (Exception e) {
 				System.out.println("Connection to redis failed at 169.254.214.175:4567");
@@ -103,8 +115,8 @@ public class DemoApp implements CommListener {
 			try {
 				if (jedisHandler2.ping().equals("PONG")) {
 					jedisHandler2.select(0);
-					host = jedisHandler2.get("2").split(":")[0];
-					port = Integer.parseInt(jedisHandler2.get("2").split(":")[1]);
+					host = jedisHandler2.get(String.valueOf(Constants.clusterId)).split(":")[0];
+					port = Integer.parseInt(jedisHandler2.get(String.valueOf(Constants.clusterId)).split(":")[1]);
 				}
 			} catch (Exception e) {
 				System.out.println("Connection to redis failed at 169.254.56.202:4567");
@@ -112,29 +124,37 @@ public class DemoApp implements CommListener {
 			try {
 				if (jedisHandler3.ping().equals("PONG")) {
 					jedisHandler3.select(0);
-					host = jedisHandler3.get("2").split(":")[0];
-					port = Integer.parseInt(jedisHandler3.get("2").split(":")[1]);
+					host = jedisHandler3.get(String.valueOf(Constants.clusterId)).split(":")[0];
+					port = Integer.parseInt(jedisHandler3.get(String.valueOf(Constants.clusterId)).split(":")[1]);
 				}
 			} catch (Exception e) {
 				System.out.println("Connection to redis failed at 169.254.80.87:4567");
 			}
-
+			new Thread(new ClientAsServer()).start();
 			MessageClient msgClient = new MessageClient(host, port);
 			DemoApp app = new DemoApp(msgClient);
 
 			do {
 				int option = 0;
 				System.out.println("Welcome to Gossamer Distributed");
-				System.out.println("Press any key to continue: ");
-				System.in.read();
+				System.out.println("Please choose an option to continue: ");
 
 				System.out.println("[1] Write - Write a file to the cluster");
 				System.out.println("[2] Read  - Read file from cluster");
-				System.out.println("[3] Fetch - Fetch File Names stored in cluster");
+				System.out.println("[3] Fetch Names - Fetch File Names stored in cluster");
+				System.out.println("[4] Ping - Ping to cluster");
+				System.out.println("[5] Read Multiple - Read Multiple files from cluster");
 				System.out.println("[0] Exit  - Exit cluster");
-				System.out.println("Please choose an option to continue: ");
 
-				option = reader.nextInt();
+				try {
+					option = reader.nextInt();
+				} catch (Exception e) {
+					option = 0;
+					// TODO Auto-generated catch block
+					// e.printStackTrace();
+				}
+				// option = 2;
+				// reader.nextLine();
 				System.out.println("You entered " + option);
 				CommConnection.getInstance().clearQueue();
 				System.out.println("Queue size is " + CommConnection.getInstance().outboundWriteQueue.size());
@@ -171,9 +191,17 @@ public class DemoApp implements CommListener {
 					 */
 					break;
 				case 1:
+					// For testing writes
+					// String path = runWriteTest();
+
 					System.out.println("Please enter directory (path) to upload:");
 
 					path = reader.nextLine();
+					// path = "C:\\Songs\\1.mp4";
+					// path = "C:\\JS\\test\\test.js";
+					// path = "C:\\Songs\\2.mp4";
+
+					System.in.read();
 
 					System.out.println("You entered" + path);
 
@@ -185,11 +213,14 @@ public class DemoApp implements CommListener {
 					if (ans2.equals("Y")) {
 						affirm = true;
 					}
-
+					// reader.close();
 					File file = new File(path);
+					if (path.trim().equals("") || file == null) {
+						break;
+					}
 					long begin = System.currentTimeMillis();
-					//System.out.println("Begin time");
-					//System.out.println(begin);
+					System.out.println("Begin time");
+					System.out.println(begin);
 					sendFile(file, channel);
 					System.out.println("File sent");
 					System.out.flush();
@@ -198,6 +229,16 @@ public class DemoApp implements CommListener {
 					System.out.println("Please enter name of file to fetch");
 					String fileName = reader.nextLine();
 					MessageSender.SendReadRequest(fileName);
+					break;
+				case 4:
+					break;
+				case 5:
+					System.out.println("Please enter names of file to fetch seperated by comma");
+					String fileNames = reader.nextLine();
+					String[] fileArray = fileNames.split(",");
+					for (String fileName1 : fileArray) {
+						MessageSender.SendReadRequest(fileName1);
+					}
 					break;
 				default:
 					break;
@@ -210,10 +251,39 @@ public class DemoApp implements CommListener {
 			e.printStackTrace();
 		} finally {
 			System.out.println("Exiting...");
-			reader.close();
+			// Thread.sleep(10 * 1000);
+
 		}
+
+		// System.out.println("\n** exiting in 10 seconds. **");
+		// System.out.flush();
+		// Thread.sleep(10 * 1000);
 	}
 
+	private static String runWriteTest() {
+		String path = "C:\\1\\Natrang.avi";
+		return path;
+	}
+
+	public static void clientAcceptConnections() {
+
+	}
+
+	private CommandMessage createCommandPing(int clusterId) {
+		// TODO Auto-generated method stub
+		CommandMessage.Builder command = CommandMessage.newBuilder();
+		Boolean ping = true;
+		command.setPing(ping);
+
+		Header.Builder header = Header.newBuilder();
+		header.setNodeId(2);
+		header.setTime(System.currentTimeMillis());
+		header.setDestination(Constants.whomToConnect);
+		command.setHeader(header);
+
+		return command.build();
+	}
+	
 	private static void sendFile(File file, Channel channel) {
 		// TODO Auto-generated method stub
 

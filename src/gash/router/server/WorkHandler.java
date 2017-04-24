@@ -40,6 +40,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import pipe.common.Common.Failure;
 import pipe.common.Common.Request;
+import pipe.common.Common.TaskType;
 import pipe.election.Election.LeaderStatus.LeaderState;
 import pipe.work.Work.Heartbeat;
 import pipe.work.Work.Task;
@@ -85,19 +86,19 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	 * @param msg
 	 * @throws IOException
 	 */
-	
 	public void handleMessage(WorkMessage msg, Channel channel) throws IOException {
-		if(msg!=null){
-			QueueHandler.enqueueInboundWorkAndChannel(msg,channel);
-
-		}
-		/*if (msg == null) {
+		if (msg == null) {
 			// TODO add logging
 			System.out.println("ERROR: Unexpected content  - " + msg);
 			return;
 		}
-
-		if (msg.getReq().getRequestType() == Request.RequestType.WRITEFILE) {
+		if(!state.isStealReq() && !msg.hasBeat() && msg.getHeader().getSteal()){
+			state.setStealNode(msg.getHeader().getNodeId());
+			state.setStealReq(true);
+		}
+		if (msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
+			QueueHandler.enqueueInboundWorkAndChannel(msg,channel);
+		}else if (msg.getReq().getRequestType() == TaskType.REQUESTWRITEFILE) {
 
 			// WorkMessage wm=SendWriteWorkMessage(msg);
 			// System.out.println("File replicated");
@@ -204,12 +205,12 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 						"Heartbeat from leader " + msg.getLeaderStatus().getLeaderId() + "...Resetting the timmer:");
 				state.getElecHandler().getTimer().cancel();
 				state.getElecHandler().setTimer();
-				try{
+				try {
 					state.getLocalhostJedis().select(0);
-					state.getLocalhostJedis().set("2", msg.getLeaderStatus().getLeaderHost()+":4568");
+					state.getLocalhostJedis().set(Constants.clusterId+"", msg.getLeaderStatus().getLeaderHost() + ":4568");
 					System.out.println("---Redis updated---");
-					
-				}catch(Exception e){
+
+				} catch (Exception e) {
 					System.out.println("---Problem with redis at voteReceived in WorkHandler---");
 				}
 				state.setLeaderId(msg.getLeaderStatus().getLeaderId());
@@ -219,10 +220,10 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			} else if (msg.hasBeat()) {
 				Heartbeat hb = msg.getBeat();
 				logger.info("heartbeat from " + msg.getHeader().getNodeId());
-				Timer t=state.getEmon().getTimer(msg.getHeader().getNodeId());
-				if(t!=null){
-				t.cancel();
-				t=null;
+				Timer t = state.getEmon().getTimer(msg.getHeader().getNodeId());
+				if (t != null) {
+					t.cancel();
+					t = null;
 				}
 				state.getEmon().setTimer(msg.getHeader().getNodeId());
 			} else if (msg.hasPing()) {
@@ -251,7 +252,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			channel.write(rb.build());
 		}
 
-		System.out.flush();*/
+		System.out.flush();
 
 	}
 
@@ -269,8 +270,6 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	protected void channelRead0(ChannelHandlerContext ctx, WorkMessage msg) throws Exception {
 		handleMessage(msg, ctx.channel());
 	}
-
-	
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

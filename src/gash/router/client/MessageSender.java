@@ -3,6 +3,7 @@ package gash.router.client;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -19,7 +20,7 @@ import routing.Pipe.CommandMessage;
 public class MessageSender {
 	static Channel channel = CommConnection.getInstance().connect();
 
-	public static void SendReadRequest(String fileName) {
+	public static void SendReadRequest(String fileName) throws UnknownHostException {
 		// TODO Auto-generated method stub
 		CommandMessage msg = MessageCreator.createReadMessage(fileName);
 		channel.writeAndFlush(msg);
@@ -33,7 +34,7 @@ public class MessageSender {
 		List<String> response = null;
 		CommandMessage msg = MessageCreator.CreateReadAllMessage();
 		channel.writeAndFlush(msg);
-		//System.out.println("Read all files request sent");
+		System.out.println("Read all files request sent");
 	}
 
 	public static void sendReadCommand(File file) {
@@ -75,9 +76,15 @@ public class MessageSender {
 
 			long start = System.currentTimeMillis();
 			System.out.print(start);
-			//System.out.println("Start send");
+			System.out.println("Start send");
 
-			List<Future<Long>> futures = service.invokeAll(CommConnection.getInstance().outboundWriteQueue);
+			try {
+				List<Future<Long>> futures = service.invokeAll(CommConnection.getInstance().outboundWriteQueue);
+			} catch (NullPointerException e) {
+				// TODO Auto-generated catch block
+				// e.printStackTrace();
+
+			}
 			System.out.println("Completed tasks");
 			service.shutdown();
 

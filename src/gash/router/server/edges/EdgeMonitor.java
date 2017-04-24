@@ -31,6 +31,7 @@ import gash.router.server.QueueHandler;
 import gash.router.server.ServerState;
 import gash.router.server.ServerState.State;
 import gash.router.server.WorkInit;
+import global.Constants;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -42,7 +43,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import pipe.common.Common.Header;
-import pipe.common.Common.Request;
 import pipe.election.Election.LeaderStatus;
 import pipe.election.Election.LeaderStatus.LeaderState;
 import pipe.work.Work.Heartbeat;
@@ -53,15 +53,16 @@ import routing.Pipe.CommandMessage;
 
 public class EdgeMonitor implements EdgeListener, Runnable {
 	protected static Logger logger = LoggerFactory.getLogger("edge monitor");
-	private HashMap<Integer,Timer> timer=new HashMap<Integer,Timer>();
+	private HashMap<Integer, Timer> timer = new HashMap<Integer, Timer>();
 	private static EdgeList outboundEdges;
 	private EdgeList inboundEdges;
 	private long dt = 2000;
 	private ServerState state;
 	private boolean forever = true;
-	private static int activeOutboundEdges=0;
-	private static int nodeCount=0;
-	public HashMap<Integer,EdgeInfo> getOutboundEdges() {
+	private static int activeOutboundEdges = 0;
+	private static int nodeCount = 0;
+
+	public HashMap<Integer, EdgeInfo> getOutboundEdges() {
 		return outboundEdges.getMap();
 	}
 
@@ -74,23 +75,22 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		this.state = state;
 		this.state.setEmon(this);
 
-		/*if (state.getConf().getRouting() != null) {
-			
-			for (RoutingEntry e : state.getConf().getRouting()) {
-				
-				outboundEdges.addNode(e.getId(), e.getHost(), e.getPort());
-			}
-		}*/
+		/*
+		 * if (state.getConf().getRouting() != null) {
+		 * 
+		 * for (RoutingEntry e : state.getConf().getRouting()) {
+		 * 
+		 * outboundEdges.addNode(e.getId(), e.getHost(), e.getPort()); } }
+		 */
 
 		// cannot go below 2 sec
 		if (state.getConf().getHeartbeatDt() > this.dt)
 			this.dt = state.getConf().getHeartbeatDt();
 	}
-	
 
-	public void sendData(CommandMessage msg){
-		for (EdgeInfo ei : this.outboundEdges.map.values()){
-			Channel ch=ei.getChannel();
+	public void sendData(CommandMessage msg) {
+		for (EdgeInfo ei : this.outboundEdges.map.values()) {
+			Channel ch = ei.getChannel();
 			ChannelFuture cf = ch.writeAndFlush(msg);
 			if (cf.isDone() && !cf.isSuccess()) {
 				logger.error("failed to send message to server");
@@ -98,55 +98,70 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			}
 		}
 	}
+
 	public void createInboundIfNew(int ref, String host, int port) {
 		inboundEdges.createIfNew(ref, host, port);
 	}
-	public void broadcast(WorkMessage msg){
-			for (EdgeInfo ei : this.outboundEdges.map.values()){
-				Channel ch=ei.getChannel();
-				ChannelFuture cf =null;
-				if(ch!=null){
-					if(msg.getReq().getRequestType() == Request.RequestType.WRITEFILE){
-						QueueHandler.enqueueOutboundWorkAndChannel(msg, ch);
 
-					}else{
-						cf= ch.write(msg);
-						ch.flush();
-						if (cf.isDone() && !cf.isSuccess()) {
-							logger.info("failed to send vote to server");
-
-						}
-					}
-					
-				}else{
-					ei.setActive(false);
-					activeOutboundEdges--;
-				}
-				
-				
-			}
-		}
-	public void broadcast(CommandMessage msg){
-		for (EdgeInfo ei : this.outboundEdges.map.values()){
-			Channel ch=ei.getChannel();
-			ChannelFuture cf =null;
-			if(ch!=null){
-				
-				System.out.println("Broadcast cmd msg");
-				cf= ch.write(msg);
+	public void broadcast(WorkMessage msg) {
+		for (EdgeInfo ei : this.outboundEdges.map.values()) {
+			Channel ch = ei.getChannel();
+			ChannelFuture cf = null;
+			if (ch != null) {
+				cf = ch.write(msg);
 				ch.flush();
 				if (cf.isDone() && !cf.isSuccess()) {
 					logger.info("failed to send vote to server");
 
 				}
-			}else{
+			} else {
 				ei.setActive(false);
 				activeOutboundEdges--;
 			}
-			
-			
+
 		}
 	}
+	public static void sendToNode(WorkMessage msg,int nodeId){
+		for (EdgeInfo ei : outboundEdges.map.values()) {
+			if(ei.getRef()==nodeId){
+				Channel ch = ei.getChannel();
+				ChannelFuture cf = null;
+				if (ch != null) {
+					System.out.println("Sendind steal to "+nodeId);
+					//QueueHandler.enqueueInboundWorkAndChannel(msg, ch);
+					cf = ch.write(msg);
+					ch.flush();
+					if (cf.isDone() && !cf.isSuccess()) {
+						logger.info("failed to send vote to server");
+
+					}
+				} else {
+					ei.setActive(false);
+					activeOutboundEdges--;
+				}
+			}
+		}
+	}
+	public void broadcast(CommandMessage msg) {
+		for (EdgeInfo ei : this.outboundEdges.map.values()) {
+			Channel ch = ei.getChannel();
+			ChannelFuture cf = null;
+			if (ch != null) {
+				System.out.println("Broadcast cmd msg");
+				cf = ch.write(msg);
+				ch.flush();
+				if (cf.isDone() && !cf.isSuccess()) {
+					logger.info("failed to send vote to server");
+
+				}
+			} else {
+				ei.setActive(false);
+				activeOutboundEdges--;
+			}
+
+		}
+	}
+
 	private WorkMessage createHB(EdgeInfo ei) {
 		WorkState.Builder sb = WorkState.newBuilder();
 		sb.setEnqueued(-1);
@@ -159,7 +174,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		hb.setNodeId(state.getConf().getNodeId());
 		hb.setDestination(-1);
 		hb.setTime(System.currentTimeMillis());
-		LeaderStatus.Builder status=LeaderStatus.newBuilder();
+		LeaderStatus.Builder status = LeaderStatus.newBuilder();
 		status.setLeaderId(state.getConf().getNodeId());
 		status.setLeaderHost(state.getIpAddress());
 
@@ -183,6 +198,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	public void shutdown() {
 		forever = false;
 	}
+
 	public WorkMessage createHB(int nodeId) {
 		WorkState.Builder sb = WorkState.newBuilder();
 		sb.setEnqueued(-1);
@@ -195,25 +211,25 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		hb.setNodeId(state.getConf().getNodeId());
 		hb.setDestination(-1);
 		hb.setTime(System.currentTimeMillis());
-		LeaderStatus.Builder status=LeaderStatus.newBuilder();
+		LeaderStatus.Builder status = LeaderStatus.newBuilder();
 		status.setLeaderId(state.getConf().getNodeId());
 		WorkMessage.Builder wb = WorkMessage.newBuilder();
 		wb.setHeader(hb);
 		wb.setSecret(0);
 		wb.setBeat(bb);
-		if(state.getLeaderId()!=0){
+		if (state.getLeaderId() != 0) {
 			status.setState(LeaderState.LEADERKNOWN);
-		}else{
+		} else {
 			status.setState(LeaderState.LEADERUNKNOWN);
 		}
 		wb.setLeaderStatus(status);
-		
+
 		return wb.build();
 	}
+
 	@Override
 	public void run() {
 		while (forever) {
-			
 			if(state.getAnyJedis().dbSize()>nodeCount+1){
 				Jedis j=state.getAnyJedis();
 				Set<String> list = j.keys("*"); 
@@ -237,7 +253,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				System.out.println("Node:"+state.getConf().getNodeId()+" is the Leader!!");
 				try{
 					state.getLocalhostJedis().select(0);
-					state.getLocalhostJedis().set("2", state.getIpAddress()+":4568");
+					state.getLocalhostJedis().set(Constants.clusterId+"", state.getIpAddress()+":4568");
 					System.out.println("---Redis updated---");
 					
 				}catch(Exception e){
@@ -251,12 +267,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					
 					if (ei.isActive() && ei.getChannel() != null) {
 						WorkMessage wmhb=createHB(state.getConf().getNodeId());
-						//QueueHandler.enqueueOutboundWorkAndChannel(wmhb, ei.getChannel());
 						ei.getChannel().writeAndFlush(wmhb);
 						if(state.isLeader()){
 							WorkMessage wm = createHB(ei);
 							System.out.println("---Leader "+state.getLeaderId()+" sending heartbeat---");
-							//QueueHandler.enqueueOutboundWorkAndChannel(wm, ei.getChannel());
 
 							ei.getChannel().writeAndFlush(wm);
 						}
@@ -318,7 +332,6 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				        	e.printStackTrace();
 				            //workerGroup.shutdownGracefully();
 				        }
-				        
 
 					}
 				}
@@ -328,63 +341,71 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
 			if(state.next==null){
-				
-				EventLoopGroup workerGroup = new NioEventLoopGroup();
-
-		        try {
-		        	String host=state.getLocalhostJedis().get(1+"").split(":")[0];
-					int port=Integer.parseInt(state.getLocalhostJedis().get(1+"").split(":")[1]);
-		            Bootstrap b = new Bootstrap(); // (1)
-		            b.group(workerGroup); // (2)
-		            b.channel(NioSocketChannel.class); // (3)
-		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-		            b.handler(new WorkInit(state,false));
-
-		            // Start the client.
-		            //System.out.println("Connect to a node.");
-
-		             ChannelFuture cha = b.connect(host, port).sync();
-		             state.setNext(cha.channel());
-		            /*ei.setChannel(f.channel());
-		            ei.setActive(true);
-		            activeOutboundEdges++;*/
-		             
-		        }catch(Exception e){
-		        	System.out.println("Failed to connect to next");
-		        }
-			}
+ 				
+ 				EventLoopGroup workerGroup = new NioEventLoopGroup();
+ 
+ 		        try {
+ 		        	String host=state.getLocalhostJedis().get(Constants.nextClusterId+"").split(":")[0];
+ 					int port=Integer.parseInt(state.getLocalhostJedis().get(Constants.nextClusterId+"").split(":")[1]);
+ 		            Bootstrap b = new Bootstrap(); // (1)
+ 		            b.group(workerGroup); // (2)
+ 		            b.channel(NioSocketChannel.class); // (3)
+ 		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+ 		            b.handler(new WorkInit(state,false));
+ 
+ 		            // Start the client.
+ 		            //System.out.println("Connect to a node.");
+ 
+ 		             ChannelFuture cha = b.connect(host, port).sync();
+ 		             state.setNext(cha.channel());
+ 		            /*ei.setChannel(f.channel());
+ 		            ei.setActive(true);
+ 		            activeOutboundEdges;*/
+ 		             
+ 		        }catch(Exception e){
+ 		        	System.out.println("Failed to connect to next");
+ 		        }
+ 			}
+			
+			
 		}
 	}
-	private static class DeadFollowerTimer extends TimerTask{
+
+	private static class DeadFollowerTimer extends TimerTask {
 		private int nodeId;
 		private ServerState state;
-        public DeadFollowerTimer(int nodeId,ServerState s){
-        	this.nodeId=nodeId;
-        	state=s;
-        }
-        @Override
-        public void run(){
-        	//	System.out.println("Node "+nodeId+"dead");
-        	outboundEdges.map.get(nodeId).setChannel(null);
-          	outboundEdges.map.get(nodeId).setActive(false);
-        	//outboundEdges.map.remove(nodeId);
-        	//state.delRedis(nodeId);
-        	//activeOutboundEdges--;
-        	//nodeCount--;
-        	this.cancel();
-        }
-    }
+
+		public DeadFollowerTimer(int nodeId, ServerState s) {
+			this.nodeId = nodeId;
+			state = s;
+		}
+
+		@Override
+		public void run() {
+			// System.out.println("Node "+nodeId+"dead");
+			outboundEdges.map.get(nodeId).setChannel(null);
+			outboundEdges.map.get(nodeId).setActive(false);
+			// outboundEdges.map.remove(nodeId);
+			// state.delRedis(nodeId);
+			// activeOutboundEdges--;
+			// nodeCount--;
+			this.cancel();
+		}
+	}
+
 	public Timer getTimer(int nodeId) {
 		return timer.get(nodeId);
 	}
 
 	public void setTimer(int nodeId) {
-		int randomTimeout=(2000+(new Random()).nextInt(3500))*4;
-        Timer t=new Timer();
-        t.schedule(new DeadFollowerTimer(nodeId,state),(long)randomTimeout,(long)randomTimeout);
-		timer.put(nodeId,t );
+		int randomTimeout = (2000 + (new Random()).nextInt(3500)) * 4;
+		Timer t = new Timer();
+		t.schedule(new DeadFollowerTimer(nodeId, state), (long) randomTimeout, (long) randomTimeout);
+		timer.put(nodeId, t);
 	}
+
 	@Override
 	public synchronized void onAdd(EdgeInfo ei) {
 		// TODO check connection

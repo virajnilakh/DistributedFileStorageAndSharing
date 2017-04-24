@@ -4,107 +4,15 @@ option java_package = "routing";
 
 import "common.proto";
 
-
-/**
- * the accompanying information for all messages. Provides origination,
- * security, authentication, and tracking information
- */
-
-
-/**
- * IMPORTANT !!::
- * Command Message is delivered from the client and will be used to communicate with the client
-*/
-
 message CommandMessage {
    required Header header = 1;
 
-   // As we need to identify message from different network, message_id would help with that. 
-   // in addition with node_id, it will remain unique every time.
-   required int64 message_id = 1;
-   required type MessageType = 10;
-   optional type Status = 11;
-
-
-   enum MessageType{
-       PING = 1;
-       PINGRESPONSE = 2;
-       REQUESTREADFILE = 3;
-       REQUESTWRITEFILE = 4;
-       RESPONSEREADFILE = 5;
-       RESPONSEWRITEFILE = 6;
+    oneof payload {
+      // a client (external) sanity check for testing
+      bool ping = 3;
+      string message = 4;
+      Failure err = 5;
+      Request req = 6;
+      Response resp = 7;
    }
-
-   enum Status {
-       SUCCESS = 1;
-       SERVERTIMEOUT = 2; //if message got lost in intra cluster you need to send a resonpse back to client.
-       REDIRECTION = 3; // when leader sends a response back with location of chunks node.
-       FILENOTFOUND = 4; // no file was found on server
-       NOLEADER = 5; // cannot recieve request, or must say client to stop sending request
-       UNREACHABLE = 6; //cluster to clust communication stops working, broken link.
-       SERVICEDOWN = 7; //what if it has less number of nodes alive in cluster.
-       ERROR = 8; //similiar to failure messages.
-   }
-
-   oneof payload {
-        // a client (external) sanity check for testing
-        bool ping = 3;
-        string message = 4;
-        Failure err = 5;
-        WriteRequest request_write = 6;
-        ReadRequest request_read = 7;
-        WriteResponse response_write = 8;
-        ReadResponse response_read = 9;
-   }
-
 }
-
-message Chunk{
-     required int32 chunk_id = 1;
-     required bytes chunk_data = 6;
-     optional int32 chunk_size=9;
-}
-
-message WriteRequest{
-     optional int32 file_id = 1;
-     required string filename = 2;
-     optional string file_ext=3;
-     optional Chunk chunk=4;
-     optional int32 num_of_chunks = 5;
-}
-
-message ChunkLocation{
-     optional int32 chunkid = 1;
-     repeated Node node = 2;
-}
-
-message Node{
-     required int32 node_id = 1;
-     required string host = 2;
-     required int32 port = 3;
-}
-
-message ReadResponse{
-    optional string file_id = 1;
-    required string filename = 2;
-    optional string file_ext= 3;
-    optional int32 num_of_chunks = 4;
-    repeated ChunkLocation chunk_location = 5;
-    optional Chunk chunk = 6;
-}
-
-message ReadRequest{
-    optional string filename = 1; // to get all use * wildcard
-    optional int64 file_id = 2;
-    optional int64 chunk_id = 3;
-    optional int64 chunk_size = 4;
-}
-
-//this payload will be only present when chunks are missing on server during write
-//and will request client to send it again.
-message WriteResponse {
-    repeated int32 ChunkId=1;
-    optional string filename=2;
-}
-
-

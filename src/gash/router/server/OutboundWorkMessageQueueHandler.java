@@ -2,11 +2,9 @@ package gash.router.server;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import pipe.common.Common.Request;
 import pipe.work.Work.WorkMessage;
-import routing.Pipe.CommandMessage;
 
-public class OutboundWorkMessageQueueHandler implements Runnable{
+public class OutboundWorkMessageQueueHandler implements Runnable {
 
 	@Override
 	public void run() {
@@ -14,9 +12,9 @@ public class OutboundWorkMessageQueueHandler implements Runnable{
 		while(true){
 			WorkAndChannel wch=QueueHandler.dequeueOutboundWorkAndChannel();
 			WorkMessage msg=wch.getMsg();
-			if(msg.getReq().getRequestType() == Request.RequestType.WRITEFILE){
+			/*if(msg.getReq().getRequestType() == RequestType.WRITEFILE){
 				System.out.println(" ");
-			}
+			}*/
 			ChannelFuture cf =null;
 			Channel channel=wch.getChannel();
 			if(msg!=null){

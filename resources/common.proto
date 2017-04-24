@@ -1,120 +1,206 @@
-syntax="proto2";
+syntax = "proto2";
+
 option optimize_for = SPEED;
+
 option java_package = "pipe.common";
-
-/**
-* the accompanying information for all messages. Provides origination,
-* security, authentication, and tracking information
-*/
-message Header { 
-required int32 node_id = 1;
-optional int64 time = 2;
-optional bool election=3;
-// if the message is for a specific node, this will be set
-optional int32 destination = 8;
-
-// This factor limits the distance that a msg travels from the originating 
-// node. Default (-1) is the whole network (not restricted).
-optional int32 max_hops = 10 [default = -1];
-}
-
-message Request { 
-required RequestType requestType = 3; 
-enum RequestType {
-READFILE = 1;
-WRITEFILE = 2;
-DELETEFILE = 3;
-UPDATEFILE = 4;
-GETFILES = 5;
-}
-oneof payload{
-WriteBody rwb = 4;
-ReadBody rrb = 5;
-//DeleteBody rdb = 6;
-//UpdateBody rub = 7;
-} 
-
-}
-message WriteBody{
-optional string file_id = 1;
-required string filename = 2;
-optional string file_ext=3;
-optional Chunk chunk=4;
-optional int32 num_of_chunks = 5;
-optional int64 file_size = 6;
-}
-
-//this payload will be only present when chunks are missing on server during write
-//and will request client to send it again.
-message WriteResponse {
-repeated int32 ChunkId=1;
-}
-
-
-message Chunk{
-required int32 chunk_id = 1;
-required bytes chunk_data = 6;
-optional int32 chunk_size=9;
-}
-
-message ReadBody{
-optional string filename = 1; // to get all use * wildcard
-optional int64 file_id = 2;
-optional int64 chunk_id = 3;
-optional int64 chunk_size = 4;
-optional int64 file_size = 5;
-optional string file_ext = 6;
-}
-
-message ReadResponse{
-optional string file_id = 1;
-optional string filename = 2;
-optional string file_ext= 3;
-optional int32 num_of_chunks = 4;
-optional ChunkLocation chunk_location = 5;
-}
-
-message ChunkLocation{
-optional int32 chunkid = 1;
-repeated Node node = 2;
-}
-
-message Node{
-required int32 node_id = 1;
-required string host = 2;
-required int32 port = 3;
-}
 
  
 
-message Response{
-optional ResponseType responseType = 8;
-optional string filename=3; 
-enum ResponseType{
-READFILE = 1;
-WRITEFILE = 2;
-DELETEFILE = 3;
-UPDATEFILE = 4;
-READFILENAMES = 5;
-}
-enum Status{
-Success = 1;
-Failure = 2;
-}
-oneof payload{
-WriteResponse writeResponse = 4;
-ReadResponse readResponse = 5;
-//optional ResponseDeleteBody rdb = 6;
-//optional ResponseUpdateBody rub = 7;
-}
+/**
+
+ * the accompanying information for all messages. Provides origination,
+
+ * security, authentication, and tracking information
+
+ */
+
+message Header { 
+
+  // As we need to identify message from different network, message_id would help with that. 
+   // in addition with node_id, it will remain unique every time.
+   optional int32 message_id = 1;  //New field Added
+   required int32 node_id = 2;
+   optional int64 time = 3; 
+   optional bool election=4;
+   optional bool steal=5;
+   
+   // if the message is for a specific node, this will be set
+   optional int32 destination = 8;
+
+   // This factor limits the distance that a msg travels from the originating 
+   // node. Default (-1) is the whole network (not restricted). 
+   optional int32 max_hops = 10 [default = -1];
 
 }
 
 
 message Failure {
-required int32 id = 1;
-optional int32 ref_id = 2;
-optional string message = 3;
+
+ required int32 id = 1;
+
+ optional int32 ref_id = 2;
+
+ optional string message = 3;
+
 }
 
  
+
+enum TaskType{ 
+     PING = 1;
+     PINGRESPONSE = 2;
+     REQUESTREADFILE = 3;
+     REQUESTWRITEFILE = 4;
+     RESPONSEREADFILE = 5;
+     RESPONSEWRITEFILE = 6;
+     REQUESTREADALLFILEDETAILS = 7;
+}
+ 
+
+message Request { 
+
+ optional Node client = 1;
+
+ required TaskType requestType = 3; 
+
+ oneof payload{
+
+ WriteBody rwb = 4;
+
+ ReadBody rrb = 5;
+
+ } 
+
+}
+
+ 
+
+message WriteBody{
+
+ optional string file_id = 1;
+
+ required string filename = 2;
+
+ optional string file_ext=3;
+
+ optional Chunk chunk=4;
+
+ optional int32 num_of_chunks = 5;
+
+ optional int64 file_size = 6;	
+}
+
+ 
+
+//this payload will be only present when chunks are missing on server during write
+
+//and will request client to send it again.
+
+ message WriteResponse {
+
+ repeated int32 ChunkId=1;
+ 
+ optional string filename=2;
+
+}
+
+ 
+
+message Chunk{
+
+ required int32 chunk_id = 1;
+
+ required bytes chunk_data = 6;
+
+ optional int32 chunk_size=9;
+
+}
+
+ 
+
+message ReadBody{
+
+ 	optional string filename = 1; // to get all use * wildcard
+    optional string file_id = 2;
+    optional int32 chunk_id = 3;
+    optional int32 chunk_size = 4;
+    optional int64 file_size= 5;
+    optional string clientAddress=6;
+
+}
+
+ 
+
+message ReadResponse{
+
+ optional string file_id = 1;
+
+ required string filename = 2;
+
+ optional string file_ext= 3;
+
+ optional int32 num_of_chunks = 4;
+
+ repeated ChunkLocation chunk_location = 5;
+
+ optional Chunk chunk = 6;
+
+ 
+
+}
+
+ 
+
+message ChunkLocation{
+
+ 	 required int32 chunk_id = 1;
+     required bytes chunk_data = 6;
+     optional int32 chunk_size=9;
+
+}
+
+ 
+
+message Node{
+
+ required int32 node_id = 1;
+
+ required string host = 2;
+
+ required int32 port = 3;
+
+}
+
+ 
+
+message Response{
+
+ required TaskType responseType = 1; 
+
+ optional string filename=3; 
+
+ optional Status status = 10;  // Status should be part of Response
+
+ enum Status{
+     SUCCESS = 1;
+     SERVERTIMEOUT = 2; //if message got lost in intra cluster you need to send a resonpse back to client.
+     REDIRECTION = 3; // when leader sends a response back with location of chunks node.
+     FILENOTFOUND = 4; // no file was found on server
+     NOLEADER = 5; // cannot receive request, or must say client to stop sending request
+     UNREACHABLE = 6; //cluster to cluster communication stops working, broken link.
+     SERVICEDOWN = 7; //what if it has less number of nodes alive in cluster.
+     ERROR = 8; //similar to failure messages.
+ 
+
+ }
+
+
+ oneof payload{
+
+ WriteResponse writeResponse = 4;
+
+ ReadResponse readResponse = 5;
+
+ }
+
+}

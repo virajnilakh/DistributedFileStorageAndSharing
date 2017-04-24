@@ -193,10 +193,9 @@ public class MessageServer {
 			state = new ServerState();
 			state.setConf(conf);
 			state.setRedis();
-			state.startAllThreads();
 			TaskList tasks = new TaskList(new NoOpBalancer());
 			state.setTasks(tasks);
-			
+			state.startAllThreads();
 			EdgeMonitor emon = new EdgeMonitor(state);
 			Thread t = new Thread(emon);
 			t.start();

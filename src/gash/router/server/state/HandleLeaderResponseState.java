@@ -1,6 +1,7 @@
 package gash.router.server.state;
 
 import gash.router.server.ServerState;
+import global.Constants;
 import io.netty.channel.Channel;
 import pipe.work.Work.WorkMessage;
 
@@ -19,7 +20,7 @@ public class HandleLeaderResponseState implements Handelable {
 		state.getElecHandler().setTimer();
 		try{
 			state.getLocalhostJedis().select(0);
-			state.getLocalhostJedis().set("2", wm.getLeaderStatus().getLeaderHost()+":4568");
+			state.getLocalhostJedis().set(Constants.clusterId+"", wm.getLeaderStatus().getLeaderHost()+":4568");
 			System.out.println("---Redis updated---");
 			
 		}catch(Exception e){

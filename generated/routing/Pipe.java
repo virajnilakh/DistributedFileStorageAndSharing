@@ -32,10 +32,18 @@ public final class Pipe {
     pipe.common.Common.HeaderOrBuilder getHeaderOrBuilder();
 
     /**
+     * <pre>
+     * a client (external) sanity check for testing
+     * </pre>
+     *
      * <code>optional bool ping = 3;</code>
      */
     boolean hasPing();
     /**
+     * <pre>
+     * a client (external) sanity check for testing
+     * </pre>
+     *
      * <code>optional bool ping = 3;</code>
      */
     boolean getPing();
@@ -68,30 +76,30 @@ public final class Pipe {
     pipe.common.Common.FailureOrBuilder getErrOrBuilder();
 
     /**
-     * <code>optional .Request reqMsg = 6;</code>
+     * <code>optional .Request req = 6;</code>
      */
-    boolean hasReqMsg();
+    boolean hasReq();
     /**
-     * <code>optional .Request reqMsg = 6;</code>
+     * <code>optional .Request req = 6;</code>
      */
-    pipe.common.Common.Request getReqMsg();
+    pipe.common.Common.Request getReq();
     /**
-     * <code>optional .Request reqMsg = 6;</code>
+     * <code>optional .Request req = 6;</code>
      */
-    pipe.common.Common.RequestOrBuilder getReqMsgOrBuilder();
+    pipe.common.Common.RequestOrBuilder getReqOrBuilder();
 
     /**
-     * <code>optional .Response resMsg = 7;</code>
+     * <code>optional .Response resp = 7;</code>
      */
-    boolean hasResMsg();
+    boolean hasResp();
     /**
-     * <code>optional .Response resMsg = 7;</code>
+     * <code>optional .Response resp = 7;</code>
      */
-    pipe.common.Common.Response getResMsg();
+    pipe.common.Common.Response getResp();
     /**
-     * <code>optional .Response resMsg = 7;</code>
+     * <code>optional .Response resp = 7;</code>
      */
-    pipe.common.Common.ResponseOrBuilder getResMsgOrBuilder();
+    pipe.common.Common.ResponseOrBuilder getRespOrBuilder();
 
     public routing.Pipe.CommandMessage.PayloadCase getPayloadCase();
   }
@@ -235,8 +243,8 @@ public final class Pipe {
       PING(3),
       MESSAGE(4),
       ERR(5),
-      REQMSG(6),
-      RESMSG(7),
+      REQ(6),
+      RESP(7),
       PAYLOAD_NOT_SET(0);
       private final int value;
       private PayloadCase(int value) {
@@ -255,8 +263,8 @@ public final class Pipe {
           case 3: return PING;
           case 4: return MESSAGE;
           case 5: return ERR;
-          case 6: return REQMSG;
-          case 7: return RESMSG;
+          case 6: return REQ;
+          case 7: return RESP;
           case 0: return PAYLOAD_NOT_SET;
           default: return null;
         }
@@ -295,12 +303,20 @@ public final class Pipe {
 
     public static final int PING_FIELD_NUMBER = 3;
     /**
+     * <pre>
+     * a client (external) sanity check for testing
+     * </pre>
+     *
      * <code>optional bool ping = 3;</code>
      */
     public boolean hasPing() {
       return payloadCase_ == 3;
     }
     /**
+     * <pre>
+     * a client (external) sanity check for testing
+     * </pre>
+     *
      * <code>optional bool ping = 3;</code>
      */
     public boolean getPing() {
@@ -385,52 +401,52 @@ public final class Pipe {
       return pipe.common.Common.Failure.getDefaultInstance();
     }
 
-    public static final int REQMSG_FIELD_NUMBER = 6;
+    public static final int REQ_FIELD_NUMBER = 6;
     /**
-     * <code>optional .Request reqMsg = 6;</code>
+     * <code>optional .Request req = 6;</code>
      */
-    public boolean hasReqMsg() {
+    public boolean hasReq() {
       return payloadCase_ == 6;
     }
     /**
-     * <code>optional .Request reqMsg = 6;</code>
+     * <code>optional .Request req = 6;</code>
      */
-    public pipe.common.Common.Request getReqMsg() {
+    public pipe.common.Common.Request getReq() {
       if (payloadCase_ == 6) {
          return (pipe.common.Common.Request) payload_;
       }
       return pipe.common.Common.Request.getDefaultInstance();
     }
     /**
-     * <code>optional .Request reqMsg = 6;</code>
+     * <code>optional .Request req = 6;</code>
      */
-    public pipe.common.Common.RequestOrBuilder getReqMsgOrBuilder() {
+    public pipe.common.Common.RequestOrBuilder getReqOrBuilder() {
       if (payloadCase_ == 6) {
          return (pipe.common.Common.Request) payload_;
       }
       return pipe.common.Common.Request.getDefaultInstance();
     }
 
-    public static final int RESMSG_FIELD_NUMBER = 7;
+    public static final int RESP_FIELD_NUMBER = 7;
     /**
-     * <code>optional .Response resMsg = 7;</code>
+     * <code>optional .Response resp = 7;</code>
      */
-    public boolean hasResMsg() {
+    public boolean hasResp() {
       return payloadCase_ == 7;
     }
     /**
-     * <code>optional .Response resMsg = 7;</code>
+     * <code>optional .Response resp = 7;</code>
      */
-    public pipe.common.Common.Response getResMsg() {
+    public pipe.common.Common.Response getResp() {
       if (payloadCase_ == 7) {
          return (pipe.common.Common.Response) payload_;
       }
       return pipe.common.Common.Response.getDefaultInstance();
     }
     /**
-     * <code>optional .Response resMsg = 7;</code>
+     * <code>optional .Response resp = 7;</code>
      */
-    public pipe.common.Common.ResponseOrBuilder getResMsgOrBuilder() {
+    public pipe.common.Common.ResponseOrBuilder getRespOrBuilder() {
       if (payloadCase_ == 7) {
          return (pipe.common.Common.Response) payload_;
       }
@@ -457,14 +473,14 @@ public final class Pipe {
           return false;
         }
       }
-      if (hasReqMsg()) {
-        if (!getReqMsg().isInitialized()) {
+      if (hasReq()) {
+        if (!getReq().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
       }
-      if (hasResMsg()) {
-        if (!getResMsg().isInitialized()) {
+      if (hasResp()) {
+        if (!getResp().isInitialized()) {
           memoizedIsInitialized = 0;
           return false;
         }
@@ -565,12 +581,12 @@ public final class Pipe {
               .equals(other.getErr());
           break;
         case 6:
-          result = result && getReqMsg()
-              .equals(other.getReqMsg());
+          result = result && getReq()
+              .equals(other.getReq());
           break;
         case 7:
-          result = result && getResMsg()
-              .equals(other.getResMsg());
+          result = result && getResp()
+              .equals(other.getResp());
           break;
         case 0:
         default:
@@ -605,12 +621,12 @@ public final class Pipe {
           hash = (53 * hash) + getErr().hashCode();
           break;
         case 6:
-          hash = (37 * hash) + REQMSG_FIELD_NUMBER;
-          hash = (53 * hash) + getReqMsg().hashCode();
+          hash = (37 * hash) + REQ_FIELD_NUMBER;
+          hash = (53 * hash) + getReq().hashCode();
           break;
         case 7:
-          hash = (37 * hash) + RESMSG_FIELD_NUMBER;
-          hash = (53 * hash) + getResMsg().hashCode();
+          hash = (37 * hash) + RESP_FIELD_NUMBER;
+          hash = (53 * hash) + getResp().hashCode();
           break;
         case 0:
         default:
@@ -788,17 +804,17 @@ public final class Pipe {
           }
         }
         if (payloadCase_ == 6) {
-          if (reqMsgBuilder_ == null) {
+          if (reqBuilder_ == null) {
             result.payload_ = payload_;
           } else {
-            result.payload_ = reqMsgBuilder_.build();
+            result.payload_ = reqBuilder_.build();
           }
         }
         if (payloadCase_ == 7) {
-          if (resMsgBuilder_ == null) {
+          if (respBuilder_ == null) {
             result.payload_ = payload_;
           } else {
-            result.payload_ = resMsgBuilder_.build();
+            result.payload_ = respBuilder_.build();
           }
         }
         result.bitField0_ = to_bitField0_;
@@ -862,12 +878,12 @@ public final class Pipe {
             mergeErr(other.getErr());
             break;
           }
-          case REQMSG: {
-            mergeReqMsg(other.getReqMsg());
+          case REQ: {
+            mergeReq(other.getReq());
             break;
           }
-          case RESMSG: {
-            mergeResMsg(other.getResMsg());
+          case RESP: {
+            mergeResp(other.getResp());
             break;
           }
           case PAYLOAD_NOT_SET: {
@@ -891,13 +907,13 @@ public final class Pipe {
             return false;
           }
         }
-        if (hasReqMsg()) {
-          if (!getReqMsg().isInitialized()) {
+        if (hasReq()) {
+          if (!getReq().isInitialized()) {
             return false;
           }
         }
-        if (hasResMsg()) {
-          if (!getResMsg().isInitialized()) {
+        if (hasResp()) {
+          if (!getResp().isInitialized()) {
             return false;
           }
         }
@@ -1057,12 +1073,20 @@ public final class Pipe {
       }
 
       /**
+       * <pre>
+       * a client (external) sanity check for testing
+       * </pre>
+       *
        * <code>optional bool ping = 3;</code>
        */
       public boolean hasPing() {
         return payloadCase_ == 3;
       }
       /**
+       * <pre>
+       * a client (external) sanity check for testing
+       * </pre>
+       *
        * <code>optional bool ping = 3;</code>
        */
       public boolean getPing() {
@@ -1072,6 +1096,10 @@ public final class Pipe {
         return false;
       }
       /**
+       * <pre>
+       * a client (external) sanity check for testing
+       * </pre>
+       *
        * <code>optional bool ping = 3;</code>
        */
       public Builder setPing(boolean value) {
@@ -1081,6 +1109,10 @@ public final class Pipe {
         return this;
       }
       /**
+       * <pre>
+       * a client (external) sanity check for testing
+       * </pre>
+       *
        * <code>optional bool ping = 3;</code>
        */
       public Builder clearPing() {
@@ -1316,64 +1348,64 @@ public final class Pipe {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder> reqMsgBuilder_;
+          pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder> reqBuilder_;
       /**
-       * <code>optional .Request reqMsg = 6;</code>
+       * <code>optional .Request req = 6;</code>
        */
-      public boolean hasReqMsg() {
+      public boolean hasReq() {
         return payloadCase_ == 6;
       }
       /**
-       * <code>optional .Request reqMsg = 6;</code>
+       * <code>optional .Request req = 6;</code>
        */
-      public pipe.common.Common.Request getReqMsg() {
-        if (reqMsgBuilder_ == null) {
+      public pipe.common.Common.Request getReq() {
+        if (reqBuilder_ == null) {
           if (payloadCase_ == 6) {
             return (pipe.common.Common.Request) payload_;
           }
           return pipe.common.Common.Request.getDefaultInstance();
         } else {
           if (payloadCase_ == 6) {
-            return reqMsgBuilder_.getMessage();
+            return reqBuilder_.getMessage();
           }
           return pipe.common.Common.Request.getDefaultInstance();
         }
       }
       /**
-       * <code>optional .Request reqMsg = 6;</code>
+       * <code>optional .Request req = 6;</code>
        */
-      public Builder setReqMsg(pipe.common.Common.Request value) {
-        if (reqMsgBuilder_ == null) {
+      public Builder setReq(pipe.common.Common.Request value) {
+        if (reqBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           payload_ = value;
           onChanged();
         } else {
-          reqMsgBuilder_.setMessage(value);
+          reqBuilder_.setMessage(value);
         }
         payloadCase_ = 6;
         return this;
       }
       /**
-       * <code>optional .Request reqMsg = 6;</code>
+       * <code>optional .Request req = 6;</code>
        */
-      public Builder setReqMsg(
+      public Builder setReq(
           pipe.common.Common.Request.Builder builderForValue) {
-        if (reqMsgBuilder_ == null) {
+        if (reqBuilder_ == null) {
           payload_ = builderForValue.build();
           onChanged();
         } else {
-          reqMsgBuilder_.setMessage(builderForValue.build());
+          reqBuilder_.setMessage(builderForValue.build());
         }
         payloadCase_ = 6;
         return this;
       }
       /**
-       * <code>optional .Request reqMsg = 6;</code>
+       * <code>optional .Request req = 6;</code>
        */
-      public Builder mergeReqMsg(pipe.common.Common.Request value) {
-        if (reqMsgBuilder_ == null) {
+      public Builder mergeReq(pipe.common.Common.Request value) {
+        if (reqBuilder_ == null) {
           if (payloadCase_ == 6 &&
               payload_ != pipe.common.Common.Request.getDefaultInstance()) {
             payload_ = pipe.common.Common.Request.newBuilder((pipe.common.Common.Request) payload_)
@@ -1384,18 +1416,18 @@ public final class Pipe {
           onChanged();
         } else {
           if (payloadCase_ == 6) {
-            reqMsgBuilder_.mergeFrom(value);
+            reqBuilder_.mergeFrom(value);
           }
-          reqMsgBuilder_.setMessage(value);
+          reqBuilder_.setMessage(value);
         }
         payloadCase_ = 6;
         return this;
       }
       /**
-       * <code>optional .Request reqMsg = 6;</code>
+       * <code>optional .Request req = 6;</code>
        */
-      public Builder clearReqMsg() {
-        if (reqMsgBuilder_ == null) {
+      public Builder clearReq() {
+        if (reqBuilder_ == null) {
           if (payloadCase_ == 6) {
             payloadCase_ = 0;
             payload_ = null;
@@ -1406,22 +1438,22 @@ public final class Pipe {
             payloadCase_ = 0;
             payload_ = null;
           }
-          reqMsgBuilder_.clear();
+          reqBuilder_.clear();
         }
         return this;
       }
       /**
-       * <code>optional .Request reqMsg = 6;</code>
+       * <code>optional .Request req = 6;</code>
        */
-      public pipe.common.Common.Request.Builder getReqMsgBuilder() {
-        return getReqMsgFieldBuilder().getBuilder();
+      public pipe.common.Common.Request.Builder getReqBuilder() {
+        return getReqFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Request reqMsg = 6;</code>
+       * <code>optional .Request req = 6;</code>
        */
-      public pipe.common.Common.RequestOrBuilder getReqMsgOrBuilder() {
-        if ((payloadCase_ == 6) && (reqMsgBuilder_ != null)) {
-          return reqMsgBuilder_.getMessageOrBuilder();
+      public pipe.common.Common.RequestOrBuilder getReqOrBuilder() {
+        if ((payloadCase_ == 6) && (reqBuilder_ != null)) {
+          return reqBuilder_.getMessageOrBuilder();
         } else {
           if (payloadCase_ == 6) {
             return (pipe.common.Common.Request) payload_;
@@ -1430,16 +1462,16 @@ public final class Pipe {
         }
       }
       /**
-       * <code>optional .Request reqMsg = 6;</code>
+       * <code>optional .Request req = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder> 
-          getReqMsgFieldBuilder() {
-        if (reqMsgBuilder_ == null) {
+          getReqFieldBuilder() {
+        if (reqBuilder_ == null) {
           if (!(payloadCase_ == 6)) {
             payload_ = pipe.common.Common.Request.getDefaultInstance();
           }
-          reqMsgBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          reqBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               pipe.common.Common.Request, pipe.common.Common.Request.Builder, pipe.common.Common.RequestOrBuilder>(
                   (pipe.common.Common.Request) payload_,
                   getParentForChildren(),
@@ -1448,68 +1480,68 @@ public final class Pipe {
         }
         payloadCase_ = 6;
         onChanged();;
-        return reqMsgBuilder_;
+        return reqBuilder_;
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          pipe.common.Common.Response, pipe.common.Common.Response.Builder, pipe.common.Common.ResponseOrBuilder> resMsgBuilder_;
+          pipe.common.Common.Response, pipe.common.Common.Response.Builder, pipe.common.Common.ResponseOrBuilder> respBuilder_;
       /**
-       * <code>optional .Response resMsg = 7;</code>
+       * <code>optional .Response resp = 7;</code>
        */
-      public boolean hasResMsg() {
+      public boolean hasResp() {
         return payloadCase_ == 7;
       }
       /**
-       * <code>optional .Response resMsg = 7;</code>
+       * <code>optional .Response resp = 7;</code>
        */
-      public pipe.common.Common.Response getResMsg() {
-        if (resMsgBuilder_ == null) {
+      public pipe.common.Common.Response getResp() {
+        if (respBuilder_ == null) {
           if (payloadCase_ == 7) {
             return (pipe.common.Common.Response) payload_;
           }
           return pipe.common.Common.Response.getDefaultInstance();
         } else {
           if (payloadCase_ == 7) {
-            return resMsgBuilder_.getMessage();
+            return respBuilder_.getMessage();
           }
           return pipe.common.Common.Response.getDefaultInstance();
         }
       }
       /**
-       * <code>optional .Response resMsg = 7;</code>
+       * <code>optional .Response resp = 7;</code>
        */
-      public Builder setResMsg(pipe.common.Common.Response value) {
-        if (resMsgBuilder_ == null) {
+      public Builder setResp(pipe.common.Common.Response value) {
+        if (respBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           payload_ = value;
           onChanged();
         } else {
-          resMsgBuilder_.setMessage(value);
+          respBuilder_.setMessage(value);
         }
         payloadCase_ = 7;
         return this;
       }
       /**
-       * <code>optional .Response resMsg = 7;</code>
+       * <code>optional .Response resp = 7;</code>
        */
-      public Builder setResMsg(
+      public Builder setResp(
           pipe.common.Common.Response.Builder builderForValue) {
-        if (resMsgBuilder_ == null) {
+        if (respBuilder_ == null) {
           payload_ = builderForValue.build();
           onChanged();
         } else {
-          resMsgBuilder_.setMessage(builderForValue.build());
+          respBuilder_.setMessage(builderForValue.build());
         }
         payloadCase_ = 7;
         return this;
       }
       /**
-       * <code>optional .Response resMsg = 7;</code>
+       * <code>optional .Response resp = 7;</code>
        */
-      public Builder mergeResMsg(pipe.common.Common.Response value) {
-        if (resMsgBuilder_ == null) {
+      public Builder mergeResp(pipe.common.Common.Response value) {
+        if (respBuilder_ == null) {
           if (payloadCase_ == 7 &&
               payload_ != pipe.common.Common.Response.getDefaultInstance()) {
             payload_ = pipe.common.Common.Response.newBuilder((pipe.common.Common.Response) payload_)
@@ -1520,18 +1552,18 @@ public final class Pipe {
           onChanged();
         } else {
           if (payloadCase_ == 7) {
-            resMsgBuilder_.mergeFrom(value);
+            respBuilder_.mergeFrom(value);
           }
-          resMsgBuilder_.setMessage(value);
+          respBuilder_.setMessage(value);
         }
         payloadCase_ = 7;
         return this;
       }
       /**
-       * <code>optional .Response resMsg = 7;</code>
+       * <code>optional .Response resp = 7;</code>
        */
-      public Builder clearResMsg() {
-        if (resMsgBuilder_ == null) {
+      public Builder clearResp() {
+        if (respBuilder_ == null) {
           if (payloadCase_ == 7) {
             payloadCase_ = 0;
             payload_ = null;
@@ -1542,22 +1574,22 @@ public final class Pipe {
             payloadCase_ = 0;
             payload_ = null;
           }
-          resMsgBuilder_.clear();
+          respBuilder_.clear();
         }
         return this;
       }
       /**
-       * <code>optional .Response resMsg = 7;</code>
+       * <code>optional .Response resp = 7;</code>
        */
-      public pipe.common.Common.Response.Builder getResMsgBuilder() {
-        return getResMsgFieldBuilder().getBuilder();
+      public pipe.common.Common.Response.Builder getRespBuilder() {
+        return getRespFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Response resMsg = 7;</code>
+       * <code>optional .Response resp = 7;</code>
        */
-      public pipe.common.Common.ResponseOrBuilder getResMsgOrBuilder() {
-        if ((payloadCase_ == 7) && (resMsgBuilder_ != null)) {
-          return resMsgBuilder_.getMessageOrBuilder();
+      public pipe.common.Common.ResponseOrBuilder getRespOrBuilder() {
+        if ((payloadCase_ == 7) && (respBuilder_ != null)) {
+          return respBuilder_.getMessageOrBuilder();
         } else {
           if (payloadCase_ == 7) {
             return (pipe.common.Common.Response) payload_;
@@ -1566,16 +1598,16 @@ public final class Pipe {
         }
       }
       /**
-       * <code>optional .Response resMsg = 7;</code>
+       * <code>optional .Response resp = 7;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.Response, pipe.common.Common.Response.Builder, pipe.common.Common.ResponseOrBuilder> 
-          getResMsgFieldBuilder() {
-        if (resMsgBuilder_ == null) {
+          getRespFieldBuilder() {
+        if (respBuilder_ == null) {
           if (!(payloadCase_ == 7)) {
             payload_ = pipe.common.Common.Response.getDefaultInstance();
           }
-          resMsgBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          respBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               pipe.common.Common.Response, pipe.common.Common.Response.Builder, pipe.common.Common.ResponseOrBuilder>(
                   (pipe.common.Common.Response) payload_,
                   getParentForChildren(),
@@ -1584,7 +1616,7 @@ public final class Pipe {
         }
         payloadCase_ = 7;
         onChanged();;
-        return resMsgBuilder_;
+        return respBuilder_;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -1649,12 +1681,12 @@ public final class Pipe {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\npipe.proto\032\014common.proto\"\251\001\n\016CommandMe" +
+      "\n\npipe.proto\032\014common.proto\"\244\001\n\016CommandMe" +
       "ssage\022\027\n\006header\030\001 \002(\0132\007.Header\022\016\n\004ping\030\003" +
       " \001(\010H\000\022\021\n\007message\030\004 \001(\tH\000\022\027\n\003err\030\005 \001(\0132\010" +
-      ".FailureH\000\022\032\n\006reqMsg\030\006 \001(\0132\010.RequestH\000\022\033" +
-      "\n\006resMsg\030\007 \001(\0132\t.ResponseH\000B\t\n\007payloadB\013" +
-      "\n\007routingH\001"
+      ".FailureH\000\022\027\n\003req\030\006 \001(\0132\010.RequestH\000\022\031\n\004r" +
+      "esp\030\007 \001(\0132\t.ResponseH\000B\t\n\007payloadB\013\n\007rou" +
+      "tingH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1674,7 +1706,7 @@ public final class Pipe {
     internal_static_CommandMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_CommandMessage_descriptor,
-        new java.lang.String[] { "Header", "Ping", "Message", "Err", "ReqMsg", "ResMsg", "Payload", });
+        new java.lang.String[] { "Header", "Ping", "Message", "Err", "Req", "Resp", "Payload", });
     pipe.common.Common.getDescriptor();
   }
 

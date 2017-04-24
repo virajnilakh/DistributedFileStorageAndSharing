@@ -1,11 +1,16 @@
 package gash.router.client;
 
+import java.net.UnknownHostException;
+
 import com.google.protobuf.ByteString;
 
+import discovery.LocalAddress;
+import global.Constants;
 import pipe.common.Common.Chunk;
 import pipe.common.Common.Header;
 import pipe.common.Common.ReadBody;
 import pipe.common.Common.Request;
+import pipe.common.Common.TaskType;
 import pipe.common.Common.WriteBody;
 import routing.Pipe.CommandMessage;
 
@@ -22,17 +27,18 @@ public class MessageCreator {
 		body.setFilename("*");
 
 		Request.Builder req = Request.newBuilder();
-		req.setRequestType(Request.RequestType.READFILE);
+		// req.setRequestType(TaskType.REQUESTREADALLFILEDETAILS);
+		req.setRequestType(TaskType.REQUESTREADFILE);
 		req.setRrb(body);
 
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
-		comm.setReqMsg(req);
+		comm.setReq(req);
 		return comm.build();
 
 	}
 
-	public static CommandMessage createReadMessage(String fileName) {
+	public static CommandMessage createReadMessage(String fileName) throws UnknownHostException {
 		// TODO Auto-generated method stub
 		Header.Builder header = Header.newBuilder();
 		header.setNodeId(99);
@@ -41,14 +47,15 @@ public class MessageCreator {
 
 		ReadBody.Builder body = ReadBody.newBuilder();
 		body.setFilename(fileName);
-
+		body.setClientAddress(LocalAddress.getLocalHostLANAddress().getHostAddress()+":"+Constants.clientPort);
 		Request.Builder req = Request.newBuilder();
-		req.setRequestType(Request.RequestType.READFILE);
+		// req.setRequestType(Request.RequestType.READFILE);
+		req.setRequestType(TaskType.REQUESTREADFILE);
 		req.setRrb(body);
 
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
-		comm.setReqMsg(req);
+		comm.setReq(req);
 		return comm.build();
 
 	}
@@ -62,8 +69,8 @@ public class MessageCreator {
 		header.setDestination(-1);
 
 		Chunk.Builder chunk = Chunk.newBuilder();
-		//System.out.println("Chunk Id while creating:" + chunkId);
-		//System.out.println("Chunk Size:" + bs.size());
+		System.out.println("Chunk Id while creating:" + chunkId);
+		System.out.println("Chunk Size:" + bs.size());
 		chunk.setChunkId(chunkId);
 		chunk.setChunkData(bs);
 		chunk.setChunkSize(bs.size());
@@ -72,17 +79,18 @@ public class MessageCreator {
 		body.setFilename(fileName);
 		// File Id is the MD5 hash in string format of the file name
 		body.setFileId(hash);
+		
 		body.setNumOfChunks(chunkCount);
 		body.setChunk(chunk);
-		body.setFileSize(filesize);
-
+		//body.setFileSize(filesize);
+		
 		Request.Builder req = Request.newBuilder();
-		req.setRequestType(Request.RequestType.WRITEFILE);
+		req.setRequestType(TaskType.REQUESTWRITEFILE);
 		req.setRwb(body);
 
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
-		comm.setReqMsg(req);
+		comm.setReq(req);
 		return comm.build();
 	}
 

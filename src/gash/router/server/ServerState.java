@@ -24,13 +24,52 @@ public class ServerState {
 	public enum State {
 		Follower, Leader, Candidate;
 	}
-	private static Channel clientChannel=null;
-	public static Channel getClientChannel() {
-		return clientChannel;
+
+	public static boolean roundTrip = false;
+	private static boolean stealReq = false;
+	private static int stealNode = 0;
+
+	public static boolean isStealReq() {
+		return stealReq;
 	}
 
-	public static void setClientChannel(Channel clientChannel) {
-		ServerState.clientChannel = clientChannel;
+	public static void setStealReq(boolean s) {
+		stealReq = s;
+	}
+
+	public static int getStealNode() {
+		return stealNode;
+	}
+
+	public static void setStealNode(int stealNode) {
+		ServerState.stealNode = stealNode;
+	}
+
+	public static boolean isRoundTrip() {
+		return roundTrip;
+	}
+
+	public static void setRoundTrip(boolean roundTrip) {
+		ServerState.roundTrip = roundTrip;
+	}
+
+	public static Channel next = null;
+	private static Jedis nextJedis = null;
+
+	public static Channel getNext() {
+		return next;
+	}
+
+	public static void setNext(Channel next) {
+		ServerState.next = next;
+	}
+
+	public static Jedis getNextJedis() {
+		return nextJedis;
+	}
+
+	public static void setNextJedis(Jedis nextJedis) {
+		ServerState.nextJedis = nextJedis;
 	}
 
 	private Handelable requestHandler;
@@ -49,29 +88,12 @@ public class ServerState {
 	public Jedis getLocalhostJedis() {
 		return localhostJedis;
 	}
-	public static Channel next=null;
-	private static Jedis nextJedis = null;
-	public static Channel getNext() {
-		return next;
-	}
-
-	public static void setNext(Channel next) {
-		ServerState.next = next;
-	}
-
-	public static Jedis getNextJedis() {
-		return nextJedis;
-	}
-
-	public static void setNextJedis(Jedis nextJedis) {
-		ServerState.nextJedis = nextJedis;
-	}
 
 	private Jedis jedisHandler1 = null;
 	private Jedis jedisHandler2 = null;
 	private Jedis jedisHandler3 = null;
 	// private int nodeId=0;
-	private RoutingConf conf;
+	private static RoutingConf conf;
 	private static EdgeMonitor emon;
 	private TaskList tasks;
 	private boolean hasLeader = false;
@@ -88,30 +110,34 @@ public class ServerState {
 
 	public ServerState() throws UnknownHostException {
 		// ipAddress=LocalAddress.getLocalHostLANAddress().getHostAddress();
-		 ipAddress = LocalAddress.getLocalHostLANAddress().getHostAddress();
-		//ipAddress = "169.254.80.87";
+		ipAddress = LocalAddress.getLocalHostLANAddress().getHostAddress();
+		// ipAddress = "10.250.175.205";
 
 		System.out.println(LocalAddress.getLocalHostLANAddress().getHostAddress());
 		reqVote = new HandleVoteRequestState(this);
 		resLeader = new HandleLeaderResponseState(this);
 		voteReceived = new HandleVoteReceivedState(this);
-		nextJedis=new Jedis(Constants.next, Constants.redisPort);
+		nextJedis = new Jedis(Constants.next, Constants.redisPort);
 		jedisHandler1 = new Jedis(Constants.jedis1, Constants.redisPort);
 		jedisHandler2 = new Jedis(Constants.jedis2, Constants.redisPort);
 		jedisHandler3 = new Jedis(Constants.jedis3, Constants.redisPort);
-		
+
 		// setRedis();
 		/*
 		 * try{ ipAddress=InetAddress.getLocalHost().getHostAddress();
 		 * }catch(Exception e){ e.printStackTrace(); }
 		 */
 	}
-	public void startAllThreads(){
+
+	public void startAllThreads() {
 		new Thread(new InboundCommandMessageQueueHandler()).start();
-		new Thread(new InboundWorkMessageQueueHandler(this)).start();
+		new Thread(new InboundWorkMessageQueueHandler()).start();
 		new Thread(new OutboundCommandMessageQueueHandler()).start();
 		new Thread(new OutboundWorkMessageQueueHandler()).start();
+		new Thread(new WorkStealHandler(this)).start();
+
 	}
+
 	public void setRedis() {
 		// TODO Auto-generated method stub
 		try {
@@ -335,7 +361,7 @@ public class ServerState {
 
 	}
 
-	public RoutingConf getConf() {
+	public static RoutingConf getConf() {
 		return conf;
 	}
 
