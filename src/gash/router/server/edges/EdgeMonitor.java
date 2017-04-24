@@ -387,10 +387,10 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			// System.out.println("Node "+nodeId+"dead");
 			outboundEdges.map.get(nodeId).setChannel(null);
 			outboundEdges.map.get(nodeId).setActive(false);
-			// outboundEdges.map.remove(nodeId);
-			// state.delRedis(nodeId);
-			// activeOutboundEdges--;
-			// nodeCount--;
+			outboundEdges.map.remove(nodeId);
+			state.delRedis(nodeId);
+			activeOutboundEdges--;
+			nodeCount--;
 			this.cancel();
 		}
 	}
