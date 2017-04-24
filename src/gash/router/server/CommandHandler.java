@@ -44,9 +44,15 @@ import gash.router.client.WriteChannel;
 import gash.router.container.RoutingConf;
 import global.Constants;
 import global.Utility;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import pipe.common.Common.Failure;
 import pipe.common.Common.Header;
 import pipe.common.Common.Request;
@@ -122,7 +128,25 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			if (msg.getReq().getRrb().getFilename().equals("*")) {
 				readFileNamesCmd(msg, channel);
 			} else {
+				EventLoopGroup workerGroup = new NioEventLoopGroup();
+				 
+ 		        try {
+ 		        	String host=msg.getReq().getRrb().getClientAddress().split(":")[0];
+ 					int port=Integer.parseInt(msg.getReq().getRrb().getClientAddress().split(":")[1]);
+ 		            Bootstrap b = new Bootstrap(); // (1)
+ 		            b.group(workerGroup); // (2)
+ 		            b.channel(NioSocketChannel.class); // (3)
+ 		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+ 		            b.handler(new CommandInit(null,false));
+ 
+ 		            // Start the client.
+ 		            //System.out.println("===============Stole Read Request From Leader=============================");
+ 
+ 		             ChannelFuture cha = b.connect(host, port).sync();
 				readFileCmd(msg, channel);
+ 		        }catch(Exception e){
+ 		        	
+ 		        }
 			}
 		}
 
