@@ -231,6 +231,7 @@ public class DemoApp implements CommListener {
 					MessageSender.SendReadRequest(fileName);
 					break;
 				case 4:
+					MessageSender.createCommandPing(Constants.clusterId);
 					break;
 				case 5:
 					System.out.println("Please enter names of file to fetch seperated by comma");
@@ -265,24 +266,8 @@ public class DemoApp implements CommListener {
 		return path;
 	}
 
-	public static void clientAcceptConnections() {
-
-	}
-
-	private CommandMessage createCommandPing(int clusterId) {
-		// TODO Auto-generated method stub
-		CommandMessage.Builder command = CommandMessage.newBuilder();
-		Boolean ping = true;
-		command.setPing(ping);
-
-		Header.Builder header = Header.newBuilder();
-		header.setNodeId(2);
-		header.setTime(System.currentTimeMillis());
-		header.setDestination(Constants.whomToConnect);
-		command.setHeader(header);
-
-		return command.build();
-	}
+	
+	
 	
 	private static void sendFile(File file, Channel channel) {
 		// TODO Auto-generated method stub

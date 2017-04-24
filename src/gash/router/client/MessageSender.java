@@ -15,6 +15,7 @@ import com.google.protobuf.ByteString;
 import global.Constants;
 import global.Utility;
 import io.netty.channel.Channel;
+import pipe.common.Common.Header;
 import routing.Pipe.CommandMessage;
 
 public class MessageSender {
@@ -27,7 +28,20 @@ public class MessageSender {
 		System.out.println("Read request sent");
 
 	}
+	public static void createCommandPing(int clusterId) {
+		// TODO Auto-generated method stub
+		CommandMessage.Builder command = CommandMessage.newBuilder();
+		Boolean ping = true;
+		command.setPing(ping);
 
+		Header.Builder header = Header.newBuilder();
+		header.setNodeId(2);
+		header.setTime(System.currentTimeMillis());
+		header.setDestination(Constants.whomToConnect);
+		command.setHeader(header);
+
+		channel.writeAndFlush(command.build());
+	}
 	public static void SendReadAllFileInfo() {
 		// TODO Auto-generated method stub
 		// Channel channel = CommConnection.getInstance().connect();
