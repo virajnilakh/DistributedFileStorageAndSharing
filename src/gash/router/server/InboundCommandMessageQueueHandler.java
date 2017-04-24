@@ -47,7 +47,16 @@ public class InboundCommandMessageQueueHandler implements Runnable {
 				if (msg.getReq().getRrb().getFilename().equals("*")) {
 					// readFileNamesCmd(msg, channel);
 				} else {
-					readFileCmd(msg, channel);
+
+					DBHandler mysql_db = new DBHandler();
+					String fileId = Utility.getHashFileName(msg.getReq().getRrb().getFilename());
+
+					if (mysql_db.checkFileExists(fileId)) {
+						readFileCmd(msg, channel);
+					} else {
+						// ToDo: Fill else to create workmessage and send back
+						// as if leader has stolen from this follower
+					}
 				}
 			}
 
