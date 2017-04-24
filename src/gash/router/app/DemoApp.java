@@ -239,6 +239,8 @@ public class DemoApp implements CommListener {
 					MessageSender.SendReadRequest(fileName);
 					break;
 				case 4:
+					MessageSender.createCommandPing(Constants.clusterId);
+					
 					break;
 				case 5:
 					System.out.println("Please enter names of file to fetch seperated by comma");
