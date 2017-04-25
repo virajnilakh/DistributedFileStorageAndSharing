@@ -342,7 +342,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				e.printStackTrace();
 			}
 			
-			if(state.next==null){
+			if(true){
  				
  				EventLoopGroup workerGroup = new NioEventLoopGroup();
  

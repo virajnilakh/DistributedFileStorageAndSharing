@@ -37,10 +37,10 @@ public class MessageSender {
 		Header.Builder header = Header.newBuilder();
 		header.setNodeId(2);
 		header.setTime(System.currentTimeMillis());
-		header.setDestination(Constants.whomToConnect);
+		header.setDestination(clusterId);
 		command.setHeader(header);
 
-		channel.writeAndFlush(command.build());
+		 channel.writeAndFlush(command.build());
 	}
 	public static void SendReadAllFileInfo() {
 		// TODO Auto-generated method stub

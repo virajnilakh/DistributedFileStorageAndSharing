@@ -104,7 +104,10 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			System.out.println("ERROR: Unexpected content - " + msg);
 			return;
 		}
-
+		if(msg.hasPing()){
+			System.out.println("Received ping from cluster 1");
+			 ServerState.getNext().writeAndFlush(msg);
+		}
 		if (msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
 			QueueHandler.enqueueInboundCommandAndChannel(msg,channel);
 		}else if (msg.getPing()) {

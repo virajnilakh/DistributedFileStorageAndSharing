@@ -240,7 +240,7 @@ public class DemoApp implements CommListener {
 					break;
 				case 4:
 					MessageSender.createCommandPing(Constants.clusterId);
-					
+					//channel.writeAndFlush(msg);
 					break;
 				case 5:
 					System.out.println("Please enter names of file to fetch seperated by comma");
