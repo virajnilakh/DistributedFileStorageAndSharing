@@ -58,6 +58,15 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 	 		            // Start the client.
 	 		            if(!state.isLeader()){
 		 		            System.out.println("===============Stole Read Request From Leader=============================");
+		 		           System.out.println("===============Stole Read Request From Leader=============================");
+		 		          System.out.println("===============Stole Read Request From Leader=============================");
+		 		         System.out.println("===============Stole Read Request From Leader=============================");
+		 		        System.out.println("===============Stole Read Request From Leader=============================");
+		 		       System.out.println("===============Stole Read Request From Leader=============================");
+		 		      System.out.println("===============Stole Read Request From Leader=============================");
+		 		     System.out.println("===============Stole Read Request From Leader=============================");
+		 		    System.out.println("===============Stole Read Request From Leader=============================");
+		 		        System.out.println("===============Stole Read Request From Leader=============================");
 	 		            }
 	 
 	 		             ChannelFuture cha = b.connect(host, port).sync();
@@ -78,7 +87,16 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 	 		            b.handler(new CommandInit(null,false));
 	 
 	 		            // Start the client.
-	 		            System.out.println("===============Stole Read Request From Leader=============================");
+	 		            System.out.println("===============Stole request sent back to leader because no file exists=============================");
+	 		            System.out.println("===============Stole request sent back to leader because no file exists=============================");
+	 		            System.out.println("===============Stole request sent back to leader because no file exists=============================");
+	 		            System.out.println("===============Stole request sent back to leader because no file exists=============================");
+	 		            System.out.println("===============Stole request sent back to leader because no file exists=============================");
+	 		            System.out.println("===============Stole request sent back to leader because no file exists=============================");
+	 		            System.out.println("===============Stole request sent back to leader because no file exists=============================");
+	 		            System.out.println("===============Stole request sent back to leader because no file exists=============================");
+	 		            System.out.println("===============Stole request sent back to leader because no file exists=============================");
+	 		            System.out.println("===============Stole request sent back to leader because no file exists=============================");
 	 
 	 		             ChannelFuture cha = b.connect(host, port).sync();
 	 		            readFileCmd(msg, cha.channel());
