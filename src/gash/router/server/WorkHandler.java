@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.ByteString;
 
+import database.DBHandler;
 import gash.router.client.WriteChannel;
 import gash.router.container.RoutingConf;
 import global.Constants;
@@ -80,6 +81,15 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 		}
 	}
 
+	private long getFileSize(WorkMessage msg) {
+		try {
+			return msg.getReq().getRwb().getFileSize();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
 	/**
 	 * override this method to provide processing behavior. T
 	 *
@@ -92,52 +102,50 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			System.out.println("ERROR: Unexpected content  - " + msg);
 			return;
 		}
-		if(!state.isStealReq() && !msg.hasBeat() && msg.getHeader().getSteal()){
+		if (!state.isStealReq() && !msg.hasBeat() && msg.getHeader().getSteal()) {
 			state.setStealNode(msg.getHeader().getNodeId());
 			state.setStealReq(true);
 		}
 		if (msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
-			QueueHandler.enqueueInboundWorkAndChannel(msg,channel);
-		}else if (msg.getReq().getRequestType() == TaskType.REQUESTWRITEFILE) {
+			QueueHandler.enqueueInboundWorkAndChannel(msg, channel);
+		} else if (msg.getReq().getRequestType() == TaskType.REQUESTWRITEFILE) {
 
-			// WorkMessage wm=SendWriteWorkMessage(msg);
-			// System.out.println("File replicated");
+			String file_id = msg.getReq().getRwb().getFileId();
+			String file_name = msg.getReq().getRwb().getFilename();
+			String file_ext = msg.getReq().getRwb().getFileExt();
+			long file_size = getFileSize(msg);
 
-			// System.out.println("Message received :" +
-			// msg.getReqMsg().getRwb().getChunk().getChunkId());
-			// PrintUtil.printCommand(msg);
+			int chunk_id = msg.getReq().getRwb().getChunk().getChunkId();
+			int num_of_chunks = msg.getReq().getRwb().getNumOfChunks();
+			byte[] chunk_data = msg.getReq().getRwb().getChunk().getChunkData().toByteArray();
+			int chunk_size = msg.getReq().getRwb().getChunk().getChunkSize();
+
+			// Pushing chunks to Mysql DB
+			DBHandler mysql_db = new DBHandler();
+			mysql_db.addChunk(file_id, chunk_id, chunk_data, chunk_size, num_of_chunks);
+			mysql_db.closeConn();
+
+			System.out.println("Message received :" + msg.getReq().getRwb().getChunk().getChunkId());
+
 			lstMsg.add(msg);
 
 			System.out.println("List size is: ");
 			System.out.println(lstMsg.size());
 			String storeStr = new String(msg.getReq().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
 			System.out.println("No. of chunks" + String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
-			jedisHandler1.hset(msg.getReq().getRwb().getFileId(), "name", msg.getReq().getRwb().getFilename());
-			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileId());
-			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileExt());
-			// Uncomment to store chunk data
-			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()),storeStr);
-			// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getChunk().getChunkData());
-			jedisHandler1.hset(msg.getReq().getRwb().getFileId(), "numChunks",
-					String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
-
-			Map<String, String> map = jedisHandler1.hgetAll(msg.getReq().getRwb().getFileId());
-			String temp = map.get("chunks");
-
-			jedisHandler1.hset(msg.getReq().getRwb().getFileId(), "chunks",
-					temp + "," + String.valueOf(msg.getReq().getRwb().getChunk().getChunkId()));
+			// storeRedisData(msg);
 
 			if (lstMsg.size() == msg.getReq().getRwb().getNumOfChunks()) {
 
 				System.out.println("Checking if chunks exist");
 				try {
-					if (!jedisHandler1.exists(msg.getReq().getRwb().getFileId())) {
+					if (!jedisHandler1.exists(file_id)) {
 						// return null;
 						System.out.println("Does not exists");
 					}
 					System.out.println("Printing map");
 
-					Map<String, String> map1 = jedisHandler1.hgetAll(msg.getReq().getRwb().getFileId());
+					Map<String, String> map1 = jedisHandler1.hgetAll(file_id);
 
 					System.out.println(new PrettyPrintingMap<String, String>(map1));
 
@@ -166,9 +174,9 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				File directory = new File(Constants.dataDir);
 				if (!directory.exists()) {
 					directory.mkdir();
-					// If you require it to make the entire directory path
-					// including parents,
-					// use directory.mkdirs(); here instead.
+					File logFile = new File(Constants.logFile);
+					logFile.createNewFile(); // Create log File
+
 				}
 
 				File file = new File(Constants.dataDir + msg.getReq().getRwb().getFilename());
@@ -183,6 +191,15 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				long end = System.currentTimeMillis();
 				System.out.println("End time");
 				System.out.println(end);
+
+				// Pushing file to Mysql DB
+				DBHandler mysql_db2 = new DBHandler();
+				mysql_db2.addFile(file_id, file_name, file_ext, num_of_chunks, file_size);
+				mysql_db2.closeConn();
+
+				// Send acks
+				// List<Future<Long>> futures = service.invokeAll(futuresList);
+				// service.shutdown();
 
 				// Cleanup
 				chunkedFile = new ArrayList<ByteString>();
@@ -207,7 +224,8 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 				state.getElecHandler().setTimer();
 				try {
 					state.getLocalhostJedis().select(0);
-					state.getLocalhostJedis().set(Constants.clusterId+"", msg.getLeaderStatus().getLeaderHost() + ":4568");
+					state.getLocalhostJedis().set(Constants.clusterId + "",
+							msg.getLeaderStatus().getLeaderHost() + ":4568");
 					System.out.println("---Redis updated---");
 
 				} catch (Exception e) {
