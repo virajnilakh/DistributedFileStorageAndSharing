@@ -365,7 +365,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
  		            activeOutboundEdges;*/
  		             
  		        }catch(Exception e){
- 		        	System.out.println("Failed to connect to next");
+ 		        	System.out.println("Failed to connect to next cluster");
  		        }
  			}
 			
@@ -400,7 +400,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	}
 
 	public void setTimer(int nodeId) {
-		int randomTimeout = (2000 + (new Random()).nextInt(3500)) * 4;
+		int randomTimeout = (2000 + (new Random()).nextInt(3500)) * 8;
 		Timer t = new Timer();
 		t.schedule(new DeadFollowerTimer(nodeId, state), (long) randomTimeout, (long) randomTimeout);
 		timer.put(nodeId, t);

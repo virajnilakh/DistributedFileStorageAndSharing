@@ -317,6 +317,12 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		PrintUtil.printCommand(msg);
 
 		lstMsg.add(msg);
+		try{
+			ServerState.getNext().writeAndFlush(msg);
+
+		}catch(Exception e){
+			System.out.println("Write failed to next cluster");
+		}
 		ServerState.getEmon().broadcast(wm);
 		System.out.println("Message broadcasted");
 

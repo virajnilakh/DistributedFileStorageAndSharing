@@ -61,7 +61,7 @@ public class QueueHandler implements Runnable {
 		QueueHandler.cmdMsgOutboundQueue = cmdMsgOutboundQueue;
 	}
 
-	public static void enqueueInboundCommandAndChannel(CommandMessage msg,Channel channel) {
+	public static  void  enqueueInboundCommandAndChannel(CommandMessage msg,Channel channel) {
 		CommandAndChannel cch=new CommandAndChannel(msg,channel);
 		// TODO Auto-generated method stub
 		cmdMsgInboundQueue.add(cch);
