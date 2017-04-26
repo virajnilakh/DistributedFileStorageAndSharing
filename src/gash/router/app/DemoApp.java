@@ -152,6 +152,7 @@ public class DemoApp implements CommListener {
 				System.out.println("[3] Fetch Names - Fetch File Names stored in cluster");
 				System.out.println("[4] Ping - Ping to cluster");
 				System.out.println("[5] Read Multiple - Read Multiple files from cluster");
+				System.out.println("[6] Write Multiple - Write Multiple files from cluster");
 				System.out.println("[0] Exit  - Exit cluster");
 
 				try {
@@ -233,6 +234,39 @@ public class DemoApp implements CommListener {
 					System.out.println("File sent");
 					System.out.flush();
 					break;
+				case 6:
+
+					System.out.println("Please enter directories (paths) to upload seperated by a comma (,) :");
+
+					path = reader.nextLine();
+					System.in.read();
+
+					System.out.println("You entered" + path);
+
+					System.out.println("Press Y to continue");
+					String[] paths = path.split(",");
+					int j = 0;
+					File file1 = null;
+					String ans3 = "";
+					while (j < paths.length) {
+						affirm = false;
+
+						ans3 = reader.next();
+						ans3 = "Y";
+						if (ans3.equals("Y")) {
+							affirm = true;
+						}
+						// reader.close();
+						file1 = new File(path);
+						if (path.trim().equals("") || file1 == null) {
+							break;
+						}
+						sendFile(file1, channel);
+						System.out.println("File sent");
+						System.out.flush();
+					}
+
+					break;
 				case 2:
 					System.out.println("Please enter name of file to fetch");
 					String fileName = reader.nextLine();
@@ -240,7 +274,7 @@ public class DemoApp implements CommListener {
 					break;
 				case 4:
 					MessageSender.createCommandPing(Constants.clusterId);
-					//channel.writeAndFlush(msg);
+					// channel.writeAndFlush(msg);
 					break;
 				case 5:
 					System.out.println("Please enter names of file to fetch seperated by comma");
