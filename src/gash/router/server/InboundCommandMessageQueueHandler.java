@@ -134,6 +134,15 @@ public class InboundCommandMessageQueueHandler implements Runnable {
 		List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
 		double sizeChunks = Constants.sizeOfChunk;
 		byte[] buffer = new byte[(int) sizeChunks];
+		System.out.println("Reading From Leader!!");
+		System.out.println("Reading From Leader!!");
+		System.out.println("Reading From Leader!!");
+		System.out.println("Reading From Leader!!");
+		System.out.println("Reading From Leader!!");
+		System.out.println("Reading From Leader!!");
+		System.out.println("Reading From Leader!!");
+		System.out.println("Reading From Leader!!");
+		System.out.println("Reading From Leader!!");
 
 		long start = System.currentTimeMillis();
 		System.out.print(start);
