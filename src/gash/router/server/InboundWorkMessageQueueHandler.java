@@ -73,6 +73,7 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 	 		            readFileCmd(msg, cha.channel());
 	 		        }catch(Exception e){
 	 		        	System.out.println("Problem to connecting to client on steal node");
+	 		        	e.printStackTrace();
 	 		        }
 				}else{
 					EventLoopGroup workerGroup = new NioEventLoopGroup();
