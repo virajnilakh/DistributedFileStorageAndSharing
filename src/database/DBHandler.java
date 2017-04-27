@@ -22,7 +22,7 @@ public class DBHandler {
 
 	public Connection makeConn() {
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db", "root", "admin");
+			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db", "root", "test");
 			System.out.println("Successfully connected");
 
 		} catch (Exception e) {

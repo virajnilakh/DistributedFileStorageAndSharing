@@ -18,18 +18,18 @@ message Header {
 
   // As we need to identify message from different network, message_id would help with that. 
    // in addition with node_id, it will remain unique every time.
-   optional int32 message_id = 1;  //New field Added
-   required int32 node_id = 2;
-   optional int64 time = 3; 
-   optional bool election=4;
-   optional bool steal=5;
+   optional int32 message_id = 3;  //New field Added
+   required int32 node_id = 1;
+   required int64 time = 2; 
+   optional bool election=24;
+   optional bool steal=25;
    
    // if the message is for a specific node, this will be set
-   optional int32 destination = 8;
+   optional int32 destination = 4;
 
    // This factor limits the distance that a msg travels from the originating 
    // node. Default (-1) is the whole network (not restricted). 
-   optional int32 max_hops = 10 [default = -1];
+   optional int32 max_hops = 5 [default = -1];
 
 }
 
@@ -47,27 +47,25 @@ message Failure {
  
 
 enum TaskType{ 
-     PING = 1;
-     PINGRESPONSE = 2;
-     REQUESTREADFILE = 3;
-     REQUESTWRITEFILE = 4;
-     RESPONSEREADFILE = 5;
-     RESPONSEWRITEFILE = 6;
-     REQUESTREADALLFILEDETAILS = 7;
+     REQUESTREADFILE = 1;
+     REQUESTWRITEFILE = 2;
+     RESPONSEREADFILE = 3;
+     RESPONSEWRITEFILE = 4;
+     REQUESTREADALLFILEDETAILS = 25;
 }
  
 
 message Request { 
 
- optional Node client = 1;
+ optional Node client = 21;
 
- required TaskType requestType = 3; 
+ required TaskType requestType = 1; 
 
  oneof payload{
 
- WriteBody rwb = 4;
+ WriteBody rwb = 2;
 
- ReadBody rrb = 5;
+ ReadBody rrb = 3;
 
  } 
 
@@ -77,17 +75,17 @@ message Request {
 
 message WriteBody{
 
- optional string file_id = 1;
+ optional string file_id = 4;
 
- required string filename = 2;
+ required string filename = 1;
 
- optional string file_ext=3;
+ optional string file_ext=2;
 
- optional Chunk chunk=4;
+ optional Chunk chunk=3;
 
  optional int32 num_of_chunks = 5;
 
- optional int64 file_size = 6;	
+ optional int64 file_size = 26;	
 }
 
  
@@ -109,10 +107,10 @@ message WriteBody{
 message Chunk{
 
  required int32 chunk_id = 1;
+	
+ required bytes chunk_data = 2;
 
- required bytes chunk_data = 6;
-
- optional int32 chunk_size=9;
+ optional int32 chunk_size=3;
 
 }
 
@@ -124,8 +122,8 @@ message ReadBody{
     optional string file_id = 2;
     optional int32 chunk_id = 3;
     optional int32 chunk_size = 4;
-    optional int64 file_size= 5;
-    optional string clientAddress=6;
+    optional int32 file_size= 5;
+    //optional string clientAddress=6;
 
 }
 
@@ -133,17 +131,18 @@ message ReadBody{
 
 message ReadResponse{
 
- optional string file_id = 1;
 
- required string filename = 2;
+ required string filename = 1;
 
- optional string file_ext= 3;
+ optional string file_ext= 2;
 
- optional int32 num_of_chunks = 4;
+ optional int32 num_of_chunks = 3;
 
- repeated ChunkLocation chunk_location = 5;
+ repeated ChunkLocation chunk_location = 4;
 
- optional Chunk chunk = 6;
+ optional Chunk chunk = 5;
+ optional string file_id = 6;
+ 
 
  
 
@@ -177,9 +176,9 @@ message Response{
 
  required TaskType responseType = 1; 
 
- optional string filename=3; 
+ optional string filename=2; 
 
- optional Status status = 10;  // Status should be part of Response
+ optional Status status = 3;  // Status should be part of Response
 
  enum Status{
      SUCCESS = 1;
