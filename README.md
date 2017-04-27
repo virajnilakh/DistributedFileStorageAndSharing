@@ -3,10 +3,10 @@
 • Proof	Team-wise	(must	have)
 - [x] Cluster	replication	or	sharding as	per	individual	team	goals
 - [x] RAFT	– working	(cold	start,	node	addition,	node	removal,	leader	lost)
-- [ ] Work	Stealing	– What	is	stolen?	Proof	that	tasks	are	stolen
+- [x] Work	Stealing	– What	is	stolen?	Proof	that	tasks	are	stolen
 - [x] Support	for	class	determined	functional	behavior
 - [x] A java	client	is	okay
-- [ ] Not	using	IDE	(e.g.,	Eclipse)	to	run	your	servers
+- [x] Not	using	IDE	(e.g.,	Eclipse)	to	run	your	servers
 
 • Global	(a.k.a.	Class)	Proof	(gosh-my-grade-would-love-to-have-this)
 - [x] Ping	round	trip	– ground	truth	that	the	global	communication	is	working
