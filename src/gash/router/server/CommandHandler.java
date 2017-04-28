@@ -115,14 +115,19 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				System.out.println("Ping received from client");
 
 				CommandMessage ping=decHopPing(msg);
-				ServerState.getNext().writeAndFlush(msg);
+				ServerState.getNext().writeAndFlush(ping);
 			}else if(msg.getHeader().getDestination()==Constants.clusterId){
 				System.out.println("Ping received from cluster 1");
 				CommandMessage ping=invertPing(msg);
-				ServerState.getNext().writeAndFlush(msg);
+				ServerState.getNext().writeAndFlush(ping);
 			}else if(msg.getHeader().getDestination()/10!=0 && msg.getHeader().getDestination()%10==Constants.clusterId){
 				System.out.println("Ping received from cluster 1");
 				clientChannel.writeAndFlush(msg);
+			}else{
+				System.out.println("Ping received from cluster 1");
+
+				CommandMessage ping=decHopPing(msg);
+				ServerState.getNext().writeAndFlush(msg);
 			}
 		}
 		if (msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
