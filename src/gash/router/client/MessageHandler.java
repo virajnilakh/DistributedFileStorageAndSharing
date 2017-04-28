@@ -24,7 +24,7 @@ public class MessageHandler {
 	 * @throws FileNotFoundException
 	 */
 	public static void handleRead(CommandMessage msg) throws IOException, FileNotFoundException {
-		 if (msg.getPing()){
+		 if (msg.hasPing()){
 			 System.out.println("Received ping back from cluster "+Constants.whomToConnect);
 		 }else{
 			 System.out.println("Receiving chunks");

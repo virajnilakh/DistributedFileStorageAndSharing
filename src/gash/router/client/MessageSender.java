@@ -35,9 +35,10 @@ public class MessageSender {
 		command.setPing(ping);
 
 		Header.Builder header = Header.newBuilder();
-		header.setNodeId(2);
+		header.setNodeId(22);
 		header.setTime(System.currentTimeMillis());
-		header.setDestination(clusterId);
+		header.setDestination(5);
+		header.setMaxHops(10);
 		command.setHeader(header);
 
 		 channel.writeAndFlush(command.build());

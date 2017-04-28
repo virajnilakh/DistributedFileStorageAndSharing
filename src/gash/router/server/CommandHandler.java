@@ -42,6 +42,7 @@ import database.DBManager;
 import gash.router.client.MessageCreator;
 import gash.router.client.WriteChannel;
 import gash.router.container.RoutingConf;
+import gash.router.server.ServerState.State;
 import global.Constants;
 import global.Utility;
 import io.netty.bootstrap.Bootstrap;
@@ -80,7 +81,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	private static Jedis jedisHandler1 = new Jedis("localhost", 6379);
 	List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
 	ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
+	private Channel clientChannel=null;
 	public CommandHandler(RoutingConf conf) {
 		if (conf != null) {
 			this.conf = conf;
@@ -105,8 +106,24 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			return;
 		}
 		if(msg.hasPing()){
-			System.out.println("Received ping from cluster 1");
-			 ServerState.getNext().writeAndFlush(msg);
+			//System.out.println("Received ping from cluster 1");
+			 //ServerState.getNext().writeAndFlush(msg);
+			if(msg.getHeader().getMaxHops()==0){
+				System.out.println("Ping received from cluster 1");
+			}else if(msg.getHeader().getNodeId()/10==Constants.clusterId){
+				clientChannel=channel;
+				System.out.println("Ping received from client");
+
+				CommandMessage ping=decHopPing(msg);
+				ServerState.getNext().writeAndFlush(msg);
+			}else if(msg.getHeader().getDestination()==Constants.clusterId){
+				System.out.println("Ping received from cluster 1");
+				CommandMessage ping=invertPing(msg);
+				ServerState.getNext().writeAndFlush(msg);
+			}else if(msg.getHeader().getDestination()/10!=0 && msg.getHeader().getDestination()%10==Constants.clusterId){
+				System.out.println("Ping received from cluster 1");
+				clientChannel.writeAndFlush(msg);
+			}
 		}
 		if (msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
 			QueueHandler.enqueueInboundCommandAndChannel(msg,channel);
@@ -148,6 +165,22 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		System.out.flush();
 
 	}
+
+	private CommandMessage decHopPing(CommandMessage msg) {
+		// TODO Auto-generated method stub
+		CommandMessage.Builder command = CommandMessage.newBuilder();
+		Boolean ping = true;
+		command.setPing(ping);
+
+		Header.Builder header = Header.newBuilder();
+		header.setNodeId(msg.getHeader().getNodeId());
+		header.setTime(System.currentTimeMillis());
+		header.setDestination(msg.getHeader().getDestination());
+		header.setMaxHops(msg.getHeader().getMaxHops()-1);
+		command.setHeader(header);
+
+		return command.build();
+		}
 
 	private void readFileCmd(CommandMessage msg, Channel channel) {
 		// TODO Auto-generated method stub
@@ -282,7 +315,21 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		}
 		return 0;
 	}
+	public static CommandMessage invertPing(CommandMessage msg) {
+		// TODO Auto-generated method stub
+		CommandMessage.Builder command = CommandMessage.newBuilder();
+		Boolean ping = true;
+		command.setPing(ping);
 
+		Header.Builder header = Header.newBuilder();
+		header.setNodeId(msg.getHeader().getDestination());
+		header.setTime(System.currentTimeMillis());
+		header.setDestination(msg.getHeader().getNodeId());
+		header.setMaxHops(10);
+		command.setHeader(header);
+		return command.build();
+		 //channel.writeAndFlush(command.build());
+	}
 	/**
 	 * @param msg
 	 * @param channel
