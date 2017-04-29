@@ -127,7 +127,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				System.out.println("Ping received from cluster 1");
 
 				CommandMessage ping=decHopPing(msg);
-				ServerState.getNext().writeAndFlush(msg);
+				ServerState.getNext().writeAndFlush(ping);
 			}
 		}
 		if (msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
