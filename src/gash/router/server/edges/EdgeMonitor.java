@@ -232,19 +232,24 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	@Override
 	public void run() {
 		while (forever) {
-			/*
-			 * if(state.getAnyJedis().dbSize()>nodeCount+1){ Jedis
-			 * j=state.getAnyJedis(); Set<String> list = j.keys("*");
-			 * 
-			 * for(String l:list){ String[] node= j.get(l).split(":");
-			 * if(Integer.parseInt(l)==state.getConf().getNodeId()){ continue; }
-			 * if(this.outboundEdges.map.get(Integer.parseInt(l)) == null){
-			 * outboundEdges.addNode(Integer.parseInt(l), node[0],
-			 * Integer.parseInt(node[1])); } nodeCount++; } }
-			 */
-			state.getLocalhostJedis().select(1);
-			//if (state.getLocalhostJedis().dbSize() == 1) {
-			if (1 == 1) {
+			if(state.getAnyJedis().dbSize()>nodeCount+1){
+				Jedis j=state.getAnyJedis();
+				Set<String> list = j.keys("*"); 
+			      
+				 for(String l:list){
+					String[] node= j.get(l).split(":");
+					if(Integer.parseInt(l)==state.getConf().getNodeId()){
+						continue;
+					}
+					if(this.outboundEdges.map.get(Integer.parseInt(l)) == null){
+						outboundEdges.addNode(Integer.parseInt(l), node[0], Integer.parseInt(node[1]));
+					}
+					nodeCount++;
+				 }
+			}
+			state.getAnyJedis().select(1);
+			if (state.getAnyJedis().dbSize() == 1) {
+			//if (1 == 1) {
 				state.becomeLeader();
 				state.setLeaderAddress(state.getIpAddress());
 				state.setLeaderId(state.getConf().getNodeId());
@@ -255,7 +260,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					System.out.println("---Redis updated---");
 
 				} catch (Exception e) {
-					System.out.println("---Problem with redis at HandleVoteReceived---");
+					System.out.println("---Problem with redis at Edge Monitor Leader updation---");
 				}
 				state.getElecHandler().initElection();
 			}

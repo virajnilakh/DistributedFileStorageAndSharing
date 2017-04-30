@@ -24,6 +24,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import pipe.common.Common.Header;
+import pipe.common.Common.Node;
 import pipe.common.Common.ReadBody;
 import pipe.common.Common.Request;
 import pipe.common.Common.TaskType;
@@ -103,10 +104,13 @@ public class InboundCommandMessageQueueHandler implements Runnable {
 		body.setFilename(msg.getRequest().getRrb().getFilename());
 		LeaderStatus.Builder leaderStatus = LeaderStatus.newBuilder();
 		leaderStatus.setState(LeaderState.LEADERKNOWN);
-
+		Node.Builder client=Node.newBuilder();
+		client.setHost(msg.getRequest().getClient().getHost());
+		client.setPort(msg.getRequest().getClient().getPort());
 		Request.Builder req = Request.newBuilder();
 		req.setRequestType(TaskType.REQUESTREADFILE);
 		req.setRrb(body);
+		req.setClient(client);
 
 		WorkMessage.Builder wmsg = WorkMessage.newBuilder();
 		wmsg.setHeader(header);
