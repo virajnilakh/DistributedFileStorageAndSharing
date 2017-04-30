@@ -34,7 +34,7 @@ public class MessageCreator {
 
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
-		comm.setReq(req);
+		comm.setRequest(req);
 		return comm.build();
 
 	}
@@ -61,7 +61,7 @@ public class MessageCreator {
 		req.setClient(node);
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
-		comm.setReq(req);
+		comm.setRequest(req);
 		return comm.build();
 
 	}
@@ -96,7 +96,7 @@ public class MessageCreator {
 
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
-		comm.setReq(req);
+		comm.setRequest(req);
 		return comm.build();
 	}
 

@@ -43,9 +43,9 @@ public class DemoApp implements CommListener {
 	private static MessageClient mc;
 	public static Channel channel = null;
 
-	static Jedis jedisHandler1 = new Jedis(Constants.jedis1, Constants.redisPort);
-	static Jedis jedisHandler2 = new Jedis(Constants.jedis2, Constants.redisPort);
-	static Jedis jedisHandler3 = new Jedis(Constants.jedis3, Constants.redisPort);
+	static Jedis jedisHandler1 = new Jedis("192.168.1.40", Constants.redisPort);
+	static Jedis jedisHandler2 = new Jedis("192.168.1.40", Constants.redisPort);
+	static Jedis jedisHandler3 = new Jedis("192.168.1.40", Constants.redisPort);
 
 	public Jedis getJedisHandler1() {
 		return jedisHandler1;

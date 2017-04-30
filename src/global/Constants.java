@@ -15,7 +15,7 @@ public class Constants {
 	// public static String jedis2 = "10.250.47.208";
 	// public static String jedis3 = "10.250.175.205";
 	public static int clusterId = 2;
-	public static int nextClusterId = 3;
+	public static int nextClusterId = 1;
 	public static int whomToConnect = 2;
 
 	public static int redisPort = 6379;

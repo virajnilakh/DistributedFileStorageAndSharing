@@ -81,7 +81,8 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	private static Jedis jedisHandler1 = new Jedis("localhost", 6379);
 	List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
 	ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-	private Channel clientChannel=null;
+	private Channel clientChannel = null;
+
 	public CommandHandler(RoutingConf conf) {
 		if (conf != null) {
 			this.conf = conf;
@@ -105,62 +106,74 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			System.out.println("ERROR: Unexpected content - " + msg);
 			return;
 		}
-		if(msg.hasPing()){
-			//System.out.println("Received ping from cluster 1");
-			 //ServerState.getNext().writeAndFlush(msg);
-			if(msg.getHeader().getMaxHops()==0){
+		if (msg.hasPing()) {
+			// System.out.println("Received ping from cluster 1");
+			// ServerState.getNext().writeAndFlush(msg);
+			if (msg.getHeader().getMaxHops() == 0) {
 				System.out.println("Ping received from cluster 1");
-			}else if(msg.getHeader().getNodeId()/10==Constants.clusterId){
-				clientChannel=channel;
+			} else if (msg.getHeader().getNodeId() / 10 == Constants.clusterId) {
+				clientChannel = channel;
 				System.out.println("Ping received from client");
 
-				CommandMessage ping=decHopPing(msg);
+				CommandMessage ping = decHopPing(msg);
 				ServerState.getNext().writeAndFlush(ping);
-			}else if(msg.getHeader().getDestination()==Constants.clusterId){
+			} else if (msg.getHeader().getDestination() == Constants.clusterId) {
 				System.out.println("Ping received from cluster 1");
-				CommandMessage ping=invertPing(msg);
+				CommandMessage ping = invertPing(msg);
 				ServerState.getNext().writeAndFlush(ping);
-			}else if(msg.getHeader().getDestination()/10!=0 && msg.getHeader().getDestination()%10==Constants.clusterId){
+			} else if (msg.getHeader().getDestination() / 10 != 0
+					&& msg.getHeader().getDestination() % 10 == Constants.clusterId) {
 				System.out.println("Ping received from cluster 1");
 				clientChannel.writeAndFlush(msg);
-			}else{
+			} else {
 				System.out.println("Ping received from cluster 1");
 
-				CommandMessage ping=decHopPing(msg);
-				ServerState.getNext().writeAndFlush(ping);
+				CommandMessage ping = decHopPing(msg);
+				System.out.println("Hack");
+				// Hack
+				EventLoopGroup workerGroup = new NioEventLoopGroup();
+				Bootstrap b = new Bootstrap(); // (1)
+				b.group(workerGroup); // (2)
+				b.channel(NioSocketChannel.class); // (3)
+				b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+				b.handler(new CommandInit(null, false));
+				ChannelFuture cha = b.connect("192.168.1.30", 4168).sync();
+				cha.channel().writeAndFlush(ping);
+				// ServerState.getNext().writeAndFlush(ping);
 			}
 		}
-		if (msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
-			QueueHandler.enqueueInboundCommandAndChannel(msg,channel);
-		}else if (msg.getPing()) {
-			 System.out.println("Received ping from cluster 1");
-			 ServerState.getNext().writeAndFlush(msg);
-			/*if (!ServerState.isRoundTrip() && msg.getHeader().getDestination() == Constants.clusterId) {
-				ServerState.setRoundTrip(true);
-				CommandMessage ping = createCommandPing(msg.getHeader().getDestination());
-				ServerState.getNext().writeAndFlush(ping);
-			} else if (ServerState.isRoundTrip() && msg.getHeader().getDestination() == Constants.clusterId) {
-				ServerState.setRoundTrip(false);
-				System.out.println("***Got the ping back by going through the ring across all clusters***");
-				channel.writeAndFlush(msg);
-			} else {
-				CommandMessage ping = createCommandPing(msg.getHeader().getDestination());
-				ServerState.getNext().writeAndFlush(ping);
-			}*/
+		if (msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE) {
+			QueueHandler.enqueueInboundCommandAndChannel(msg, channel);
+		} else if (msg.getPing()) {
+			System.out.println("Received ping from cluster 1");
+			ServerState.getNext().writeAndFlush(msg);
+			/*
+			 * if (!ServerState.isRoundTrip() &&
+			 * msg.getHeader().getDestination() == Constants.clusterId) {
+			 * ServerState.setRoundTrip(true); CommandMessage ping =
+			 * createCommandPing(msg.getHeader().getDestination());
+			 * ServerState.getNext().writeAndFlush(ping); } else if
+			 * (ServerState.isRoundTrip() && msg.getHeader().getDestination() ==
+			 * Constants.clusterId) { ServerState.setRoundTrip(false);
+			 * System.out.
+			 * println("***Got the ping back by going through the ring across all clusters***"
+			 * ); channel.writeAndFlush(msg); } else { CommandMessage ping =
+			 * createCommandPing(msg.getHeader().getDestination());
+			 * ServerState.getNext().writeAndFlush(ping); }
+			 */
 
 		}
 
-		if (msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
-			if (msg.getReq().getRrb().getFilename().equals("*")) {
+		if (msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE) {
+			if (msg.getRequest().getRrb().getFilename().equals("*")) {
 				readFileNamesCmd(msg, channel);
 			} else {
-				
-				readFileCmd(msg, channel);
- 		        }
-			}
-		
 
-		if (msg.getReq().getRequestType() == TaskType.REQUESTWRITEFILE) {
+				readFileCmd(msg, channel);
+			}
+		}
+
+		if (msg.getRequest().getRequestType() == TaskType.REQUESTWRITEFILE) {
 
 			writeFileCmd(msg, channel);
 		}
@@ -181,17 +194,17 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		header.setNodeId(msg.getHeader().getNodeId());
 		header.setTime(System.currentTimeMillis());
 		header.setDestination(msg.getHeader().getDestination());
-		header.setMaxHops(msg.getHeader().getMaxHops()-1);
+		header.setMaxHops(msg.getHeader().getMaxHops() - 1);
 		command.setHeader(header);
 
 		return command.build();
-		}
+	}
 
 	private void readFileCmd(CommandMessage msg, Channel channel) {
 		// TODO Auto-generated method stub
 
 		// Read a specific file
-		String fileName = msg.getReq().getRrb().getFilename();
+		String fileName = msg.getRequest().getRrb().getFilename();
 		// long filesize = msg.getReqMsg().getRrb().getFil
 		long filesize = 0; // TODO: update this
 		String fileId = Utility.getHashFileName(fileName);
@@ -314,12 +327,13 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 	private long getFileSize(CommandMessage msg) {
 		try {
-			return msg.getReq().getRwb().getFileSize();
+			return msg.getRequest().getRwb().getFileSize();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return 0;
 	}
+
 	public static CommandMessage invertPing(CommandMessage msg) {
 		// TODO Auto-generated method stub
 		CommandMessage.Builder command = CommandMessage.newBuilder();
@@ -333,8 +347,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		header.setMaxHops(10);
 		command.setHeader(header);
 		return command.build();
-		 //channel.writeAndFlush(command.build());
+		// channel.writeAndFlush(command.build());
 	}
+
 	/**
 	 * @param msg
 	 * @param channel
@@ -347,15 +362,15 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	private void writeFileCmd(CommandMessage msg, Channel channel)
 			throws UnsupportedEncodingException, Exception, IOException, FileNotFoundException, InterruptedException {
 
-		String file_id = msg.getReq().getRwb().getFileId();
-		String file_name = msg.getReq().getRwb().getFilename();
-		String file_ext = msg.getReq().getRwb().getFileExt();
+		String file_id = msg.getRequest().getRwb().getFileId();
+		String file_name = msg.getRequest().getRwb().getFilename();
+		String file_ext = msg.getRequest().getRwb().getFileExt();
 		long file_size = getFileSize(msg);
 
-		int chunk_id = msg.getReq().getRwb().getChunk().getChunkId();
-		int num_of_chunks = msg.getReq().getRwb().getNumOfChunks();
-		byte[] chunk_data = msg.getReq().getRwb().getChunk().getChunkData().toByteArray();
-		int chunk_size = msg.getReq().getRwb().getChunk().getChunkSize();
+		int chunk_id = msg.getRequest().getRwb().getChunk().getChunkId();
+		int num_of_chunks = msg.getRequest().getRwb().getNumOfChunks();
+		byte[] chunk_data = msg.getRequest().getRwb().getChunk().getChunkData().toByteArray();
+		int chunk_size = msg.getRequest().getRwb().getChunk().getChunkSize();
 
 		// Pushing chunks to Mysql DB
 		DBHandler mysql_db = new DBHandler();
@@ -365,14 +380,14 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 		WorkMessage wm = WorkMessageCreator.SendWriteWorkMessage(msg);
 		System.out.println("File replicated");
 
-		System.out.println("Message received :" + msg.getReq().getRwb().getChunk().getChunkId());
+		System.out.println("Message received :" + msg.getRequest().getRwb().getChunk().getChunkId());
 		PrintUtil.printCommand(msg);
 
 		lstMsg.add(msg);
-		try{
+		try {
 			ServerState.getNext().writeAndFlush(msg);
 
-		}catch(Exception e){
+		} catch (Exception e) {
 			System.out.println("Write failed to next cluster");
 		}
 		ServerState.getEmon().broadcast(wm);
@@ -380,18 +395,18 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 		System.out.println("List size is: ");
 		System.out.println(lstMsg.size());
-		String storeStr = new String(msg.getReq().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
-		System.out.println("No. of chunks" + String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
+		String storeStr = new String(msg.getRequest().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
+		System.out.println("No. of chunks" + String.valueOf(msg.getRequest().getRwb().getNumOfChunks()));
 		// storeRedisData(msg);
 
-		CommandMessage commMsg = WorkMessageCreator.createAckWriteRequest(file_id, msg.getReq().getRwb().getFilename(),
-				msg.getReq().getRwb().getChunk().getChunkId());
+		CommandMessage commMsg = WorkMessageCreator.createAckWriteRequest(file_id,
+				msg.getRequest().getRwb().getFilename(), msg.getRequest().getRwb().getChunk().getChunkId());
 
 		WriteChannel myCallable = new WriteChannel(commMsg, channel);
 
 		futuresList.add(myCallable);
 
-		if (lstMsg.size() == msg.getReq().getRwb().getNumOfChunks()) {
+		if (lstMsg.size() == msg.getRequest().getRwb().getNumOfChunks()) {
 
 			System.out.println("Checking if chunks exist");
 			try {
@@ -416,14 +431,14 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			Collections.sort(lstMsg, new Comparator<CommandMessage>() {
 				@Override
 				public int compare(CommandMessage msg1, CommandMessage msg2) {
-					return Integer.compare(msg1.getReq().getRwb().getChunk().getChunkId(),
-							msg2.getReq().getRwb().getChunk().getChunkId());
+					return Integer.compare(msg1.getRequest().getRwb().getChunk().getChunkId(),
+							msg2.getRequest().getRwb().getChunk().getChunkId());
 				}
 			});
 
 			System.out.println("All chunks sorted");
 			for (CommandMessage message : lstMsg) {
-				chunkedFile.add(message.getReq().getRwb().getChunk().getChunkData());
+				chunkedFile.add(message.getRequest().getRwb().getChunk().getChunkData());
 			}
 			System.out.println("Chunked file created");
 
@@ -435,7 +450,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 
 			}
 
-			File file = new File(Constants.dataDir + msg.getReq().getRwb().getFilename());
+			File file = new File(Constants.dataDir + msg.getRequest().getRwb().getFilename());
 			file.createNewFile();
 			System.out.println("File created in Gossamer dir");
 			FileOutputStream outputStream = new FileOutputStream(file);
@@ -469,24 +484,24 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	 * @param msg
 	 */
 	private void storeRedisData(CommandMessage msg) {
-		jedisHandler1.hset(msg.getReq().getRwb().getFileId(), "name", msg.getReq().getRwb().getFilename());
+		jedisHandler1.hset(msg.getRequest().getRwb().getFileId(), "name", msg.getRequest().getRwb().getFilename());
 		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileId());
 		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getFileExt());
 		// Uncomment to store chunk data
 		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),String.valueOf(msg.getReqMsg().getRwb().getChunk().getChunkId()),storeStr);
 		// jedisHandler1.hset(msg.getReqMsg().getRwb().getFileId(),msg.getReqMsg().getRwb().getChunk().getChunkData());
-		jedisHandler1.hset(msg.getReq().getRwb().getFileId(), "numChunks",
-				String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
+		jedisHandler1.hset(msg.getRequest().getRwb().getFileId(), "numChunks",
+				String.valueOf(msg.getRequest().getRwb().getNumOfChunks()));
 
-		Map<String, String> map = jedisHandler1.hgetAll(msg.getReq().getRwb().getFileId());
+		Map<String, String> map = jedisHandler1.hgetAll(msg.getRequest().getRwb().getFileId());
 		String temp = map.get("chunks");
 
 		if (temp != null) {
-			jedisHandler1.hset(msg.getReq().getRwb().getFileId(), "chunks",
-					temp + "," + String.valueOf(msg.getReq().getRwb().getChunk().getChunkId()));
+			jedisHandler1.hset(msg.getRequest().getRwb().getFileId(), "chunks",
+					temp + "," + String.valueOf(msg.getRequest().getRwb().getChunk().getChunkId()));
 		} else {
-			jedisHandler1.hset(msg.getReq().getRwb().getFileId(), "chunks",
-					String.valueOf(msg.getReq().getRwb().getChunk().getChunkId()));
+			jedisHandler1.hset(msg.getRequest().getRwb().getFileId(), "chunks",
+					String.valueOf(msg.getRequest().getRwb().getChunk().getChunkId()));
 		}
 	}
 

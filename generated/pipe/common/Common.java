@@ -20,63 +20,47 @@ public final class Common {
   public enum TaskType
       implements com.google.protobuf.ProtocolMessageEnum {
     /**
-     * <code>PING = 1;</code>
+     * <code>REQUESTREADFILE = 1;</code>
      */
-    PING(1),
+    REQUESTREADFILE(1),
     /**
-     * <code>PINGRESPONSE = 2;</code>
+     * <code>REQUESTWRITEFILE = 2;</code>
      */
-    PINGRESPONSE(2),
+    REQUESTWRITEFILE(2),
     /**
-     * <code>REQUESTREADFILE = 3;</code>
+     * <code>RESPONSEREADFILE = 3;</code>
      */
-    REQUESTREADFILE(3),
+    RESPONSEREADFILE(3),
     /**
-     * <code>REQUESTWRITEFILE = 4;</code>
+     * <code>RESPONSEWRITEFILE = 4;</code>
      */
-    REQUESTWRITEFILE(4),
+    RESPONSEWRITEFILE(4),
     /**
-     * <code>RESPONSEREADFILE = 5;</code>
+     * <code>REQUESTREADALLFILEDETAILS = 25;</code>
      */
-    RESPONSEREADFILE(5),
-    /**
-     * <code>RESPONSEWRITEFILE = 6;</code>
-     */
-    RESPONSEWRITEFILE(6),
-    /**
-     * <code>REQUESTREADALLFILEDETAILS = 7;</code>
-     */
-    REQUESTREADALLFILEDETAILS(7),
+    REQUESTREADALLFILEDETAILS(25),
     ;
 
     /**
-     * <code>PING = 1;</code>
+     * <code>REQUESTREADFILE = 1;</code>
      */
-    public static final int PING_VALUE = 1;
+    public static final int REQUESTREADFILE_VALUE = 1;
     /**
-     * <code>PINGRESPONSE = 2;</code>
+     * <code>REQUESTWRITEFILE = 2;</code>
      */
-    public static final int PINGRESPONSE_VALUE = 2;
+    public static final int REQUESTWRITEFILE_VALUE = 2;
     /**
-     * <code>REQUESTREADFILE = 3;</code>
+     * <code>RESPONSEREADFILE = 3;</code>
      */
-    public static final int REQUESTREADFILE_VALUE = 3;
+    public static final int RESPONSEREADFILE_VALUE = 3;
     /**
-     * <code>REQUESTWRITEFILE = 4;</code>
+     * <code>RESPONSEWRITEFILE = 4;</code>
      */
-    public static final int REQUESTWRITEFILE_VALUE = 4;
+    public static final int RESPONSEWRITEFILE_VALUE = 4;
     /**
-     * <code>RESPONSEREADFILE = 5;</code>
+     * <code>REQUESTREADALLFILEDETAILS = 25;</code>
      */
-    public static final int RESPONSEREADFILE_VALUE = 5;
-    /**
-     * <code>RESPONSEWRITEFILE = 6;</code>
-     */
-    public static final int RESPONSEWRITEFILE_VALUE = 6;
-    /**
-     * <code>REQUESTREADALLFILEDETAILS = 7;</code>
-     */
-    public static final int REQUESTREADALLFILEDETAILS_VALUE = 7;
+    public static final int REQUESTREADALLFILEDETAILS_VALUE = 25;
 
 
     public final int getNumber() {
@@ -93,13 +77,11 @@ public final class Common {
 
     public static TaskType forNumber(int value) {
       switch (value) {
-        case 1: return PING;
-        case 2: return PINGRESPONSE;
-        case 3: return REQUESTREADFILE;
-        case 4: return REQUESTWRITEFILE;
-        case 5: return RESPONSEREADFILE;
-        case 6: return RESPONSEWRITEFILE;
-        case 7: return REQUESTREADALLFILEDETAILS;
+        case 1: return REQUESTREADFILE;
+        case 2: return REQUESTWRITEFILE;
+        case 3: return RESPONSEREADFILE;
+        case 4: return RESPONSEWRITEFILE;
+        case 25: return REQUESTREADALLFILEDETAILS;
         default: return null;
       }
     }
@@ -159,7 +141,7 @@ public final class Common {
      * in addition with node_id, it will remain unique every time.
      * </pre>
      *
-     * <code>optional int32 message_id = 1;</code>
+     * <code>optional int32 message_id = 3;</code>
      */
     boolean hasMessageId();
     /**
@@ -168,43 +150,52 @@ public final class Common {
      * in addition with node_id, it will remain unique every time.
      * </pre>
      *
-     * <code>optional int32 message_id = 1;</code>
+     * <code>optional int32 message_id = 3;</code>
      */
     int getMessageId();
 
     /**
-     * <code>required int32 node_id = 2;</code>
+     * <code>required int32 node_id = 1;</code>
      */
     boolean hasNodeId();
     /**
-     * <code>required int32 node_id = 2;</code>
+     * <code>required int32 node_id = 1;</code>
      */
     int getNodeId();
 
     /**
-     * <code>required int64 time = 3;</code>
+     * <code>required int64 time = 2;</code>
      */
     boolean hasTime();
     /**
-     * <code>required int64 time = 3;</code>
+     * <code>required int64 time = 2;</code>
      */
     long getTime();
 
     /**
-     * <code>optional bool election = 4;</code>
+     * <code>optional bool election = 24;</code>
      */
     boolean hasElection();
     /**
-     * <code>optional bool election = 4;</code>
+     * <code>optional bool election = 24;</code>
      */
     boolean getElection();
+
+    /**
+     * <code>optional bool steal = 25;</code>
+     */
+    boolean hasSteal();
+    /**
+     * <code>optional bool steal = 25;</code>
+     */
+    boolean getSteal();
 
     /**
      * <pre>
      * if the message is for a specific node, this will be set
      * </pre>
      *
-     * <code>optional int32 destination = 8;</code>
+     * <code>optional int32 destination = 4;</code>
      */
     boolean hasDestination();
     /**
@@ -212,7 +203,7 @@ public final class Common {
      * if the message is for a specific node, this will be set
      * </pre>
      *
-     * <code>optional int32 destination = 8;</code>
+     * <code>optional int32 destination = 4;</code>
      */
     int getDestination();
 
@@ -222,7 +213,7 @@ public final class Common {
      * node. Default (-1) is the whole network (not restricted). 
      * </pre>
      *
-     * <code>optional int32 max_hops = 10 [default = -1];</code>
+     * <code>optional int32 max_hops = 5 [default = -1];</code>
      */
     boolean hasMaxHops();
     /**
@@ -231,7 +222,7 @@ public final class Common {
      * node. Default (-1) is the whole network (not restricted). 
      * </pre>
      *
-     * <code>optional int32 max_hops = 10 [default = -1];</code>
+     * <code>optional int32 max_hops = 5 [default = -1];</code>
      */
     int getMaxHops();
   }
@@ -251,6 +242,7 @@ public final class Common {
       nodeId_ = 0;
       time_ = 0L;
       election_ = false;
+      steal_ = false;
       destination_ = 0;
       maxHops_ = -1;
     }
@@ -284,33 +276,38 @@ public final class Common {
               break;
             }
             case 8: {
-              bitField0_ |= 0x00000001;
-              messageId_ = input.readInt32();
-              break;
-            }
-            case 16: {
               bitField0_ |= 0x00000002;
               nodeId_ = input.readInt32();
               break;
             }
-            case 24: {
+            case 16: {
               bitField0_ |= 0x00000004;
               time_ = input.readInt64();
               break;
             }
+            case 24: {
+              bitField0_ |= 0x00000001;
+              messageId_ = input.readInt32();
+              break;
+            }
             case 32: {
+              bitField0_ |= 0x00000020;
+              destination_ = input.readInt32();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000040;
+              maxHops_ = input.readInt32();
+              break;
+            }
+            case 192: {
               bitField0_ |= 0x00000008;
               election_ = input.readBool();
               break;
             }
-            case 64: {
+            case 200: {
               bitField0_ |= 0x00000010;
-              destination_ = input.readInt32();
-              break;
-            }
-            case 80: {
-              bitField0_ |= 0x00000020;
-              maxHops_ = input.readInt32();
+              steal_ = input.readBool();
               break;
             }
           }
@@ -338,7 +335,7 @@ public final class Common {
     }
 
     private int bitField0_;
-    public static final int MESSAGE_ID_FIELD_NUMBER = 1;
+    public static final int MESSAGE_ID_FIELD_NUMBER = 3;
     private int messageId_;
     /**
      * <pre>
@@ -346,7 +343,7 @@ public final class Common {
      * in addition with node_id, it will remain unique every time.
      * </pre>
      *
-     * <code>optional int32 message_id = 1;</code>
+     * <code>optional int32 message_id = 3;</code>
      */
     public boolean hasMessageId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
@@ -357,81 +354,96 @@ public final class Common {
      * in addition with node_id, it will remain unique every time.
      * </pre>
      *
-     * <code>optional int32 message_id = 1;</code>
+     * <code>optional int32 message_id = 3;</code>
      */
     public int getMessageId() {
       return messageId_;
     }
 
-    public static final int NODE_ID_FIELD_NUMBER = 2;
+    public static final int NODE_ID_FIELD_NUMBER = 1;
     private int nodeId_;
     /**
-     * <code>required int32 node_id = 2;</code>
+     * <code>required int32 node_id = 1;</code>
      */
     public boolean hasNodeId() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required int32 node_id = 2;</code>
+     * <code>required int32 node_id = 1;</code>
      */
     public int getNodeId() {
       return nodeId_;
     }
 
-    public static final int TIME_FIELD_NUMBER = 3;
+    public static final int TIME_FIELD_NUMBER = 2;
     private long time_;
     /**
-     * <code>required int64 time = 3;</code>
+     * <code>required int64 time = 2;</code>
      */
     public boolean hasTime() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>required int64 time = 3;</code>
+     * <code>required int64 time = 2;</code>
      */
     public long getTime() {
       return time_;
     }
 
-    public static final int ELECTION_FIELD_NUMBER = 4;
+    public static final int ELECTION_FIELD_NUMBER = 24;
     private boolean election_;
     /**
-     * <code>optional bool election = 4;</code>
+     * <code>optional bool election = 24;</code>
      */
     public boolean hasElection() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional bool election = 4;</code>
+     * <code>optional bool election = 24;</code>
      */
     public boolean getElection() {
       return election_;
     }
 
-    public static final int DESTINATION_FIELD_NUMBER = 8;
+    public static final int STEAL_FIELD_NUMBER = 25;
+    private boolean steal_;
+    /**
+     * <code>optional bool steal = 25;</code>
+     */
+    public boolean hasSteal() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional bool steal = 25;</code>
+     */
+    public boolean getSteal() {
+      return steal_;
+    }
+
+    public static final int DESTINATION_FIELD_NUMBER = 4;
     private int destination_;
     /**
      * <pre>
      * if the message is for a specific node, this will be set
      * </pre>
      *
-     * <code>optional int32 destination = 8;</code>
+     * <code>optional int32 destination = 4;</code>
      */
     public boolean hasDestination() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <pre>
      * if the message is for a specific node, this will be set
      * </pre>
      *
-     * <code>optional int32 destination = 8;</code>
+     * <code>optional int32 destination = 4;</code>
      */
     public int getDestination() {
       return destination_;
     }
 
-    public static final int MAX_HOPS_FIELD_NUMBER = 10;
+    public static final int MAX_HOPS_FIELD_NUMBER = 5;
     private int maxHops_;
     /**
      * <pre>
@@ -439,10 +451,10 @@ public final class Common {
      * node. Default (-1) is the whole network (not restricted). 
      * </pre>
      *
-     * <code>optional int32 max_hops = 10 [default = -1];</code>
+     * <code>optional int32 max_hops = 5 [default = -1];</code>
      */
     public boolean hasMaxHops() {
-      return ((bitField0_ & 0x00000020) == 0x00000020);
+      return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <pre>
@@ -450,7 +462,7 @@ public final class Common {
      * node. Default (-1) is the whole network (not restricted). 
      * </pre>
      *
-     * <code>optional int32 max_hops = 10 [default = -1];</code>
+     * <code>optional int32 max_hops = 5 [default = -1];</code>
      */
     public int getMaxHops() {
       return maxHops_;
@@ -476,23 +488,26 @@ public final class Common {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(1, messageId_);
-      }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, nodeId_);
+        output.writeInt32(1, nodeId_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt64(3, time_);
+        output.writeInt64(2, time_);
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeBool(4, election_);
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeInt32(8, destination_);
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeInt32(3, messageId_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeInt32(10, maxHops_);
+        output.writeInt32(4, destination_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeInt32(5, maxHops_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBool(24, election_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeBool(25, steal_);
       }
       unknownFields.writeTo(output);
     }
@@ -502,29 +517,33 @@ public final class Common {
       if (size != -1) return size;
 
       size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, messageId_);
-      }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, nodeId_);
+          .computeInt32Size(1, nodeId_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(3, time_);
+          .computeInt64Size(2, time_);
       }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(4, election_);
-      }
-      if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(8, destination_);
+          .computeInt32Size(3, messageId_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(10, maxHops_);
+          .computeInt32Size(4, destination_);
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(5, maxHops_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(24, election_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(25, steal_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -562,6 +581,11 @@ public final class Common {
       if (hasElection()) {
         result = result && (getElection()
             == other.getElection());
+      }
+      result = result && (hasSteal() == other.hasSteal());
+      if (hasSteal()) {
+        result = result && (getSteal()
+            == other.getSteal());
       }
       result = result && (hasDestination() == other.hasDestination());
       if (hasDestination()) {
@@ -601,6 +625,11 @@ public final class Common {
         hash = (37 * hash) + ELECTION_FIELD_NUMBER;
         hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
             getElection());
+      }
+      if (hasSteal()) {
+        hash = (37 * hash) + STEAL_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getSteal());
       }
       if (hasDestination()) {
         hash = (37 * hash) + DESTINATION_FIELD_NUMBER;
@@ -736,10 +765,12 @@ public final class Common {
         bitField0_ = (bitField0_ & ~0x00000004);
         election_ = false;
         bitField0_ = (bitField0_ & ~0x00000008);
-        destination_ = 0;
+        steal_ = false;
         bitField0_ = (bitField0_ & ~0x00000010);
-        maxHops_ = -1;
+        destination_ = 0;
         bitField0_ = (bitField0_ & ~0x00000020);
+        maxHops_ = -1;
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -783,9 +814,13 @@ public final class Common {
         if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
           to_bitField0_ |= 0x00000010;
         }
-        result.destination_ = destination_;
+        result.steal_ = steal_;
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
+        }
+        result.destination_ = destination_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
         }
         result.maxHops_ = maxHops_;
         result.bitField0_ = to_bitField0_;
@@ -842,6 +877,9 @@ public final class Common {
         if (other.hasElection()) {
           setElection(other.getElection());
         }
+        if (other.hasSteal()) {
+          setSteal(other.getSteal());
+        }
         if (other.hasDestination()) {
           setDestination(other.getDestination());
         }
@@ -889,7 +927,7 @@ public final class Common {
        * in addition with node_id, it will remain unique every time.
        * </pre>
        *
-       * <code>optional int32 message_id = 1;</code>
+       * <code>optional int32 message_id = 3;</code>
        */
       public boolean hasMessageId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
@@ -900,7 +938,7 @@ public final class Common {
        * in addition with node_id, it will remain unique every time.
        * </pre>
        *
-       * <code>optional int32 message_id = 1;</code>
+       * <code>optional int32 message_id = 3;</code>
        */
       public int getMessageId() {
         return messageId_;
@@ -911,7 +949,7 @@ public final class Common {
        * in addition with node_id, it will remain unique every time.
        * </pre>
        *
-       * <code>optional int32 message_id = 1;</code>
+       * <code>optional int32 message_id = 3;</code>
        */
       public Builder setMessageId(int value) {
         bitField0_ |= 0x00000001;
@@ -925,7 +963,7 @@ public final class Common {
        * in addition with node_id, it will remain unique every time.
        * </pre>
        *
-       * <code>optional int32 message_id = 1;</code>
+       * <code>optional int32 message_id = 3;</code>
        */
       public Builder clearMessageId() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -936,19 +974,19 @@ public final class Common {
 
       private int nodeId_ ;
       /**
-       * <code>required int32 node_id = 2;</code>
+       * <code>required int32 node_id = 1;</code>
        */
       public boolean hasNodeId() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required int32 node_id = 2;</code>
+       * <code>required int32 node_id = 1;</code>
        */
       public int getNodeId() {
         return nodeId_;
       }
       /**
-       * <code>required int32 node_id = 2;</code>
+       * <code>required int32 node_id = 1;</code>
        */
       public Builder setNodeId(int value) {
         bitField0_ |= 0x00000002;
@@ -957,7 +995,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>required int32 node_id = 2;</code>
+       * <code>required int32 node_id = 1;</code>
        */
       public Builder clearNodeId() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -968,19 +1006,19 @@ public final class Common {
 
       private long time_ ;
       /**
-       * <code>required int64 time = 3;</code>
+       * <code>required int64 time = 2;</code>
        */
       public boolean hasTime() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required int64 time = 3;</code>
+       * <code>required int64 time = 2;</code>
        */
       public long getTime() {
         return time_;
       }
       /**
-       * <code>required int64 time = 3;</code>
+       * <code>required int64 time = 2;</code>
        */
       public Builder setTime(long value) {
         bitField0_ |= 0x00000004;
@@ -989,7 +1027,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>required int64 time = 3;</code>
+       * <code>required int64 time = 2;</code>
        */
       public Builder clearTime() {
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -1000,19 +1038,19 @@ public final class Common {
 
       private boolean election_ ;
       /**
-       * <code>optional bool election = 4;</code>
+       * <code>optional bool election = 24;</code>
        */
       public boolean hasElection() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional bool election = 4;</code>
+       * <code>optional bool election = 24;</code>
        */
       public boolean getElection() {
         return election_;
       }
       /**
-       * <code>optional bool election = 4;</code>
+       * <code>optional bool election = 24;</code>
        */
       public Builder setElection(boolean value) {
         bitField0_ |= 0x00000008;
@@ -1021,11 +1059,43 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional bool election = 4;</code>
+       * <code>optional bool election = 24;</code>
        */
       public Builder clearElection() {
         bitField0_ = (bitField0_ & ~0x00000008);
         election_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean steal_ ;
+      /**
+       * <code>optional bool steal = 25;</code>
+       */
+      public boolean hasSteal() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional bool steal = 25;</code>
+       */
+      public boolean getSteal() {
+        return steal_;
+      }
+      /**
+       * <code>optional bool steal = 25;</code>
+       */
+      public Builder setSteal(boolean value) {
+        bitField0_ |= 0x00000010;
+        steal_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool steal = 25;</code>
+       */
+      public Builder clearSteal() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        steal_ = false;
         onChanged();
         return this;
       }
@@ -1036,17 +1106,17 @@ public final class Common {
        * if the message is for a specific node, this will be set
        * </pre>
        *
-       * <code>optional int32 destination = 8;</code>
+       * <code>optional int32 destination = 4;</code>
        */
       public boolean hasDestination() {
-        return ((bitField0_ & 0x00000010) == 0x00000010);
+        return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
        * <pre>
        * if the message is for a specific node, this will be set
        * </pre>
        *
-       * <code>optional int32 destination = 8;</code>
+       * <code>optional int32 destination = 4;</code>
        */
       public int getDestination() {
         return destination_;
@@ -1056,10 +1126,10 @@ public final class Common {
        * if the message is for a specific node, this will be set
        * </pre>
        *
-       * <code>optional int32 destination = 8;</code>
+       * <code>optional int32 destination = 4;</code>
        */
       public Builder setDestination(int value) {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000020;
         destination_ = value;
         onChanged();
         return this;
@@ -1069,10 +1139,10 @@ public final class Common {
        * if the message is for a specific node, this will be set
        * </pre>
        *
-       * <code>optional int32 destination = 8;</code>
+       * <code>optional int32 destination = 4;</code>
        */
       public Builder clearDestination() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000020);
         destination_ = 0;
         onChanged();
         return this;
@@ -1085,10 +1155,10 @@ public final class Common {
        * node. Default (-1) is the whole network (not restricted). 
        * </pre>
        *
-       * <code>optional int32 max_hops = 10 [default = -1];</code>
+       * <code>optional int32 max_hops = 5 [default = -1];</code>
        */
       public boolean hasMaxHops() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
        * <pre>
@@ -1096,7 +1166,7 @@ public final class Common {
        * node. Default (-1) is the whole network (not restricted). 
        * </pre>
        *
-       * <code>optional int32 max_hops = 10 [default = -1];</code>
+       * <code>optional int32 max_hops = 5 [default = -1];</code>
        */
       public int getMaxHops() {
         return maxHops_;
@@ -1107,10 +1177,10 @@ public final class Common {
        * node. Default (-1) is the whole network (not restricted). 
        * </pre>
        *
-       * <code>optional int32 max_hops = 10 [default = -1];</code>
+       * <code>optional int32 max_hops = 5 [default = -1];</code>
        */
       public Builder setMaxHops(int value) {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         maxHops_ = value;
         onChanged();
         return this;
@@ -1121,10 +1191,10 @@ public final class Common {
        * node. Default (-1) is the whole network (not restricted). 
        * </pre>
        *
-       * <code>optional int32 max_hops = 10 [default = -1];</code>
+       * <code>optional int32 max_hops = 5 [default = -1];</code>
        */
       public Builder clearMaxHops() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         maxHops_ = -1;
         onChanged();
         return this;
@@ -1908,50 +1978,50 @@ public final class Common {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional .Node client = 1;</code>
+     * <code>optional .Node client = 21;</code>
      */
     boolean hasClient();
     /**
-     * <code>optional .Node client = 1;</code>
+     * <code>optional .Node client = 21;</code>
      */
     pipe.common.Common.Node getClient();
     /**
-     * <code>optional .Node client = 1;</code>
+     * <code>optional .Node client = 21;</code>
      */
     pipe.common.Common.NodeOrBuilder getClientOrBuilder();
 
     /**
-     * <code>required .TaskType requestType = 3;</code>
+     * <code>required .TaskType requestType = 1;</code>
      */
     boolean hasRequestType();
     /**
-     * <code>required .TaskType requestType = 3;</code>
+     * <code>required .TaskType requestType = 1;</code>
      */
     pipe.common.Common.TaskType getRequestType();
 
     /**
-     * <code>optional .WriteBody rwb = 4;</code>
+     * <code>optional .WriteBody rwb = 2;</code>
      */
     boolean hasRwb();
     /**
-     * <code>optional .WriteBody rwb = 4;</code>
+     * <code>optional .WriteBody rwb = 2;</code>
      */
     pipe.common.Common.WriteBody getRwb();
     /**
-     * <code>optional .WriteBody rwb = 4;</code>
+     * <code>optional .WriteBody rwb = 2;</code>
      */
     pipe.common.Common.WriteBodyOrBuilder getRwbOrBuilder();
 
     /**
-     * <code>optional .ReadBody rrb = 5;</code>
+     * <code>optional .ReadBody rrb = 3;</code>
      */
     boolean hasRrb();
     /**
-     * <code>optional .ReadBody rrb = 5;</code>
+     * <code>optional .ReadBody rrb = 3;</code>
      */
     pipe.common.Common.ReadBody getRrb();
     /**
-     * <code>optional .ReadBody rrb = 5;</code>
+     * <code>optional .ReadBody rrb = 3;</code>
      */
     pipe.common.Common.ReadBodyOrBuilder getRrbOrBuilder();
 
@@ -2000,7 +2070,46 @@ public final class Common {
               }
               break;
             }
-            case 10: {
+            case 8: {
+              int rawValue = input.readEnum();
+              pipe.common.Common.TaskType value = pipe.common.Common.TaskType.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(1, rawValue);
+              } else {
+                bitField0_ |= 0x00000002;
+                requestType_ = rawValue;
+              }
+              break;
+            }
+            case 18: {
+              pipe.common.Common.WriteBody.Builder subBuilder = null;
+              if (payloadCase_ == 2) {
+                subBuilder = ((pipe.common.Common.WriteBody) payload_).toBuilder();
+              }
+              payload_ =
+                  input.readMessage(pipe.common.Common.WriteBody.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((pipe.common.Common.WriteBody) payload_);
+                payload_ = subBuilder.buildPartial();
+              }
+              payloadCase_ = 2;
+              break;
+            }
+            case 26: {
+              pipe.common.Common.ReadBody.Builder subBuilder = null;
+              if (payloadCase_ == 3) {
+                subBuilder = ((pipe.common.Common.ReadBody) payload_).toBuilder();
+              }
+              payload_ =
+                  input.readMessage(pipe.common.Common.ReadBody.PARSER, extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((pipe.common.Common.ReadBody) payload_);
+                payload_ = subBuilder.buildPartial();
+              }
+              payloadCase_ = 3;
+              break;
+            }
+            case 170: {
               pipe.common.Common.Node.Builder subBuilder = null;
               if (((bitField0_ & 0x00000001) == 0x00000001)) {
                 subBuilder = client_.toBuilder();
@@ -2011,45 +2120,6 @@ public final class Common {
                 client_ = subBuilder.buildPartial();
               }
               bitField0_ |= 0x00000001;
-              break;
-            }
-            case 24: {
-              int rawValue = input.readEnum();
-              pipe.common.Common.TaskType value = pipe.common.Common.TaskType.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(3, rawValue);
-              } else {
-                bitField0_ |= 0x00000002;
-                requestType_ = rawValue;
-              }
-              break;
-            }
-            case 34: {
-              pipe.common.Common.WriteBody.Builder subBuilder = null;
-              if (payloadCase_ == 4) {
-                subBuilder = ((pipe.common.Common.WriteBody) payload_).toBuilder();
-              }
-              payload_ =
-                  input.readMessage(pipe.common.Common.WriteBody.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom((pipe.common.Common.WriteBody) payload_);
-                payload_ = subBuilder.buildPartial();
-              }
-              payloadCase_ = 4;
-              break;
-            }
-            case 42: {
-              pipe.common.Common.ReadBody.Builder subBuilder = null;
-              if (payloadCase_ == 5) {
-                subBuilder = ((pipe.common.Common.ReadBody) payload_).toBuilder();
-              }
-              payload_ =
-                  input.readMessage(pipe.common.Common.ReadBody.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom((pipe.common.Common.ReadBody) payload_);
-                payload_ = subBuilder.buildPartial();
-              }
-              payloadCase_ = 5;
               break;
             }
           }
@@ -2081,8 +2151,8 @@ public final class Common {
     private java.lang.Object payload_;
     public enum PayloadCase
         implements com.google.protobuf.Internal.EnumLite {
-      RWB(4),
-      RRB(5),
+      RWB(2),
+      RRB(3),
       PAYLOAD_NOT_SET(0);
       private final int value;
       private PayloadCase(int value) {
@@ -2098,8 +2168,8 @@ public final class Common {
 
       public static PayloadCase forNumber(int value) {
         switch (value) {
-          case 4: return RWB;
-          case 5: return RRB;
+          case 2: return RWB;
+          case 3: return RRB;
           case 0: return PAYLOAD_NOT_SET;
           default: return null;
         }
@@ -2115,90 +2185,90 @@ public final class Common {
           payloadCase_);
     }
 
-    public static final int CLIENT_FIELD_NUMBER = 1;
+    public static final int CLIENT_FIELD_NUMBER = 21;
     private pipe.common.Common.Node client_;
     /**
-     * <code>optional .Node client = 1;</code>
+     * <code>optional .Node client = 21;</code>
      */
     public boolean hasClient() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional .Node client = 1;</code>
+     * <code>optional .Node client = 21;</code>
      */
     public pipe.common.Common.Node getClient() {
       return client_ == null ? pipe.common.Common.Node.getDefaultInstance() : client_;
     }
     /**
-     * <code>optional .Node client = 1;</code>
+     * <code>optional .Node client = 21;</code>
      */
     public pipe.common.Common.NodeOrBuilder getClientOrBuilder() {
       return client_ == null ? pipe.common.Common.Node.getDefaultInstance() : client_;
     }
 
-    public static final int REQUESTTYPE_FIELD_NUMBER = 3;
+    public static final int REQUESTTYPE_FIELD_NUMBER = 1;
     private int requestType_;
     /**
-     * <code>required .TaskType requestType = 3;</code>
+     * <code>required .TaskType requestType = 1;</code>
      */
     public boolean hasRequestType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required .TaskType requestType = 3;</code>
+     * <code>required .TaskType requestType = 1;</code>
      */
     public pipe.common.Common.TaskType getRequestType() {
       pipe.common.Common.TaskType result = pipe.common.Common.TaskType.valueOf(requestType_);
-      return result == null ? pipe.common.Common.TaskType.PING : result;
+      return result == null ? pipe.common.Common.TaskType.REQUESTREADFILE : result;
     }
 
-    public static final int RWB_FIELD_NUMBER = 4;
+    public static final int RWB_FIELD_NUMBER = 2;
     /**
-     * <code>optional .WriteBody rwb = 4;</code>
+     * <code>optional .WriteBody rwb = 2;</code>
      */
     public boolean hasRwb() {
-      return payloadCase_ == 4;
+      return payloadCase_ == 2;
     }
     /**
-     * <code>optional .WriteBody rwb = 4;</code>
+     * <code>optional .WriteBody rwb = 2;</code>
      */
     public pipe.common.Common.WriteBody getRwb() {
-      if (payloadCase_ == 4) {
+      if (payloadCase_ == 2) {
          return (pipe.common.Common.WriteBody) payload_;
       }
       return pipe.common.Common.WriteBody.getDefaultInstance();
     }
     /**
-     * <code>optional .WriteBody rwb = 4;</code>
+     * <code>optional .WriteBody rwb = 2;</code>
      */
     public pipe.common.Common.WriteBodyOrBuilder getRwbOrBuilder() {
-      if (payloadCase_ == 4) {
+      if (payloadCase_ == 2) {
          return (pipe.common.Common.WriteBody) payload_;
       }
       return pipe.common.Common.WriteBody.getDefaultInstance();
     }
 
-    public static final int RRB_FIELD_NUMBER = 5;
+    public static final int RRB_FIELD_NUMBER = 3;
     /**
-     * <code>optional .ReadBody rrb = 5;</code>
+     * <code>optional .ReadBody rrb = 3;</code>
      */
     public boolean hasRrb() {
-      return payloadCase_ == 5;
+      return payloadCase_ == 3;
     }
     /**
-     * <code>optional .ReadBody rrb = 5;</code>
+     * <code>optional .ReadBody rrb = 3;</code>
      */
     public pipe.common.Common.ReadBody getRrb() {
-      if (payloadCase_ == 5) {
+      if (payloadCase_ == 3) {
          return (pipe.common.Common.ReadBody) payload_;
       }
       return pipe.common.Common.ReadBody.getDefaultInstance();
     }
     /**
-     * <code>optional .ReadBody rrb = 5;</code>
+     * <code>optional .ReadBody rrb = 3;</code>
      */
     public pipe.common.Common.ReadBodyOrBuilder getRrbOrBuilder() {
-      if (payloadCase_ == 5) {
+      if (payloadCase_ == 3) {
          return (pipe.common.Common.ReadBody) payload_;
       }
       return pipe.common.Common.ReadBody.getDefaultInstance();
@@ -2232,17 +2302,17 @@ public final class Common {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeMessage(1, getClient());
-      }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeEnum(3, requestType_);
+        output.writeEnum(1, requestType_);
       }
-      if (payloadCase_ == 4) {
-        output.writeMessage(4, (pipe.common.Common.WriteBody) payload_);
+      if (payloadCase_ == 2) {
+        output.writeMessage(2, (pipe.common.Common.WriteBody) payload_);
       }
-      if (payloadCase_ == 5) {
-        output.writeMessage(5, (pipe.common.Common.ReadBody) payload_);
+      if (payloadCase_ == 3) {
+        output.writeMessage(3, (pipe.common.Common.ReadBody) payload_);
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeMessage(21, getClient());
       }
       unknownFields.writeTo(output);
     }
@@ -2252,21 +2322,21 @@ public final class Common {
       if (size != -1) return size;
 
       size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getClient());
-      }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(3, requestType_);
+          .computeEnumSize(1, requestType_);
       }
-      if (payloadCase_ == 4) {
+      if (payloadCase_ == 2) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, (pipe.common.Common.WriteBody) payload_);
+          .computeMessageSize(2, (pipe.common.Common.WriteBody) payload_);
       }
-      if (payloadCase_ == 5) {
+      if (payloadCase_ == 3) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, (pipe.common.Common.ReadBody) payload_);
+          .computeMessageSize(3, (pipe.common.Common.ReadBody) payload_);
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(21, getClient());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2298,11 +2368,11 @@ public final class Common {
           other.getPayloadCase());
       if (!result) return false;
       switch (payloadCase_) {
-        case 4:
+        case 2:
           result = result && getRwb()
               .equals(other.getRwb());
           break;
-        case 5:
+        case 3:
           result = result && getRrb()
               .equals(other.getRrb());
           break;
@@ -2329,11 +2399,11 @@ public final class Common {
         hash = (53 * hash) + requestType_;
       }
       switch (payloadCase_) {
-        case 4:
+        case 2:
           hash = (37 * hash) + RWB_FIELD_NUMBER;
           hash = (53 * hash) + getRwb().hashCode();
           break;
-        case 5:
+        case 3:
           hash = (37 * hash) + RRB_FIELD_NUMBER;
           hash = (53 * hash) + getRrb().hashCode();
           break;
@@ -2505,14 +2575,14 @@ public final class Common {
           to_bitField0_ |= 0x00000002;
         }
         result.requestType_ = requestType_;
-        if (payloadCase_ == 4) {
+        if (payloadCase_ == 2) {
           if (rwbBuilder_ == null) {
             result.payload_ = payload_;
           } else {
             result.payload_ = rwbBuilder_.build();
           }
         }
-        if (payloadCase_ == 5) {
+        if (payloadCase_ == 3) {
           if (rrbBuilder_ == null) {
             result.payload_ = payload_;
           } else {
@@ -2641,13 +2711,13 @@ public final class Common {
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.Node, pipe.common.Common.Node.Builder, pipe.common.Common.NodeOrBuilder> clientBuilder_;
       /**
-       * <code>optional .Node client = 1;</code>
+       * <code>optional .Node client = 21;</code>
        */
       public boolean hasClient() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional .Node client = 1;</code>
+       * <code>optional .Node client = 21;</code>
        */
       public pipe.common.Common.Node getClient() {
         if (clientBuilder_ == null) {
@@ -2657,7 +2727,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional .Node client = 1;</code>
+       * <code>optional .Node client = 21;</code>
        */
       public Builder setClient(pipe.common.Common.Node value) {
         if (clientBuilder_ == null) {
@@ -2673,7 +2743,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional .Node client = 1;</code>
+       * <code>optional .Node client = 21;</code>
        */
       public Builder setClient(
           pipe.common.Common.Node.Builder builderForValue) {
@@ -2687,7 +2757,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional .Node client = 1;</code>
+       * <code>optional .Node client = 21;</code>
        */
       public Builder mergeClient(pipe.common.Common.Node value) {
         if (clientBuilder_ == null) {
@@ -2707,7 +2777,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional .Node client = 1;</code>
+       * <code>optional .Node client = 21;</code>
        */
       public Builder clearClient() {
         if (clientBuilder_ == null) {
@@ -2720,7 +2790,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional .Node client = 1;</code>
+       * <code>optional .Node client = 21;</code>
        */
       public pipe.common.Common.Node.Builder getClientBuilder() {
         bitField0_ |= 0x00000001;
@@ -2728,7 +2798,7 @@ public final class Common {
         return getClientFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Node client = 1;</code>
+       * <code>optional .Node client = 21;</code>
        */
       public pipe.common.Common.NodeOrBuilder getClientOrBuilder() {
         if (clientBuilder_ != null) {
@@ -2739,7 +2809,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional .Node client = 1;</code>
+       * <code>optional .Node client = 21;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.Node, pipe.common.Common.Node.Builder, pipe.common.Common.NodeOrBuilder> 
@@ -2757,20 +2827,20 @@ public final class Common {
 
       private int requestType_ = 1;
       /**
-       * <code>required .TaskType requestType = 3;</code>
+       * <code>required .TaskType requestType = 1;</code>
        */
       public boolean hasRequestType() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required .TaskType requestType = 3;</code>
+       * <code>required .TaskType requestType = 1;</code>
        */
       public pipe.common.Common.TaskType getRequestType() {
         pipe.common.Common.TaskType result = pipe.common.Common.TaskType.valueOf(requestType_);
-        return result == null ? pipe.common.Common.TaskType.PING : result;
+        return result == null ? pipe.common.Common.TaskType.REQUESTREADFILE : result;
       }
       /**
-       * <code>required .TaskType requestType = 3;</code>
+       * <code>required .TaskType requestType = 1;</code>
        */
       public Builder setRequestType(pipe.common.Common.TaskType value) {
         if (value == null) {
@@ -2782,7 +2852,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>required .TaskType requestType = 3;</code>
+       * <code>required .TaskType requestType = 1;</code>
        */
       public Builder clearRequestType() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -2794,29 +2864,29 @@ public final class Common {
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.WriteBody, pipe.common.Common.WriteBody.Builder, pipe.common.Common.WriteBodyOrBuilder> rwbBuilder_;
       /**
-       * <code>optional .WriteBody rwb = 4;</code>
+       * <code>optional .WriteBody rwb = 2;</code>
        */
       public boolean hasRwb() {
-        return payloadCase_ == 4;
+        return payloadCase_ == 2;
       }
       /**
-       * <code>optional .WriteBody rwb = 4;</code>
+       * <code>optional .WriteBody rwb = 2;</code>
        */
       public pipe.common.Common.WriteBody getRwb() {
         if (rwbBuilder_ == null) {
-          if (payloadCase_ == 4) {
+          if (payloadCase_ == 2) {
             return (pipe.common.Common.WriteBody) payload_;
           }
           return pipe.common.Common.WriteBody.getDefaultInstance();
         } else {
-          if (payloadCase_ == 4) {
+          if (payloadCase_ == 2) {
             return rwbBuilder_.getMessage();
           }
           return pipe.common.Common.WriteBody.getDefaultInstance();
         }
       }
       /**
-       * <code>optional .WriteBody rwb = 4;</code>
+       * <code>optional .WriteBody rwb = 2;</code>
        */
       public Builder setRwb(pipe.common.Common.WriteBody value) {
         if (rwbBuilder_ == null) {
@@ -2828,11 +2898,11 @@ public final class Common {
         } else {
           rwbBuilder_.setMessage(value);
         }
-        payloadCase_ = 4;
+        payloadCase_ = 2;
         return this;
       }
       /**
-       * <code>optional .WriteBody rwb = 4;</code>
+       * <code>optional .WriteBody rwb = 2;</code>
        */
       public Builder setRwb(
           pipe.common.Common.WriteBody.Builder builderForValue) {
@@ -2842,15 +2912,15 @@ public final class Common {
         } else {
           rwbBuilder_.setMessage(builderForValue.build());
         }
-        payloadCase_ = 4;
+        payloadCase_ = 2;
         return this;
       }
       /**
-       * <code>optional .WriteBody rwb = 4;</code>
+       * <code>optional .WriteBody rwb = 2;</code>
        */
       public Builder mergeRwb(pipe.common.Common.WriteBody value) {
         if (rwbBuilder_ == null) {
-          if (payloadCase_ == 4 &&
+          if (payloadCase_ == 2 &&
               payload_ != pipe.common.Common.WriteBody.getDefaultInstance()) {
             payload_ = pipe.common.Common.WriteBody.newBuilder((pipe.common.Common.WriteBody) payload_)
                 .mergeFrom(value).buildPartial();
@@ -2859,26 +2929,26 @@ public final class Common {
           }
           onChanged();
         } else {
-          if (payloadCase_ == 4) {
+          if (payloadCase_ == 2) {
             rwbBuilder_.mergeFrom(value);
           }
           rwbBuilder_.setMessage(value);
         }
-        payloadCase_ = 4;
+        payloadCase_ = 2;
         return this;
       }
       /**
-       * <code>optional .WriteBody rwb = 4;</code>
+       * <code>optional .WriteBody rwb = 2;</code>
        */
       public Builder clearRwb() {
         if (rwbBuilder_ == null) {
-          if (payloadCase_ == 4) {
+          if (payloadCase_ == 2) {
             payloadCase_ = 0;
             payload_ = null;
             onChanged();
           }
         } else {
-          if (payloadCase_ == 4) {
+          if (payloadCase_ == 2) {
             payloadCase_ = 0;
             payload_ = null;
           }
@@ -2887,32 +2957,32 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional .WriteBody rwb = 4;</code>
+       * <code>optional .WriteBody rwb = 2;</code>
        */
       public pipe.common.Common.WriteBody.Builder getRwbBuilder() {
         return getRwbFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .WriteBody rwb = 4;</code>
+       * <code>optional .WriteBody rwb = 2;</code>
        */
       public pipe.common.Common.WriteBodyOrBuilder getRwbOrBuilder() {
-        if ((payloadCase_ == 4) && (rwbBuilder_ != null)) {
+        if ((payloadCase_ == 2) && (rwbBuilder_ != null)) {
           return rwbBuilder_.getMessageOrBuilder();
         } else {
-          if (payloadCase_ == 4) {
+          if (payloadCase_ == 2) {
             return (pipe.common.Common.WriteBody) payload_;
           }
           return pipe.common.Common.WriteBody.getDefaultInstance();
         }
       }
       /**
-       * <code>optional .WriteBody rwb = 4;</code>
+       * <code>optional .WriteBody rwb = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.WriteBody, pipe.common.Common.WriteBody.Builder, pipe.common.Common.WriteBodyOrBuilder> 
           getRwbFieldBuilder() {
         if (rwbBuilder_ == null) {
-          if (!(payloadCase_ == 4)) {
+          if (!(payloadCase_ == 2)) {
             payload_ = pipe.common.Common.WriteBody.getDefaultInstance();
           }
           rwbBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -2922,7 +2992,7 @@ public final class Common {
                   isClean());
           payload_ = null;
         }
-        payloadCase_ = 4;
+        payloadCase_ = 2;
         onChanged();;
         return rwbBuilder_;
       }
@@ -2930,29 +3000,29 @@ public final class Common {
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.ReadBody, pipe.common.Common.ReadBody.Builder, pipe.common.Common.ReadBodyOrBuilder> rrbBuilder_;
       /**
-       * <code>optional .ReadBody rrb = 5;</code>
+       * <code>optional .ReadBody rrb = 3;</code>
        */
       public boolean hasRrb() {
-        return payloadCase_ == 5;
+        return payloadCase_ == 3;
       }
       /**
-       * <code>optional .ReadBody rrb = 5;</code>
+       * <code>optional .ReadBody rrb = 3;</code>
        */
       public pipe.common.Common.ReadBody getRrb() {
         if (rrbBuilder_ == null) {
-          if (payloadCase_ == 5) {
+          if (payloadCase_ == 3) {
             return (pipe.common.Common.ReadBody) payload_;
           }
           return pipe.common.Common.ReadBody.getDefaultInstance();
         } else {
-          if (payloadCase_ == 5) {
+          if (payloadCase_ == 3) {
             return rrbBuilder_.getMessage();
           }
           return pipe.common.Common.ReadBody.getDefaultInstance();
         }
       }
       /**
-       * <code>optional .ReadBody rrb = 5;</code>
+       * <code>optional .ReadBody rrb = 3;</code>
        */
       public Builder setRrb(pipe.common.Common.ReadBody value) {
         if (rrbBuilder_ == null) {
@@ -2964,11 +3034,11 @@ public final class Common {
         } else {
           rrbBuilder_.setMessage(value);
         }
-        payloadCase_ = 5;
+        payloadCase_ = 3;
         return this;
       }
       /**
-       * <code>optional .ReadBody rrb = 5;</code>
+       * <code>optional .ReadBody rrb = 3;</code>
        */
       public Builder setRrb(
           pipe.common.Common.ReadBody.Builder builderForValue) {
@@ -2978,15 +3048,15 @@ public final class Common {
         } else {
           rrbBuilder_.setMessage(builderForValue.build());
         }
-        payloadCase_ = 5;
+        payloadCase_ = 3;
         return this;
       }
       /**
-       * <code>optional .ReadBody rrb = 5;</code>
+       * <code>optional .ReadBody rrb = 3;</code>
        */
       public Builder mergeRrb(pipe.common.Common.ReadBody value) {
         if (rrbBuilder_ == null) {
-          if (payloadCase_ == 5 &&
+          if (payloadCase_ == 3 &&
               payload_ != pipe.common.Common.ReadBody.getDefaultInstance()) {
             payload_ = pipe.common.Common.ReadBody.newBuilder((pipe.common.Common.ReadBody) payload_)
                 .mergeFrom(value).buildPartial();
@@ -2995,26 +3065,26 @@ public final class Common {
           }
           onChanged();
         } else {
-          if (payloadCase_ == 5) {
+          if (payloadCase_ == 3) {
             rrbBuilder_.mergeFrom(value);
           }
           rrbBuilder_.setMessage(value);
         }
-        payloadCase_ = 5;
+        payloadCase_ = 3;
         return this;
       }
       /**
-       * <code>optional .ReadBody rrb = 5;</code>
+       * <code>optional .ReadBody rrb = 3;</code>
        */
       public Builder clearRrb() {
         if (rrbBuilder_ == null) {
-          if (payloadCase_ == 5) {
+          if (payloadCase_ == 3) {
             payloadCase_ = 0;
             payload_ = null;
             onChanged();
           }
         } else {
-          if (payloadCase_ == 5) {
+          if (payloadCase_ == 3) {
             payloadCase_ = 0;
             payload_ = null;
           }
@@ -3023,32 +3093,32 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional .ReadBody rrb = 5;</code>
+       * <code>optional .ReadBody rrb = 3;</code>
        */
       public pipe.common.Common.ReadBody.Builder getRrbBuilder() {
         return getRrbFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .ReadBody rrb = 5;</code>
+       * <code>optional .ReadBody rrb = 3;</code>
        */
       public pipe.common.Common.ReadBodyOrBuilder getRrbOrBuilder() {
-        if ((payloadCase_ == 5) && (rrbBuilder_ != null)) {
+        if ((payloadCase_ == 3) && (rrbBuilder_ != null)) {
           return rrbBuilder_.getMessageOrBuilder();
         } else {
-          if (payloadCase_ == 5) {
+          if (payloadCase_ == 3) {
             return (pipe.common.Common.ReadBody) payload_;
           }
           return pipe.common.Common.ReadBody.getDefaultInstance();
         }
       }
       /**
-       * <code>optional .ReadBody rrb = 5;</code>
+       * <code>optional .ReadBody rrb = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.ReadBody, pipe.common.Common.ReadBody.Builder, pipe.common.Common.ReadBodyOrBuilder> 
           getRrbFieldBuilder() {
         if (rrbBuilder_ == null) {
-          if (!(payloadCase_ == 5)) {
+          if (!(payloadCase_ == 3)) {
             payload_ = pipe.common.Common.ReadBody.getDefaultInstance();
           }
           rrbBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
@@ -3058,7 +3128,7 @@ public final class Common {
                   isClean());
           payload_ = null;
         }
-        payloadCase_ = 5;
+        payloadCase_ = 3;
         onChanged();;
         return rrbBuilder_;
       }
@@ -3116,57 +3186,57 @@ public final class Common {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional string file_id = 1;</code>
+     * <code>optional string file_id = 4;</code>
      */
     boolean hasFileId();
     /**
-     * <code>optional string file_id = 1;</code>
+     * <code>optional string file_id = 4;</code>
      */
     java.lang.String getFileId();
     /**
-     * <code>optional string file_id = 1;</code>
+     * <code>optional string file_id = 4;</code>
      */
     com.google.protobuf.ByteString
         getFileIdBytes();
 
     /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     boolean hasFilename();
     /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     java.lang.String getFilename();
     /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     com.google.protobuf.ByteString
         getFilenameBytes();
 
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     boolean hasFileExt();
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     java.lang.String getFileExt();
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     com.google.protobuf.ByteString
         getFileExtBytes();
 
     /**
-     * <code>optional .Chunk chunk = 4;</code>
+     * <code>optional .Chunk chunk = 3;</code>
      */
     boolean hasChunk();
     /**
-     * <code>optional .Chunk chunk = 4;</code>
+     * <code>optional .Chunk chunk = 3;</code>
      */
     pipe.common.Common.Chunk getChunk();
     /**
-     * <code>optional .Chunk chunk = 4;</code>
+     * <code>optional .Chunk chunk = 3;</code>
      */
     pipe.common.Common.ChunkOrBuilder getChunkOrBuilder();
 
@@ -3180,11 +3250,11 @@ public final class Common {
     int getNumOfChunks();
 
     /**
-     * <code>optional int64 file_size = 6;</code>
+     * <code>optional int64 file_size = 26;</code>
      */
     boolean hasFileSize();
     /**
-     * <code>optional int64 file_size = 6;</code>
+     * <code>optional int64 file_size = 26;</code>
      */
     long getFileSize();
   }
@@ -3237,23 +3307,17 @@ public final class Common {
             }
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000001;
-              fileId_ = bs;
-              break;
-            }
-            case 18: {
-              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
               filename_ = bs;
               break;
             }
-            case 26: {
+            case 18: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000004;
               fileExt_ = bs;
               break;
             }
-            case 34: {
+            case 26: {
               pipe.common.Common.Chunk.Builder subBuilder = null;
               if (((bitField0_ & 0x00000008) == 0x00000008)) {
                 subBuilder = chunk_.toBuilder();
@@ -3266,12 +3330,18 @@ public final class Common {
               bitField0_ |= 0x00000008;
               break;
             }
+            case 34: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000001;
+              fileId_ = bs;
+              break;
+            }
             case 40: {
               bitField0_ |= 0x00000010;
               numOfChunks_ = input.readInt32();
               break;
             }
-            case 48: {
+            case 208: {
               bitField0_ |= 0x00000020;
               fileSize_ = input.readInt64();
               break;
@@ -3301,16 +3371,16 @@ public final class Common {
     }
 
     private int bitField0_;
-    public static final int FILE_ID_FIELD_NUMBER = 1;
+    public static final int FILE_ID_FIELD_NUMBER = 4;
     private volatile java.lang.Object fileId_;
     /**
-     * <code>optional string file_id = 1;</code>
+     * <code>optional string file_id = 4;</code>
      */
     public boolean hasFileId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional string file_id = 1;</code>
+     * <code>optional string file_id = 4;</code>
      */
     public java.lang.String getFileId() {
       java.lang.Object ref = fileId_;
@@ -3327,7 +3397,7 @@ public final class Common {
       }
     }
     /**
-     * <code>optional string file_id = 1;</code>
+     * <code>optional string file_id = 4;</code>
      */
     public com.google.protobuf.ByteString
         getFileIdBytes() {
@@ -3343,16 +3413,16 @@ public final class Common {
       }
     }
 
-    public static final int FILENAME_FIELD_NUMBER = 2;
+    public static final int FILENAME_FIELD_NUMBER = 1;
     private volatile java.lang.Object filename_;
     /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     public boolean hasFilename() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     public java.lang.String getFilename() {
       java.lang.Object ref = filename_;
@@ -3369,7 +3439,7 @@ public final class Common {
       }
     }
     /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     public com.google.protobuf.ByteString
         getFilenameBytes() {
@@ -3385,16 +3455,16 @@ public final class Common {
       }
     }
 
-    public static final int FILE_EXT_FIELD_NUMBER = 3;
+    public static final int FILE_EXT_FIELD_NUMBER = 2;
     private volatile java.lang.Object fileExt_;
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     public boolean hasFileExt() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     public java.lang.String getFileExt() {
       java.lang.Object ref = fileExt_;
@@ -3411,7 +3481,7 @@ public final class Common {
       }
     }
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     public com.google.protobuf.ByteString
         getFileExtBytes() {
@@ -3427,22 +3497,22 @@ public final class Common {
       }
     }
 
-    public static final int CHUNK_FIELD_NUMBER = 4;
+    public static final int CHUNK_FIELD_NUMBER = 3;
     private pipe.common.Common.Chunk chunk_;
     /**
-     * <code>optional .Chunk chunk = 4;</code>
+     * <code>optional .Chunk chunk = 3;</code>
      */
     public boolean hasChunk() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional .Chunk chunk = 4;</code>
+     * <code>optional .Chunk chunk = 3;</code>
      */
     public pipe.common.Common.Chunk getChunk() {
       return chunk_ == null ? pipe.common.Common.Chunk.getDefaultInstance() : chunk_;
     }
     /**
-     * <code>optional .Chunk chunk = 4;</code>
+     * <code>optional .Chunk chunk = 3;</code>
      */
     public pipe.common.Common.ChunkOrBuilder getChunkOrBuilder() {
       return chunk_ == null ? pipe.common.Common.Chunk.getDefaultInstance() : chunk_;
@@ -3463,16 +3533,16 @@ public final class Common {
       return numOfChunks_;
     }
 
-    public static final int FILE_SIZE_FIELD_NUMBER = 6;
+    public static final int FILE_SIZE_FIELD_NUMBER = 26;
     private long fileSize_;
     /**
-     * <code>optional int64 file_size = 6;</code>
+     * <code>optional int64 file_size = 26;</code>
      */
     public boolean hasFileSize() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional int64 file_size = 6;</code>
+     * <code>optional int64 file_size = 26;</code>
      */
     public long getFileSize() {
       return fileSize_;
@@ -3500,23 +3570,23 @@ public final class Common {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, fileId_);
-      }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, filename_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, filename_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, fileExt_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, fileExt_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeMessage(4, getChunk());
+        output.writeMessage(3, getChunk());
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, fileId_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         output.writeInt32(5, numOfChunks_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeInt64(6, fileSize_);
+        output.writeInt64(26, fileSize_);
       }
       unknownFields.writeTo(output);
     }
@@ -3526,18 +3596,18 @@ public final class Common {
       if (size != -1) return size;
 
       size = 0;
-      if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, fileId_);
-      }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, filename_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, filename_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, fileExt_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, fileExt_);
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getChunk());
+          .computeMessageSize(3, getChunk());
+      }
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, fileId_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
@@ -3545,7 +3615,7 @@ public final class Common {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(6, fileSize_);
+          .computeInt64Size(26, fileSize_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3921,13 +3991,13 @@ public final class Common {
 
       private java.lang.Object fileId_ = "";
       /**
-       * <code>optional string file_id = 1;</code>
+       * <code>optional string file_id = 4;</code>
        */
       public boolean hasFileId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional string file_id = 1;</code>
+       * <code>optional string file_id = 4;</code>
        */
       public java.lang.String getFileId() {
         java.lang.Object ref = fileId_;
@@ -3944,7 +4014,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional string file_id = 1;</code>
+       * <code>optional string file_id = 4;</code>
        */
       public com.google.protobuf.ByteString
           getFileIdBytes() {
@@ -3960,7 +4030,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional string file_id = 1;</code>
+       * <code>optional string file_id = 4;</code>
        */
       public Builder setFileId(
           java.lang.String value) {
@@ -3973,7 +4043,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional string file_id = 1;</code>
+       * <code>optional string file_id = 4;</code>
        */
       public Builder clearFileId() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -3982,7 +4052,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional string file_id = 1;</code>
+       * <code>optional string file_id = 4;</code>
        */
       public Builder setFileIdBytes(
           com.google.protobuf.ByteString value) {
@@ -3997,13 +4067,13 @@ public final class Common {
 
       private java.lang.Object filename_ = "";
       /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public boolean hasFilename() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public java.lang.String getFilename() {
         java.lang.Object ref = filename_;
@@ -4020,7 +4090,7 @@ public final class Common {
         }
       }
       /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public com.google.protobuf.ByteString
           getFilenameBytes() {
@@ -4036,7 +4106,7 @@ public final class Common {
         }
       }
       /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public Builder setFilename(
           java.lang.String value) {
@@ -4049,7 +4119,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public Builder clearFilename() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -4058,7 +4128,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public Builder setFilenameBytes(
           com.google.protobuf.ByteString value) {
@@ -4073,13 +4143,13 @@ public final class Common {
 
       private java.lang.Object fileExt_ = "";
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public boolean hasFileExt() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public java.lang.String getFileExt() {
         java.lang.Object ref = fileExt_;
@@ -4096,7 +4166,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public com.google.protobuf.ByteString
           getFileExtBytes() {
@@ -4112,7 +4182,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public Builder setFileExt(
           java.lang.String value) {
@@ -4125,7 +4195,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public Builder clearFileExt() {
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -4134,7 +4204,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public Builder setFileExtBytes(
           com.google.protobuf.ByteString value) {
@@ -4151,13 +4221,13 @@ public final class Common {
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.Chunk, pipe.common.Common.Chunk.Builder, pipe.common.Common.ChunkOrBuilder> chunkBuilder_;
       /**
-       * <code>optional .Chunk chunk = 4;</code>
+       * <code>optional .Chunk chunk = 3;</code>
        */
       public boolean hasChunk() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
       /**
-       * <code>optional .Chunk chunk = 4;</code>
+       * <code>optional .Chunk chunk = 3;</code>
        */
       public pipe.common.Common.Chunk getChunk() {
         if (chunkBuilder_ == null) {
@@ -4167,7 +4237,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional .Chunk chunk = 4;</code>
+       * <code>optional .Chunk chunk = 3;</code>
        */
       public Builder setChunk(pipe.common.Common.Chunk value) {
         if (chunkBuilder_ == null) {
@@ -4183,7 +4253,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional .Chunk chunk = 4;</code>
+       * <code>optional .Chunk chunk = 3;</code>
        */
       public Builder setChunk(
           pipe.common.Common.Chunk.Builder builderForValue) {
@@ -4197,7 +4267,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional .Chunk chunk = 4;</code>
+       * <code>optional .Chunk chunk = 3;</code>
        */
       public Builder mergeChunk(pipe.common.Common.Chunk value) {
         if (chunkBuilder_ == null) {
@@ -4217,7 +4287,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional .Chunk chunk = 4;</code>
+       * <code>optional .Chunk chunk = 3;</code>
        */
       public Builder clearChunk() {
         if (chunkBuilder_ == null) {
@@ -4230,7 +4300,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional .Chunk chunk = 4;</code>
+       * <code>optional .Chunk chunk = 3;</code>
        */
       public pipe.common.Common.Chunk.Builder getChunkBuilder() {
         bitField0_ |= 0x00000008;
@@ -4238,7 +4308,7 @@ public final class Common {
         return getChunkFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Chunk chunk = 4;</code>
+       * <code>optional .Chunk chunk = 3;</code>
        */
       public pipe.common.Common.ChunkOrBuilder getChunkOrBuilder() {
         if (chunkBuilder_ != null) {
@@ -4249,7 +4319,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional .Chunk chunk = 4;</code>
+       * <code>optional .Chunk chunk = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.Chunk, pipe.common.Common.Chunk.Builder, pipe.common.Common.ChunkOrBuilder> 
@@ -4299,19 +4369,19 @@ public final class Common {
 
       private long fileSize_ ;
       /**
-       * <code>optional int64 file_size = 6;</code>
+       * <code>optional int64 file_size = 26;</code>
        */
       public boolean hasFileSize() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional int64 file_size = 6;</code>
+       * <code>optional int64 file_size = 26;</code>
        */
       public long getFileSize() {
         return fileSize_;
       }
       /**
-       * <code>optional int64 file_size = 6;</code>
+       * <code>optional int64 file_size = 26;</code>
        */
       public Builder setFileSize(long value) {
         bitField0_ |= 0x00000020;
@@ -4320,7 +4390,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional int64 file_size = 6;</code>
+       * <code>optional int64 file_size = 26;</code>
        */
       public Builder clearFileSize() {
         bitField0_ = (bitField0_ & ~0x00000020);
@@ -5096,20 +5166,20 @@ public final class Common {
     int getChunkId();
 
     /**
-     * <code>required bytes chunk_data = 6;</code>
+     * <code>required bytes chunk_data = 2;</code>
      */
     boolean hasChunkData();
     /**
-     * <code>required bytes chunk_data = 6;</code>
+     * <code>required bytes chunk_data = 2;</code>
      */
     com.google.protobuf.ByteString getChunkData();
 
     /**
-     * <code>optional int32 chunk_size = 9;</code>
+     * <code>optional int32 chunk_size = 3;</code>
      */
     boolean hasChunkSize();
     /**
-     * <code>optional int32 chunk_size = 9;</code>
+     * <code>optional int32 chunk_size = 3;</code>
      */
     int getChunkSize();
   }
@@ -5163,12 +5233,12 @@ public final class Common {
               chunkId_ = input.readInt32();
               break;
             }
-            case 50: {
+            case 18: {
               bitField0_ |= 0x00000002;
               chunkData_ = input.readBytes();
               break;
             }
-            case 72: {
+            case 24: {
               bitField0_ |= 0x00000004;
               chunkSize_ = input.readInt32();
               break;
@@ -5213,31 +5283,31 @@ public final class Common {
       return chunkId_;
     }
 
-    public static final int CHUNK_DATA_FIELD_NUMBER = 6;
+    public static final int CHUNK_DATA_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString chunkData_;
     /**
-     * <code>required bytes chunk_data = 6;</code>
+     * <code>required bytes chunk_data = 2;</code>
      */
     public boolean hasChunkData() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required bytes chunk_data = 6;</code>
+     * <code>required bytes chunk_data = 2;</code>
      */
     public com.google.protobuf.ByteString getChunkData() {
       return chunkData_;
     }
 
-    public static final int CHUNK_SIZE_FIELD_NUMBER = 9;
+    public static final int CHUNK_SIZE_FIELD_NUMBER = 3;
     private int chunkSize_;
     /**
-     * <code>optional int32 chunk_size = 9;</code>
+     * <code>optional int32 chunk_size = 3;</code>
      */
     public boolean hasChunkSize() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional int32 chunk_size = 9;</code>
+     * <code>optional int32 chunk_size = 3;</code>
      */
     public int getChunkSize() {
       return chunkSize_;
@@ -5267,10 +5337,10 @@ public final class Common {
         output.writeInt32(1, chunkId_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeBytes(6, chunkData_);
+        output.writeBytes(2, chunkData_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeInt32(9, chunkSize_);
+        output.writeInt32(3, chunkSize_);
       }
       unknownFields.writeTo(output);
     }
@@ -5286,11 +5356,11 @@ public final class Common {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(6, chunkData_);
+          .computeBytesSize(2, chunkData_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(9, chunkSize_);
+          .computeInt32Size(3, chunkSize_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5626,19 +5696,19 @@ public final class Common {
 
       private com.google.protobuf.ByteString chunkData_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>required bytes chunk_data = 6;</code>
+       * <code>required bytes chunk_data = 2;</code>
        */
       public boolean hasChunkData() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required bytes chunk_data = 6;</code>
+       * <code>required bytes chunk_data = 2;</code>
        */
       public com.google.protobuf.ByteString getChunkData() {
         return chunkData_;
       }
       /**
-       * <code>required bytes chunk_data = 6;</code>
+       * <code>required bytes chunk_data = 2;</code>
        */
       public Builder setChunkData(com.google.protobuf.ByteString value) {
         if (value == null) {
@@ -5650,7 +5720,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>required bytes chunk_data = 6;</code>
+       * <code>required bytes chunk_data = 2;</code>
        */
       public Builder clearChunkData() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -5661,19 +5731,19 @@ public final class Common {
 
       private int chunkSize_ ;
       /**
-       * <code>optional int32 chunk_size = 9;</code>
+       * <code>optional int32 chunk_size = 3;</code>
        */
       public boolean hasChunkSize() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional int32 chunk_size = 9;</code>
+       * <code>optional int32 chunk_size = 3;</code>
        */
       public int getChunkSize() {
         return chunkSize_;
       }
       /**
-       * <code>optional int32 chunk_size = 9;</code>
+       * <code>optional int32 chunk_size = 3;</code>
        */
       public Builder setChunkSize(int value) {
         bitField0_ |= 0x00000004;
@@ -5682,7 +5752,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional int32 chunk_size = 9;</code>
+       * <code>optional int32 chunk_size = 3;</code>
        */
       public Builder clearChunkSize() {
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -5802,13 +5872,21 @@ public final class Common {
     int getChunkSize();
 
     /**
-     * <code>optional int64 file_size = 5;</code>
+     * <pre>
+     *optional string clientAddress=6;
+     * </pre>
+     *
+     * <code>optional int32 file_size = 5;</code>
      */
     boolean hasFileSize();
     /**
-     * <code>optional int64 file_size = 5;</code>
+     * <pre>
+     *optional string clientAddress=6;
+     * </pre>
+     *
+     * <code>optional int32 file_size = 5;</code>
      */
-    long getFileSize();
+    int getFileSize();
   }
   /**
    * Protobuf type {@code ReadBody}
@@ -5826,7 +5904,7 @@ public final class Common {
       fileId_ = "";
       chunkId_ = 0;
       chunkSize_ = 0;
-      fileSize_ = 0L;
+      fileSize_ = 0;
     }
 
     @java.lang.Override
@@ -5881,7 +5959,7 @@ public final class Common {
             }
             case 40: {
               bitField0_ |= 0x00000010;
-              fileSize_ = input.readInt64();
+              fileSize_ = input.readInt32();
               break;
             }
           }
@@ -6036,17 +6114,25 @@ public final class Common {
     }
 
     public static final int FILE_SIZE_FIELD_NUMBER = 5;
-    private long fileSize_;
+    private int fileSize_;
     /**
-     * <code>optional int64 file_size = 5;</code>
+     * <pre>
+     *optional string clientAddress=6;
+     * </pre>
+     *
+     * <code>optional int32 file_size = 5;</code>
      */
     public boolean hasFileSize() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
-     * <code>optional int64 file_size = 5;</code>
+     * <pre>
+     *optional string clientAddress=6;
+     * </pre>
+     *
+     * <code>optional int32 file_size = 5;</code>
      */
-    public long getFileSize() {
+    public int getFileSize() {
       return fileSize_;
     }
 
@@ -6075,7 +6161,7 @@ public final class Common {
         output.writeInt32(4, chunkSize_);
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeInt64(5, fileSize_);
+        output.writeInt32(5, fileSize_);
       }
       unknownFields.writeTo(output);
     }
@@ -6101,7 +6187,7 @@ public final class Common {
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(5, fileSize_);
+          .computeInt32Size(5, fileSize_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6174,8 +6260,7 @@ public final class Common {
       }
       if (hasFileSize()) {
         hash = (37 * hash) + FILE_SIZE_FIELD_NUMBER;
-        hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-            getFileSize());
+        hash = (53 * hash) + getFileSize();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -6303,7 +6388,7 @@ public final class Common {
         bitField0_ = (bitField0_ & ~0x00000004);
         chunkSize_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
-        fileSize_ = 0L;
+        fileSize_ = 0;
         bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
@@ -6678,34 +6763,50 @@ public final class Common {
         return this;
       }
 
-      private long fileSize_ ;
+      private int fileSize_ ;
       /**
-       * <code>optional int64 file_size = 5;</code>
+       * <pre>
+       *optional string clientAddress=6;
+       * </pre>
+       *
+       * <code>optional int32 file_size = 5;</code>
        */
       public boolean hasFileSize() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional int64 file_size = 5;</code>
+       * <pre>
+       *optional string clientAddress=6;
+       * </pre>
+       *
+       * <code>optional int32 file_size = 5;</code>
        */
-      public long getFileSize() {
+      public int getFileSize() {
         return fileSize_;
       }
       /**
-       * <code>optional int64 file_size = 5;</code>
+       * <pre>
+       *optional string clientAddress=6;
+       * </pre>
+       *
+       * <code>optional int32 file_size = 5;</code>
        */
-      public Builder setFileSize(long value) {
+      public Builder setFileSize(int value) {
         bitField0_ |= 0x00000010;
         fileSize_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int64 file_size = 5;</code>
+       * <pre>
+       *optional string clientAddress=6;
+       * </pre>
+       *
+       * <code>optional int32 file_size = 5;</code>
        */
       public Builder clearFileSize() {
         bitField0_ = (bitField0_ & ~0x00000010);
-        fileSize_ = 0L;
+        fileSize_ = 0;
         onChanged();
         return this;
       }
@@ -6763,92 +6864,92 @@ public final class Common {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional string file_id = 1;</code>
-     */
-    boolean hasFileId();
-    /**
-     * <code>optional string file_id = 1;</code>
-     */
-    java.lang.String getFileId();
-    /**
-     * <code>optional string file_id = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getFileIdBytes();
-
-    /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     boolean hasFilename();
     /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     java.lang.String getFilename();
     /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     com.google.protobuf.ByteString
         getFilenameBytes();
 
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     boolean hasFileExt();
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     java.lang.String getFileExt();
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     com.google.protobuf.ByteString
         getFileExtBytes();
 
     /**
-     * <code>optional int32 num_of_chunks = 4;</code>
+     * <code>optional int32 num_of_chunks = 3;</code>
      */
     boolean hasNumOfChunks();
     /**
-     * <code>optional int32 num_of_chunks = 4;</code>
+     * <code>optional int32 num_of_chunks = 3;</code>
      */
     int getNumOfChunks();
 
     /**
-     * <code>repeated .ChunkLocation chunk_location = 5;</code>
+     * <code>repeated .ChunkLocation chunk_location = 4;</code>
      */
     java.util.List<pipe.common.Common.ChunkLocation> 
         getChunkLocationList();
     /**
-     * <code>repeated .ChunkLocation chunk_location = 5;</code>
+     * <code>repeated .ChunkLocation chunk_location = 4;</code>
      */
     pipe.common.Common.ChunkLocation getChunkLocation(int index);
     /**
-     * <code>repeated .ChunkLocation chunk_location = 5;</code>
+     * <code>repeated .ChunkLocation chunk_location = 4;</code>
      */
     int getChunkLocationCount();
     /**
-     * <code>repeated .ChunkLocation chunk_location = 5;</code>
+     * <code>repeated .ChunkLocation chunk_location = 4;</code>
      */
     java.util.List<? extends pipe.common.Common.ChunkLocationOrBuilder> 
         getChunkLocationOrBuilderList();
     /**
-     * <code>repeated .ChunkLocation chunk_location = 5;</code>
+     * <code>repeated .ChunkLocation chunk_location = 4;</code>
      */
     pipe.common.Common.ChunkLocationOrBuilder getChunkLocationOrBuilder(
         int index);
 
     /**
-     * <code>optional .Chunk chunk = 6;</code>
+     * <code>optional .Chunk chunk = 5;</code>
      */
     boolean hasChunk();
     /**
-     * <code>optional .Chunk chunk = 6;</code>
+     * <code>optional .Chunk chunk = 5;</code>
      */
     pipe.common.Common.Chunk getChunk();
     /**
-     * <code>optional .Chunk chunk = 6;</code>
+     * <code>optional .Chunk chunk = 5;</code>
      */
     pipe.common.Common.ChunkOrBuilder getChunkOrBuilder();
+
+    /**
+     * <code>optional string file_id = 6;</code>
+     */
+    boolean hasFileId();
+    /**
+     * <code>optional string file_id = 6;</code>
+     */
+    java.lang.String getFileId();
+    /**
+     * <code>optional string file_id = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getFileIdBytes();
   }
   /**
    * Protobuf type {@code ReadResponse}
@@ -6862,11 +6963,11 @@ public final class Common {
       super(builder);
     }
     private ReadResponse() {
-      fileId_ = "";
       filename_ = "";
       fileExt_ = "";
       numOfChunks_ = 0;
       chunkLocation_ = java.util.Collections.emptyList();
+      fileId_ = "";
     }
 
     @java.lang.Override
@@ -6900,38 +7001,32 @@ public final class Common {
             case 10: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
-              fileId_ = bs;
+              filename_ = bs;
               break;
             }
             case 18: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
-              filename_ = bs;
-              break;
-            }
-            case 26: {
-              com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000004;
               fileExt_ = bs;
               break;
             }
-            case 32: {
-              bitField0_ |= 0x00000008;
+            case 24: {
+              bitField0_ |= 0x00000004;
               numOfChunks_ = input.readInt32();
               break;
             }
-            case 42: {
-              if (!((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+            case 34: {
+              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
                 chunkLocation_ = new java.util.ArrayList<pipe.common.Common.ChunkLocation>();
-                mutable_bitField0_ |= 0x00000010;
+                mutable_bitField0_ |= 0x00000008;
               }
               chunkLocation_.add(
                   input.readMessage(pipe.common.Common.ChunkLocation.PARSER, extensionRegistry));
               break;
             }
-            case 50: {
+            case 42: {
               pipe.common.Common.Chunk.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000010) == 0x00000010)) {
+              if (((bitField0_ & 0x00000008) == 0x00000008)) {
                 subBuilder = chunk_.toBuilder();
               }
               chunk_ = input.readMessage(pipe.common.Common.Chunk.PARSER, extensionRegistry);
@@ -6939,7 +7034,13 @@ public final class Common {
                 subBuilder.mergeFrom(chunk_);
                 chunk_ = subBuilder.buildPartial();
               }
+              bitField0_ |= 0x00000008;
+              break;
+            }
+            case 50: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000010;
+              fileId_ = bs;
               break;
             }
           }
@@ -6950,7 +7051,7 @@ public final class Common {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000010) == 0x00000010)) {
+        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
           chunkLocation_ = java.util.Collections.unmodifiableList(chunkLocation_);
         }
         this.unknownFields = unknownFields.build();
@@ -6970,58 +7071,16 @@ public final class Common {
     }
 
     private int bitField0_;
-    public static final int FILE_ID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object fileId_;
+    public static final int FILENAME_FIELD_NUMBER = 1;
+    private volatile java.lang.Object filename_;
     /**
-     * <code>optional string file_id = 1;</code>
+     * <code>required string filename = 1;</code>
      */
-    public boolean hasFileId() {
+    public boolean hasFilename() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>optional string file_id = 1;</code>
-     */
-    public java.lang.String getFileId() {
-      java.lang.Object ref = fileId_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        if (bs.isValidUtf8()) {
-          fileId_ = s;
-        }
-        return s;
-      }
-    }
-    /**
-     * <code>optional string file_id = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getFileIdBytes() {
-      java.lang.Object ref = fileId_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        fileId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int FILENAME_FIELD_NUMBER = 2;
-    private volatile java.lang.Object filename_;
-    /**
-     * <code>required string filename = 2;</code>
-     */
-    public boolean hasFilename() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
-    }
-    /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     public java.lang.String getFilename() {
       java.lang.Object ref = filename_;
@@ -7038,7 +7097,7 @@ public final class Common {
       }
     }
     /**
-     * <code>required string filename = 2;</code>
+     * <code>required string filename = 1;</code>
      */
     public com.google.protobuf.ByteString
         getFilenameBytes() {
@@ -7054,16 +7113,16 @@ public final class Common {
       }
     }
 
-    public static final int FILE_EXT_FIELD_NUMBER = 3;
+    public static final int FILE_EXT_FIELD_NUMBER = 2;
     private volatile java.lang.Object fileExt_;
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     public boolean hasFileExt() {
-      return ((bitField0_ & 0x00000004) == 0x00000004);
+      return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     public java.lang.String getFileExt() {
       java.lang.Object ref = fileExt_;
@@ -7080,7 +7139,7 @@ public final class Common {
       }
     }
     /**
-     * <code>optional string file_ext = 3;</code>
+     * <code>optional string file_ext = 2;</code>
      */
     public com.google.protobuf.ByteString
         getFileExtBytes() {
@@ -7096,75 +7155,117 @@ public final class Common {
       }
     }
 
-    public static final int NUM_OF_CHUNKS_FIELD_NUMBER = 4;
+    public static final int NUM_OF_CHUNKS_FIELD_NUMBER = 3;
     private int numOfChunks_;
     /**
-     * <code>optional int32 num_of_chunks = 4;</code>
+     * <code>optional int32 num_of_chunks = 3;</code>
      */
     public boolean hasNumOfChunks() {
-      return ((bitField0_ & 0x00000008) == 0x00000008);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>optional int32 num_of_chunks = 4;</code>
+     * <code>optional int32 num_of_chunks = 3;</code>
      */
     public int getNumOfChunks() {
       return numOfChunks_;
     }
 
-    public static final int CHUNK_LOCATION_FIELD_NUMBER = 5;
+    public static final int CHUNK_LOCATION_FIELD_NUMBER = 4;
     private java.util.List<pipe.common.Common.ChunkLocation> chunkLocation_;
     /**
-     * <code>repeated .ChunkLocation chunk_location = 5;</code>
+     * <code>repeated .ChunkLocation chunk_location = 4;</code>
      */
     public java.util.List<pipe.common.Common.ChunkLocation> getChunkLocationList() {
       return chunkLocation_;
     }
     /**
-     * <code>repeated .ChunkLocation chunk_location = 5;</code>
+     * <code>repeated .ChunkLocation chunk_location = 4;</code>
      */
     public java.util.List<? extends pipe.common.Common.ChunkLocationOrBuilder> 
         getChunkLocationOrBuilderList() {
       return chunkLocation_;
     }
     /**
-     * <code>repeated .ChunkLocation chunk_location = 5;</code>
+     * <code>repeated .ChunkLocation chunk_location = 4;</code>
      */
     public int getChunkLocationCount() {
       return chunkLocation_.size();
     }
     /**
-     * <code>repeated .ChunkLocation chunk_location = 5;</code>
+     * <code>repeated .ChunkLocation chunk_location = 4;</code>
      */
     public pipe.common.Common.ChunkLocation getChunkLocation(int index) {
       return chunkLocation_.get(index);
     }
     /**
-     * <code>repeated .ChunkLocation chunk_location = 5;</code>
+     * <code>repeated .ChunkLocation chunk_location = 4;</code>
      */
     public pipe.common.Common.ChunkLocationOrBuilder getChunkLocationOrBuilder(
         int index) {
       return chunkLocation_.get(index);
     }
 
-    public static final int CHUNK_FIELD_NUMBER = 6;
+    public static final int CHUNK_FIELD_NUMBER = 5;
     private pipe.common.Common.Chunk chunk_;
     /**
-     * <code>optional .Chunk chunk = 6;</code>
+     * <code>optional .Chunk chunk = 5;</code>
      */
     public boolean hasChunk() {
-      return ((bitField0_ & 0x00000010) == 0x00000010);
+      return ((bitField0_ & 0x00000008) == 0x00000008);
     }
     /**
-     * <code>optional .Chunk chunk = 6;</code>
+     * <code>optional .Chunk chunk = 5;</code>
      */
     public pipe.common.Common.Chunk getChunk() {
       return chunk_ == null ? pipe.common.Common.Chunk.getDefaultInstance() : chunk_;
     }
     /**
-     * <code>optional .Chunk chunk = 6;</code>
+     * <code>optional .Chunk chunk = 5;</code>
      */
     public pipe.common.Common.ChunkOrBuilder getChunkOrBuilder() {
       return chunk_ == null ? pipe.common.Common.Chunk.getDefaultInstance() : chunk_;
+    }
+
+    public static final int FILE_ID_FIELD_NUMBER = 6;
+    private volatile java.lang.Object fileId_;
+    /**
+     * <code>optional string file_id = 6;</code>
+     */
+    public boolean hasFileId() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>optional string file_id = 6;</code>
+     */
+    public java.lang.String getFileId() {
+      java.lang.Object ref = fileId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          fileId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string file_id = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFileIdBytes() {
+      java.lang.Object ref = fileId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        fileId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -7196,22 +7297,22 @@ public final class Common {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, fileId_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, filename_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, filename_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, fileExt_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, fileExt_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
-        output.writeInt32(4, numOfChunks_);
+        output.writeInt32(3, numOfChunks_);
       }
       for (int i = 0; i < chunkLocation_.size(); i++) {
-        output.writeMessage(5, chunkLocation_.get(i));
+        output.writeMessage(4, chunkLocation_.get(i));
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeMessage(5, getChunk());
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        output.writeMessage(6, getChunk());
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, fileId_);
       }
       unknownFields.writeTo(output);
     }
@@ -7222,25 +7323,25 @@ public final class Common {
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, fileId_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, filename_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, filename_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, fileExt_);
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, fileExt_);
-      }
-      if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, numOfChunks_);
+          .computeInt32Size(3, numOfChunks_);
       }
       for (int i = 0; i < chunkLocation_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, chunkLocation_.get(i));
+          .computeMessageSize(4, chunkLocation_.get(i));
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getChunk());
       }
       if (((bitField0_ & 0x00000010) == 0x00000010)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, getChunk());
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, fileId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -7259,11 +7360,6 @@ public final class Common {
       pipe.common.Common.ReadResponse other = (pipe.common.Common.ReadResponse) obj;
 
       boolean result = true;
-      result = result && (hasFileId() == other.hasFileId());
-      if (hasFileId()) {
-        result = result && getFileId()
-            .equals(other.getFileId());
-      }
       result = result && (hasFilename() == other.hasFilename());
       if (hasFilename()) {
         result = result && getFilename()
@@ -7286,6 +7382,11 @@ public final class Common {
         result = result && getChunk()
             .equals(other.getChunk());
       }
+      result = result && (hasFileId() == other.hasFileId());
+      if (hasFileId()) {
+        result = result && getFileId()
+            .equals(other.getFileId());
+      }
       result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
@@ -7297,10 +7398,6 @@ public final class Common {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasFileId()) {
-        hash = (37 * hash) + FILE_ID_FIELD_NUMBER;
-        hash = (53 * hash) + getFileId().hashCode();
-      }
       if (hasFilename()) {
         hash = (37 * hash) + FILENAME_FIELD_NUMBER;
         hash = (53 * hash) + getFilename().hashCode();
@@ -7320,6 +7417,10 @@ public final class Common {
       if (hasChunk()) {
         hash = (37 * hash) + CHUNK_FIELD_NUMBER;
         hash = (53 * hash) + getChunk().hashCode();
+      }
+      if (hasFileId()) {
+        hash = (37 * hash) + FILE_ID_FIELD_NUMBER;
+        hash = (53 * hash) + getFileId().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -7441,17 +7542,15 @@ public final class Common {
       }
       public Builder clear() {
         super.clear();
-        fileId_ = "";
-        bitField0_ = (bitField0_ & ~0x00000001);
         filename_ = "";
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000001);
         fileExt_ = "";
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000002);
         numOfChunks_ = 0;
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000004);
         if (chunkLocationBuilder_ == null) {
           chunkLocation_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000008);
         } else {
           chunkLocationBuilder_.clear();
         }
@@ -7460,6 +7559,8 @@ public final class Common {
         } else {
           chunkBuilder_.clear();
         }
+        bitField0_ = (bitField0_ & ~0x00000010);
+        fileId_ = "";
         bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
@@ -7488,36 +7589,36 @@ public final class Common {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.fileId_ = fileId_;
+        result.filename_ = filename_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.filename_ = filename_;
+        result.fileExt_ = fileExt_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        result.fileExt_ = fileExt_;
-        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
-          to_bitField0_ |= 0x00000008;
-        }
         result.numOfChunks_ = numOfChunks_;
         if (chunkLocationBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          if (((bitField0_ & 0x00000008) == 0x00000008)) {
             chunkLocation_ = java.util.Collections.unmodifiableList(chunkLocation_);
-            bitField0_ = (bitField0_ & ~0x00000010);
+            bitField0_ = (bitField0_ & ~0x00000008);
           }
           result.chunkLocation_ = chunkLocation_;
         } else {
           result.chunkLocation_ = chunkLocationBuilder_.build();
         }
-        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
-          to_bitField0_ |= 0x00000010;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000008;
         }
         if (chunkBuilder_ == null) {
           result.chunk_ = chunk_;
         } else {
           result.chunk_ = chunkBuilder_.build();
         }
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.fileId_ = fileId_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -7560,18 +7661,13 @@ public final class Common {
 
       public Builder mergeFrom(pipe.common.Common.ReadResponse other) {
         if (other == pipe.common.Common.ReadResponse.getDefaultInstance()) return this;
-        if (other.hasFileId()) {
-          bitField0_ |= 0x00000001;
-          fileId_ = other.fileId_;
-          onChanged();
-        }
         if (other.hasFilename()) {
-          bitField0_ |= 0x00000002;
+          bitField0_ |= 0x00000001;
           filename_ = other.filename_;
           onChanged();
         }
         if (other.hasFileExt()) {
-          bitField0_ |= 0x00000004;
+          bitField0_ |= 0x00000002;
           fileExt_ = other.fileExt_;
           onChanged();
         }
@@ -7582,7 +7678,7 @@ public final class Common {
           if (!other.chunkLocation_.isEmpty()) {
             if (chunkLocation_.isEmpty()) {
               chunkLocation_ = other.chunkLocation_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000008);
             } else {
               ensureChunkLocationIsMutable();
               chunkLocation_.addAll(other.chunkLocation_);
@@ -7595,7 +7691,7 @@ public final class Common {
               chunkLocationBuilder_.dispose();
               chunkLocationBuilder_ = null;
               chunkLocation_ = other.chunkLocation_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000008);
               chunkLocationBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getChunkLocationFieldBuilder() : null;
@@ -7606,6 +7702,11 @@ public final class Common {
         }
         if (other.hasChunk()) {
           mergeChunk(other.getChunk());
+        }
+        if (other.hasFileId()) {
+          bitField0_ |= 0x00000020;
+          fileId_ = other.fileId_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -7648,91 +7749,15 @@ public final class Common {
       }
       private int bitField0_;
 
-      private java.lang.Object fileId_ = "";
+      private java.lang.Object filename_ = "";
       /**
-       * <code>optional string file_id = 1;</code>
+       * <code>required string filename = 1;</code>
        */
-      public boolean hasFileId() {
+      public boolean hasFilename() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>optional string file_id = 1;</code>
-       */
-      public java.lang.String getFileId() {
-        java.lang.Object ref = fileId_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            fileId_ = s;
-          }
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>optional string file_id = 1;</code>
-       */
-      public com.google.protobuf.ByteString
-          getFileIdBytes() {
-        java.lang.Object ref = fileId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          fileId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string file_id = 1;</code>
-       */
-      public Builder setFileId(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-        fileId_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string file_id = 1;</code>
-       */
-      public Builder clearFileId() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        fileId_ = getDefaultInstance().getFileId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string file_id = 1;</code>
-       */
-      public Builder setFileIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  bitField0_ |= 0x00000001;
-        fileId_ = value;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object filename_ = "";
-      /**
-       * <code>required string filename = 2;</code>
-       */
-      public boolean hasFilename() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
-      }
-      /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public java.lang.String getFilename() {
         java.lang.Object ref = filename_;
@@ -7749,7 +7774,7 @@ public final class Common {
         }
       }
       /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public com.google.protobuf.ByteString
           getFilenameBytes() {
@@ -7765,36 +7790,36 @@ public final class Common {
         }
       }
       /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public Builder setFilename(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
+  bitField0_ |= 0x00000001;
         filename_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public Builder clearFilename() {
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000001);
         filename_ = getDefaultInstance().getFilename();
         onChanged();
         return this;
       }
       /**
-       * <code>required string filename = 2;</code>
+       * <code>required string filename = 1;</code>
        */
       public Builder setFilenameBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000002;
+  bitField0_ |= 0x00000001;
         filename_ = value;
         onChanged();
         return this;
@@ -7802,13 +7827,13 @@ public final class Common {
 
       private java.lang.Object fileExt_ = "";
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public boolean hasFileExt() {
-        return ((bitField0_ & 0x00000004) == 0x00000004);
+        return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public java.lang.String getFileExt() {
         java.lang.Object ref = fileExt_;
@@ -7825,7 +7850,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public com.google.protobuf.ByteString
           getFileExtBytes() {
@@ -7841,36 +7866,36 @@ public final class Common {
         }
       }
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public Builder setFileExt(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000004;
+  bitField0_ |= 0x00000002;
         fileExt_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public Builder clearFileExt() {
-        bitField0_ = (bitField0_ & ~0x00000004);
+        bitField0_ = (bitField0_ & ~0x00000002);
         fileExt_ = getDefaultInstance().getFileExt();
         onChanged();
         return this;
       }
       /**
-       * <code>optional string file_ext = 3;</code>
+       * <code>optional string file_ext = 2;</code>
        */
       public Builder setFileExtBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000004;
+  bitField0_ |= 0x00000002;
         fileExt_ = value;
         onChanged();
         return this;
@@ -7878,31 +7903,31 @@ public final class Common {
 
       private int numOfChunks_ ;
       /**
-       * <code>optional int32 num_of_chunks = 4;</code>
+       * <code>optional int32 num_of_chunks = 3;</code>
        */
       public boolean hasNumOfChunks() {
-        return ((bitField0_ & 0x00000008) == 0x00000008);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>optional int32 num_of_chunks = 4;</code>
+       * <code>optional int32 num_of_chunks = 3;</code>
        */
       public int getNumOfChunks() {
         return numOfChunks_;
       }
       /**
-       * <code>optional int32 num_of_chunks = 4;</code>
+       * <code>optional int32 num_of_chunks = 3;</code>
        */
       public Builder setNumOfChunks(int value) {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
         numOfChunks_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 num_of_chunks = 4;</code>
+       * <code>optional int32 num_of_chunks = 3;</code>
        */
       public Builder clearNumOfChunks() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000004);
         numOfChunks_ = 0;
         onChanged();
         return this;
@@ -7911,9 +7936,9 @@ public final class Common {
       private java.util.List<pipe.common.Common.ChunkLocation> chunkLocation_ =
         java.util.Collections.emptyList();
       private void ensureChunkLocationIsMutable() {
-        if (!((bitField0_ & 0x00000010) == 0x00000010)) {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
           chunkLocation_ = new java.util.ArrayList<pipe.common.Common.ChunkLocation>(chunkLocation_);
-          bitField0_ |= 0x00000010;
+          bitField0_ |= 0x00000008;
          }
       }
 
@@ -7921,7 +7946,7 @@ public final class Common {
           pipe.common.Common.ChunkLocation, pipe.common.Common.ChunkLocation.Builder, pipe.common.Common.ChunkLocationOrBuilder> chunkLocationBuilder_;
 
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public java.util.List<pipe.common.Common.ChunkLocation> getChunkLocationList() {
         if (chunkLocationBuilder_ == null) {
@@ -7931,7 +7956,7 @@ public final class Common {
         }
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public int getChunkLocationCount() {
         if (chunkLocationBuilder_ == null) {
@@ -7941,7 +7966,7 @@ public final class Common {
         }
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public pipe.common.Common.ChunkLocation getChunkLocation(int index) {
         if (chunkLocationBuilder_ == null) {
@@ -7951,7 +7976,7 @@ public final class Common {
         }
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public Builder setChunkLocation(
           int index, pipe.common.Common.ChunkLocation value) {
@@ -7968,7 +7993,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public Builder setChunkLocation(
           int index, pipe.common.Common.ChunkLocation.Builder builderForValue) {
@@ -7982,7 +8007,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public Builder addChunkLocation(pipe.common.Common.ChunkLocation value) {
         if (chunkLocationBuilder_ == null) {
@@ -7998,7 +8023,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public Builder addChunkLocation(
           int index, pipe.common.Common.ChunkLocation value) {
@@ -8015,7 +8040,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public Builder addChunkLocation(
           pipe.common.Common.ChunkLocation.Builder builderForValue) {
@@ -8029,7 +8054,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public Builder addChunkLocation(
           int index, pipe.common.Common.ChunkLocation.Builder builderForValue) {
@@ -8043,7 +8068,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public Builder addAllChunkLocation(
           java.lang.Iterable<? extends pipe.common.Common.ChunkLocation> values) {
@@ -8058,12 +8083,12 @@ public final class Common {
         return this;
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public Builder clearChunkLocation() {
         if (chunkLocationBuilder_ == null) {
           chunkLocation_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000008);
           onChanged();
         } else {
           chunkLocationBuilder_.clear();
@@ -8071,7 +8096,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public Builder removeChunkLocation(int index) {
         if (chunkLocationBuilder_ == null) {
@@ -8084,14 +8109,14 @@ public final class Common {
         return this;
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public pipe.common.Common.ChunkLocation.Builder getChunkLocationBuilder(
           int index) {
         return getChunkLocationFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public pipe.common.Common.ChunkLocationOrBuilder getChunkLocationOrBuilder(
           int index) {
@@ -8101,7 +8126,7 @@ public final class Common {
         }
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public java.util.List<? extends pipe.common.Common.ChunkLocationOrBuilder> 
            getChunkLocationOrBuilderList() {
@@ -8112,14 +8137,14 @@ public final class Common {
         }
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public pipe.common.Common.ChunkLocation.Builder addChunkLocationBuilder() {
         return getChunkLocationFieldBuilder().addBuilder(
             pipe.common.Common.ChunkLocation.getDefaultInstance());
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public pipe.common.Common.ChunkLocation.Builder addChunkLocationBuilder(
           int index) {
@@ -8127,7 +8152,7 @@ public final class Common {
             index, pipe.common.Common.ChunkLocation.getDefaultInstance());
       }
       /**
-       * <code>repeated .ChunkLocation chunk_location = 5;</code>
+       * <code>repeated .ChunkLocation chunk_location = 4;</code>
        */
       public java.util.List<pipe.common.Common.ChunkLocation.Builder> 
            getChunkLocationBuilderList() {
@@ -8140,7 +8165,7 @@ public final class Common {
           chunkLocationBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               pipe.common.Common.ChunkLocation, pipe.common.Common.ChunkLocation.Builder, pipe.common.Common.ChunkLocationOrBuilder>(
                   chunkLocation_,
-                  ((bitField0_ & 0x00000010) == 0x00000010),
+                  ((bitField0_ & 0x00000008) == 0x00000008),
                   getParentForChildren(),
                   isClean());
           chunkLocation_ = null;
@@ -8152,13 +8177,13 @@ public final class Common {
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.Chunk, pipe.common.Common.Chunk.Builder, pipe.common.Common.ChunkOrBuilder> chunkBuilder_;
       /**
-       * <code>optional .Chunk chunk = 6;</code>
+       * <code>optional .Chunk chunk = 5;</code>
        */
       public boolean hasChunk() {
-        return ((bitField0_ & 0x00000020) == 0x00000020);
+        return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
-       * <code>optional .Chunk chunk = 6;</code>
+       * <code>optional .Chunk chunk = 5;</code>
        */
       public pipe.common.Common.Chunk getChunk() {
         if (chunkBuilder_ == null) {
@@ -8168,7 +8193,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional .Chunk chunk = 6;</code>
+       * <code>optional .Chunk chunk = 5;</code>
        */
       public Builder setChunk(pipe.common.Common.Chunk value) {
         if (chunkBuilder_ == null) {
@@ -8180,11 +8205,11 @@ public final class Common {
         } else {
           chunkBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000010;
         return this;
       }
       /**
-       * <code>optional .Chunk chunk = 6;</code>
+       * <code>optional .Chunk chunk = 5;</code>
        */
       public Builder setChunk(
           pipe.common.Common.Chunk.Builder builderForValue) {
@@ -8194,15 +8219,15 @@ public final class Common {
         } else {
           chunkBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000010;
         return this;
       }
       /**
-       * <code>optional .Chunk chunk = 6;</code>
+       * <code>optional .Chunk chunk = 5;</code>
        */
       public Builder mergeChunk(pipe.common.Common.Chunk value) {
         if (chunkBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) == 0x00000020) &&
+          if (((bitField0_ & 0x00000010) == 0x00000010) &&
               chunk_ != null &&
               chunk_ != pipe.common.Common.Chunk.getDefaultInstance()) {
             chunk_ =
@@ -8214,11 +8239,11 @@ public final class Common {
         } else {
           chunkBuilder_.mergeFrom(value);
         }
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000010;
         return this;
       }
       /**
-       * <code>optional .Chunk chunk = 6;</code>
+       * <code>optional .Chunk chunk = 5;</code>
        */
       public Builder clearChunk() {
         if (chunkBuilder_ == null) {
@@ -8227,19 +8252,19 @@ public final class Common {
         } else {
           chunkBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000010);
         return this;
       }
       /**
-       * <code>optional .Chunk chunk = 6;</code>
+       * <code>optional .Chunk chunk = 5;</code>
        */
       public pipe.common.Common.Chunk.Builder getChunkBuilder() {
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000010;
         onChanged();
         return getChunkFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .Chunk chunk = 6;</code>
+       * <code>optional .Chunk chunk = 5;</code>
        */
       public pipe.common.Common.ChunkOrBuilder getChunkOrBuilder() {
         if (chunkBuilder_ != null) {
@@ -8250,7 +8275,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional .Chunk chunk = 6;</code>
+       * <code>optional .Chunk chunk = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           pipe.common.Common.Chunk, pipe.common.Common.Chunk.Builder, pipe.common.Common.ChunkOrBuilder> 
@@ -8264,6 +8289,82 @@ public final class Common {
           chunk_ = null;
         }
         return chunkBuilder_;
+      }
+
+      private java.lang.Object fileId_ = "";
+      /**
+       * <code>optional string file_id = 6;</code>
+       */
+      public boolean hasFileId() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional string file_id = 6;</code>
+       */
+      public java.lang.String getFileId() {
+        java.lang.Object ref = fileId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            fileId_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string file_id = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getFileIdBytes() {
+        java.lang.Object ref = fileId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          fileId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string file_id = 6;</code>
+       */
+      public Builder setFileId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        fileId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string file_id = 6;</code>
+       */
+      public Builder clearFileId() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        fileId_ = getDefaultInstance().getFileId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string file_id = 6;</code>
+       */
+      public Builder setFileIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        fileId_ = value;
+        onChanged();
+        return this;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -9724,15 +9825,15 @@ public final class Common {
     pipe.common.Common.TaskType getResponseType();
 
     /**
-     * <code>optional string filename = 3;</code>
+     * <code>optional string filename = 2;</code>
      */
     boolean hasFilename();
     /**
-     * <code>optional string filename = 3;</code>
+     * <code>optional string filename = 2;</code>
      */
     java.lang.String getFilename();
     /**
-     * <code>optional string filename = 3;</code>
+     * <code>optional string filename = 2;</code>
      */
     com.google.protobuf.ByteString
         getFilenameBytes();
@@ -9742,7 +9843,7 @@ public final class Common {
      * Status should be part of Response
      * </pre>
      *
-     * <code>optional .Response.Status status = 10;</code>
+     * <code>optional .Response.Status status = 3;</code>
      */
     boolean hasStatus();
     /**
@@ -9750,7 +9851,7 @@ public final class Common {
      * Status should be part of Response
      * </pre>
      *
-     * <code>optional .Response.Status status = 10;</code>
+     * <code>optional .Response.Status status = 3;</code>
      */
     pipe.common.Common.Response.Status getStatus();
 
@@ -9838,10 +9939,21 @@ public final class Common {
               }
               break;
             }
-            case 26: {
+            case 18: {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
               filename_ = bs;
+              break;
+            }
+            case 24: {
+              int rawValue = input.readEnum();
+              pipe.common.Common.Response.Status value = pipe.common.Common.Response.Status.valueOf(rawValue);
+              if (value == null) {
+                unknownFields.mergeVarintField(3, rawValue);
+              } else {
+                bitField0_ |= 0x00000004;
+                status_ = rawValue;
+              }
               break;
             }
             case 34: {
@@ -9870,17 +9982,6 @@ public final class Common {
                 payload_ = subBuilder.buildPartial();
               }
               payloadCase_ = 5;
-              break;
-            }
-            case 80: {
-              int rawValue = input.readEnum();
-              pipe.common.Common.Response.Status value = pipe.common.Common.Response.Status.valueOf(rawValue);
-              if (value == null) {
-                unknownFields.mergeVarintField(10, rawValue);
-              } else {
-                bitField0_ |= 0x00000004;
-                status_ = rawValue;
-              }
               break;
             }
           }
@@ -10159,19 +10260,19 @@ public final class Common {
      */
     public pipe.common.Common.TaskType getResponseType() {
       pipe.common.Common.TaskType result = pipe.common.Common.TaskType.valueOf(responseType_);
-      return result == null ? pipe.common.Common.TaskType.PING : result;
+      return result == null ? pipe.common.Common.TaskType.REQUESTREADFILE : result;
     }
 
-    public static final int FILENAME_FIELD_NUMBER = 3;
+    public static final int FILENAME_FIELD_NUMBER = 2;
     private volatile java.lang.Object filename_;
     /**
-     * <code>optional string filename = 3;</code>
+     * <code>optional string filename = 2;</code>
      */
     public boolean hasFilename() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>optional string filename = 3;</code>
+     * <code>optional string filename = 2;</code>
      */
     public java.lang.String getFilename() {
       java.lang.Object ref = filename_;
@@ -10188,7 +10289,7 @@ public final class Common {
       }
     }
     /**
-     * <code>optional string filename = 3;</code>
+     * <code>optional string filename = 2;</code>
      */
     public com.google.protobuf.ByteString
         getFilenameBytes() {
@@ -10204,14 +10305,14 @@ public final class Common {
       }
     }
 
-    public static final int STATUS_FIELD_NUMBER = 10;
+    public static final int STATUS_FIELD_NUMBER = 3;
     private int status_;
     /**
      * <pre>
      * Status should be part of Response
      * </pre>
      *
-     * <code>optional .Response.Status status = 10;</code>
+     * <code>optional .Response.Status status = 3;</code>
      */
     public boolean hasStatus() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
@@ -10221,7 +10322,7 @@ public final class Common {
      * Status should be part of Response
      * </pre>
      *
-     * <code>optional .Response.Status status = 10;</code>
+     * <code>optional .Response.Status status = 3;</code>
      */
     public pipe.common.Common.Response.Status getStatus() {
       pipe.common.Common.Response.Status result = pipe.common.Common.Response.Status.valueOf(status_);
@@ -10306,16 +10407,16 @@ public final class Common {
         output.writeEnum(1, responseType_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, filename_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, filename_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeEnum(3, status_);
       }
       if (payloadCase_ == 4) {
         output.writeMessage(4, (pipe.common.Common.WriteResponse) payload_);
       }
       if (payloadCase_ == 5) {
         output.writeMessage(5, (pipe.common.Common.ReadResponse) payload_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeEnum(10, status_);
       }
       unknownFields.writeTo(output);
     }
@@ -10330,7 +10431,11 @@ public final class Common {
           .computeEnumSize(1, responseType_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, filename_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, filename_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(3, status_);
       }
       if (payloadCase_ == 4) {
         size += com.google.protobuf.CodedOutputStream
@@ -10339,10 +10444,6 @@ public final class Common {
       if (payloadCase_ == 5) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, (pipe.common.Common.ReadResponse) payload_);
-      }
-      if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(10, status_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -10730,7 +10831,7 @@ public final class Common {
        */
       public pipe.common.Common.TaskType getResponseType() {
         pipe.common.Common.TaskType result = pipe.common.Common.TaskType.valueOf(responseType_);
-        return result == null ? pipe.common.Common.TaskType.PING : result;
+        return result == null ? pipe.common.Common.TaskType.REQUESTREADFILE : result;
       }
       /**
        * <code>required .TaskType responseType = 1;</code>
@@ -10756,13 +10857,13 @@ public final class Common {
 
       private java.lang.Object filename_ = "";
       /**
-       * <code>optional string filename = 3;</code>
+       * <code>optional string filename = 2;</code>
        */
       public boolean hasFilename() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>optional string filename = 3;</code>
+       * <code>optional string filename = 2;</code>
        */
       public java.lang.String getFilename() {
         java.lang.Object ref = filename_;
@@ -10779,7 +10880,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional string filename = 3;</code>
+       * <code>optional string filename = 2;</code>
        */
       public com.google.protobuf.ByteString
           getFilenameBytes() {
@@ -10795,7 +10896,7 @@ public final class Common {
         }
       }
       /**
-       * <code>optional string filename = 3;</code>
+       * <code>optional string filename = 2;</code>
        */
       public Builder setFilename(
           java.lang.String value) {
@@ -10808,7 +10909,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional string filename = 3;</code>
+       * <code>optional string filename = 2;</code>
        */
       public Builder clearFilename() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -10817,7 +10918,7 @@ public final class Common {
         return this;
       }
       /**
-       * <code>optional string filename = 3;</code>
+       * <code>optional string filename = 2;</code>
        */
       public Builder setFilenameBytes(
           com.google.protobuf.ByteString value) {
@@ -10836,7 +10937,7 @@ public final class Common {
        * Status should be part of Response
        * </pre>
        *
-       * <code>optional .Response.Status status = 10;</code>
+       * <code>optional .Response.Status status = 3;</code>
        */
       public boolean hasStatus() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
@@ -10846,7 +10947,7 @@ public final class Common {
        * Status should be part of Response
        * </pre>
        *
-       * <code>optional .Response.Status status = 10;</code>
+       * <code>optional .Response.Status status = 3;</code>
        */
       public pipe.common.Common.Response.Status getStatus() {
         pipe.common.Common.Response.Status result = pipe.common.Common.Response.Status.valueOf(status_);
@@ -10857,7 +10958,7 @@ public final class Common {
        * Status should be part of Response
        * </pre>
        *
-       * <code>optional .Response.Status status = 10;</code>
+       * <code>optional .Response.Status status = 3;</code>
        */
       public Builder setStatus(pipe.common.Common.Response.Status value) {
         if (value == null) {
@@ -10873,7 +10974,7 @@ public final class Common {
        * Status should be part of Response
        * </pre>
        *
-       * <code>optional .Response.Status status = 10;</code>
+       * <code>optional .Response.Status status = 3;</code>
        */
       public Builder clearStatus() {
         bitField0_ = (bitField0_ & ~0x00000004);
@@ -11266,43 +11367,43 @@ public final class Common {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\014common.proto\"x\n\006Header\022\022\n\nmessage_id\030\001" +
-      " \001(\005\022\017\n\007node_id\030\002 \002(\005\022\014\n\004time\030\003 \002(\003\022\020\n\010e" +
-      "lection\030\004 \001(\010\022\023\n\013destination\030\010 \001(\005\022\024\n\010ma" +
-      "x_hops\030\n \001(\005:\002-1\"6\n\007Failure\022\n\n\002id\030\001 \002(\005\022" +
-      "\016\n\006ref_id\030\002 \001(\005\022\017\n\007message\030\003 \001(\t\"\200\001\n\007Req" +
-      "uest\022\025\n\006client\030\001 \001(\0132\005.Node\022\036\n\013requestTy" +
-      "pe\030\003 \002(\0162\t.TaskType\022\031\n\003rwb\030\004 \001(\0132\n.Write" +
-      "BodyH\000\022\030\n\003rrb\030\005 \001(\0132\t.ReadBodyH\000B\t\n\007payl" +
-      "oad\"\201\001\n\tWriteBody\022\017\n\007file_id\030\001 \001(\t\022\020\n\010fi" +
-      "lename\030\002 \002(\t\022\020\n\010file_ext\030\003 \001(\t\022\025\n\005chunk\030",
-      "\004 \001(\0132\006.Chunk\022\025\n\rnum_of_chunks\030\005 \001(\005\022\021\n\t" +
-      "file_size\030\006 \001(\003\"2\n\rWriteResponse\022\017\n\007Chun" +
-      "kId\030\001 \003(\005\022\020\n\010filename\030\002 \001(\t\"A\n\005Chunk\022\020\n\010" +
-      "chunk_id\030\001 \002(\005\022\022\n\nchunk_data\030\006 \002(\014\022\022\n\nch" +
-      "unk_size\030\t \001(\005\"f\n\010ReadBody\022\020\n\010filename\030\001" +
-      " \001(\t\022\017\n\007file_id\030\002 \001(\t\022\020\n\010chunk_id\030\003 \001(\005\022" +
-      "\022\n\nchunk_size\030\004 \001(\005\022\021\n\tfile_size\030\005 \001(\003\"\231" +
-      "\001\n\014ReadResponse\022\017\n\007file_id\030\001 \001(\t\022\020\n\010file" +
-      "name\030\002 \002(\t\022\020\n\010file_ext\030\003 \001(\t\022\025\n\rnum_of_c" +
-      "hunks\030\004 \001(\005\022&\n\016chunk_location\030\005 \003(\0132\016.Ch",
-      "unkLocation\022\025\n\005chunk\030\006 \001(\0132\006.Chunk\"I\n\rCh" +
-      "unkLocation\022\020\n\010chunk_id\030\001 \002(\005\022\022\n\nchunk_d" +
-      "ata\030\006 \002(\014\022\022\n\nchunk_size\030\t \001(\005\"3\n\004Node\022\017\n" +
-      "\007node_id\030\001 \002(\005\022\014\n\004host\030\002 \002(\t\022\014\n\004port\030\003 \002" +
-      "(\005\"\303\002\n\010Response\022\037\n\014responseType\030\001 \002(\0162\t." +
-      "TaskType\022\020\n\010filename\030\003 \001(\t\022 \n\006status\030\n \001" +
-      "(\0162\020.Response.Status\022\'\n\rwriteResponse\030\004 " +
-      "\001(\0132\016.WriteResponseH\000\022%\n\014readResponse\030\005 " +
-      "\001(\0132\r.ReadResponseH\000\"\206\001\n\006Status\022\013\n\007SUCCE" +
-      "SS\020\001\022\021\n\rSERVERTIMEOUT\020\002\022\017\n\013REDIRECTION\020\003",
-      "\022\020\n\014FILENOTFOUND\020\004\022\014\n\010NOLEADER\020\005\022\017\n\013UNRE" +
-      "ACHABLE\020\006\022\017\n\013SERVICEDOWN\020\007\022\t\n\005ERROR\020\010B\t\n" +
-      "\007payload*\235\001\n\010TaskType\022\010\n\004PING\020\001\022\020\n\014PINGR" +
-      "ESPONSE\020\002\022\023\n\017REQUESTREADFILE\020\003\022\024\n\020REQUES" +
-      "TWRITEFILE\020\004\022\024\n\020RESPONSEREADFILE\020\005\022\025\n\021RE" +
-      "SPONSEWRITEFILE\020\006\022\035\n\031REQUESTREADALLFILED" +
-      "ETAILS\020\007B\017\n\013pipe.commonH\001"
+      "\n\014common.proto\"\207\001\n\006Header\022\022\n\nmessage_id\030" +
+      "\003 \001(\005\022\017\n\007node_id\030\001 \002(\005\022\014\n\004time\030\002 \002(\003\022\020\n\010" +
+      "election\030\030 \001(\010\022\r\n\005steal\030\031 \001(\010\022\023\n\013destina" +
+      "tion\030\004 \001(\005\022\024\n\010max_hops\030\005 \001(\005:\002-1\"6\n\007Fail" +
+      "ure\022\n\n\002id\030\001 \002(\005\022\016\n\006ref_id\030\002 \001(\005\022\017\n\007messa" +
+      "ge\030\003 \001(\t\"\200\001\n\007Request\022\025\n\006client\030\025 \001(\0132\005.N" +
+      "ode\022\036\n\013requestType\030\001 \002(\0162\t.TaskType\022\031\n\003r" +
+      "wb\030\002 \001(\0132\n.WriteBodyH\000\022\030\n\003rrb\030\003 \001(\0132\t.Re" +
+      "adBodyH\000B\t\n\007payload\"\201\001\n\tWriteBody\022\017\n\007fil" +
+      "e_id\030\004 \001(\t\022\020\n\010filename\030\001 \002(\t\022\020\n\010file_ext",
+      "\030\002 \001(\t\022\025\n\005chunk\030\003 \001(\0132\006.Chunk\022\025\n\rnum_of_" +
+      "chunks\030\005 \001(\005\022\021\n\tfile_size\030\032 \001(\003\"2\n\rWrite" +
+      "Response\022\017\n\007ChunkId\030\001 \003(\005\022\020\n\010filename\030\002 " +
+      "\001(\t\"A\n\005Chunk\022\020\n\010chunk_id\030\001 \002(\005\022\022\n\nchunk_" +
+      "data\030\002 \002(\014\022\022\n\nchunk_size\030\003 \001(\005\"f\n\010ReadBo" +
+      "dy\022\020\n\010filename\030\001 \001(\t\022\017\n\007file_id\030\002 \001(\t\022\020\n" +
+      "\010chunk_id\030\003 \001(\005\022\022\n\nchunk_size\030\004 \001(\005\022\021\n\tf" +
+      "ile_size\030\005 \001(\005\"\231\001\n\014ReadResponse\022\020\n\010filen" +
+      "ame\030\001 \002(\t\022\020\n\010file_ext\030\002 \001(\t\022\025\n\rnum_of_ch" +
+      "unks\030\003 \001(\005\022&\n\016chunk_location\030\004 \003(\0132\016.Chu",
+      "nkLocation\022\025\n\005chunk\030\005 \001(\0132\006.Chunk\022\017\n\007fil" +
+      "e_id\030\006 \001(\t\"I\n\rChunkLocation\022\020\n\010chunk_id\030" +
+      "\001 \002(\005\022\022\n\nchunk_data\030\006 \002(\014\022\022\n\nchunk_size\030" +
+      "\t \001(\005\"3\n\004Node\022\017\n\007node_id\030\001 \002(\005\022\014\n\004host\030\002" +
+      " \002(\t\022\014\n\004port\030\003 \002(\005\"\303\002\n\010Response\022\037\n\014respo" +
+      "nseType\030\001 \002(\0162\t.TaskType\022\020\n\010filename\030\002 \001" +
+      "(\t\022 \n\006status\030\003 \001(\0162\020.Response.Status\022\'\n\r" +
+      "writeResponse\030\004 \001(\0132\016.WriteResponseH\000\022%\n" +
+      "\014readResponse\030\005 \001(\0132\r.ReadResponseH\000\"\206\001\n" +
+      "\006Status\022\013\n\007SUCCESS\020\001\022\021\n\rSERVERTIMEOUT\020\002\022",
+      "\017\n\013REDIRECTION\020\003\022\020\n\014FILENOTFOUND\020\004\022\014\n\010NO" +
+      "LEADER\020\005\022\017\n\013UNREACHABLE\020\006\022\017\n\013SERVICEDOWN" +
+      "\020\007\022\t\n\005ERROR\020\010B\t\n\007payload*\201\001\n\010TaskType\022\023\n" +
+      "\017REQUESTREADFILE\020\001\022\024\n\020REQUESTWRITEFILE\020\002" +
+      "\022\024\n\020RESPONSEREADFILE\020\003\022\025\n\021RESPONSEWRITEF" +
+      "ILE\020\004\022\035\n\031REQUESTREADALLFILEDETAILS\020\031B\017\n\013" +
+      "pipe.commonH\001"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11321,7 +11422,7 @@ public final class Common {
     internal_static_Header_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Header_descriptor,
-        new java.lang.String[] { "MessageId", "NodeId", "Time", "Election", "Destination", "MaxHops", });
+        new java.lang.String[] { "MessageId", "NodeId", "Time", "Election", "Steal", "Destination", "MaxHops", });
     internal_static_Failure_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_Failure_fieldAccessorTable = new
@@ -11363,7 +11464,7 @@ public final class Common {
     internal_static_ReadResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ReadResponse_descriptor,
-        new java.lang.String[] { "FileId", "Filename", "FileExt", "NumOfChunks", "ChunkLocation", "Chunk", });
+        new java.lang.String[] { "Filename", "FileExt", "NumOfChunks", "ChunkLocation", "Chunk", "FileId", });
     internal_static_ChunkLocation_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_ChunkLocation_fieldAccessorTable = new

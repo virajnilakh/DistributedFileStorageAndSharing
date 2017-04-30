@@ -121,14 +121,15 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 
 		}
 	}
-	public static void sendToNode(WorkMessage msg,int nodeId){
+
+	public static void sendToNode(WorkMessage msg, int nodeId) {
 		for (EdgeInfo ei : outboundEdges.map.values()) {
-			if(ei.getRef()==nodeId){
+			if (ei.getRef() == nodeId) {
 				Channel ch = ei.getChannel();
 				ChannelFuture cf = null;
 				if (ch != null) {
-					System.out.println("Sendind steal to "+nodeId);
-					//QueueHandler.enqueueInboundWorkAndChannel(msg, ch);
+					System.out.println("Sendind steal to " + nodeId);
+					// QueueHandler.enqueueInboundWorkAndChannel(msg, ch);
 					cf = ch.write(msg);
 					ch.flush();
 					if (cf.isDone() && !cf.isSuccess()) {
@@ -142,6 +143,7 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 			}
 		}
 	}
+
 	public void broadcast(CommandMessage msg) {
 		for (EdgeInfo ei : this.outboundEdges.map.values()) {
 			Channel ch = ei.getChannel();
@@ -230,108 +232,104 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 	@Override
 	public void run() {
 		while (forever) {
-			if(state.getAnyJedis().dbSize()>nodeCount+1){
-				Jedis j=state.getAnyJedis();
-				Set<String> list = j.keys("*"); 
-			      
-				 for(String l:list){
-					String[] node= j.get(l).split(":");
-					if(Integer.parseInt(l)==state.getConf().getNodeId()){
-						continue;
-					}
-					if(this.outboundEdges.map.get(Integer.parseInt(l)) == null){
-						outboundEdges.addNode(Integer.parseInt(l), node[0], Integer.parseInt(node[1]));
-					}
-					nodeCount++;
-				 }
-			}
+			/*
+			 * if(state.getAnyJedis().dbSize()>nodeCount+1){ Jedis
+			 * j=state.getAnyJedis(); Set<String> list = j.keys("*");
+			 * 
+			 * for(String l:list){ String[] node= j.get(l).split(":");
+			 * if(Integer.parseInt(l)==state.getConf().getNodeId()){ continue; }
+			 * if(this.outboundEdges.map.get(Integer.parseInt(l)) == null){
+			 * outboundEdges.addNode(Integer.parseInt(l), node[0],
+			 * Integer.parseInt(node[1])); } nodeCount++; } }
+			 */
 			state.getLocalhostJedis().select(1);
-			if(state.getLocalhostJedis().dbSize()==1){
+			//if (state.getLocalhostJedis().dbSize() == 1) {
+			if (1 == 1) {
 				state.becomeLeader();
 				state.setLeaderAddress(state.getIpAddress());
 				state.setLeaderId(state.getConf().getNodeId());
-				System.out.println("Node:"+state.getConf().getNodeId()+" is the Leader!!");
-				try{
+				System.out.println("Node:" + state.getConf().getNodeId() + " is the Leader!!");
+				try {
 					state.getLocalhostJedis().select(0);
-					state.getLocalhostJedis().set(Constants.clusterId+"", state.getIpAddress()+":4568");
+					state.getLocalhostJedis().set(Constants.clusterId + "", state.getIpAddress() + ":4568");
 					System.out.println("---Redis updated---");
-					
-				}catch(Exception e){
+
+				} catch (Exception e) {
 					System.out.println("---Problem with redis at HandleVoteReceived---");
 				}
-				state.getElecHandler().initElection();	
+				state.getElecHandler().initElection();
 			}
 			try {
 				for (final EdgeInfo ei : this.outboundEdges.map.values()) {
-					
-					
+
 					if (ei.isActive() && ei.getChannel() != null) {
-						WorkMessage wmhb=createHB(state.getConf().getNodeId());
+						WorkMessage wmhb = createHB(state.getConf().getNodeId());
 						ei.getChannel().writeAndFlush(wmhb);
-						if(state.isLeader()){
+						if (state.isLeader()) {
 							WorkMessage wm = createHB(ei);
-							System.out.println("---Leader "+state.getLeaderId()+" sending heartbeat---");
+							System.out.println("---Leader " + state.getLeaderId() + " sending heartbeat---");
 
 							ei.getChannel().writeAndFlush(wm);
 						}
-						if(activeOutboundEdges==outboundEdges.map.size() && state.getLeaderId()==0){
+						if (activeOutboundEdges == outboundEdges.map.size() && state.getLeaderId() == 0) {
 							state.getElecHandler().initElection();
-						}else{
-							if(state.getLeaderId()!=0){
-								System.out.println("---Current Leader is:"+state.getLeaderId()+"---");
+						} else {
+							if (state.getLeaderId() != 0) {
+								System.out.println("---Current Leader is:" + state.getLeaderId() + "---");
 
-							}else{
+							} else {
 								System.out.println("No proper connections");
-								
 
 							}
 						}
-						
+
 					} else {
 						// TODO create a client to the node
 						logger.info("trying to connect to node " + ei.getRef());
 						String host = ei.getHost();
-				        int port = ei.getPort();
-				        EventLoopGroup workerGroup = new NioEventLoopGroup();
+						int port = ei.getPort();
+						EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-				        try {
-				            Bootstrap b = new Bootstrap(); // (1)
-				            b.group(workerGroup); // (2)
-				            b.channel(NioSocketChannel.class); // (3)
-				            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-				            b.handler(new WorkInit(state,false));
+						try {
+							Bootstrap b = new Bootstrap(); // (1)
+							b.group(workerGroup); // (2)
+							b.channel(NioSocketChannel.class); // (3)
+							b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+							b.handler(new WorkInit(state, false));
 
-				            // Start the client.
-				            //System.out.println("Connect to a node.");
+							// Start the client.
+							// System.out.println("Connect to a node.");
 
-				            final ChannelFuture f = b.connect(host, port);
-				            /*ei.setChannel(f.channel());
-				            ei.setActive(true);
-				            activeOutboundEdges++;*/
-				            f.addListener(new FutureListener<Void>() {
+							final ChannelFuture f = b.connect(host, port);
+							/*
+							 * ei.setChannel(f.channel()); ei.setActive(true);
+							 * activeOutboundEdges++;
+							 */
+							f.addListener(new FutureListener<Void>() {
 
-				                @Override
-				                public void operationComplete(Future<Void> future) throws Exception {
-				                    if (!f.isSuccess()) {
-				                        //System.out.println("Test Connection failed");
-				                        future.cause();
+								@Override
+								public void operationComplete(Future<Void> future) throws Exception {
+									if (!f.isSuccess()) {
+										// System.out.println("Test Connection
+										// failed");
+										future.cause();
 
-				                    }else{
-				                    	setTimer(ei.getRef());
-				                    	
-				                    	ei.setChannel(f.channel());
-							            ei.setActive(true);
-							            activeOutboundEdges++;
-				                    }
-				                }
-				            });			            
-				            
-				            // Wait until the connection is closed.
-				            //f.channel().closeFuture().sync();
-				        } catch(Exception e) {
-				        	e.printStackTrace();
-				            //workerGroup.shutdownGracefully();
-				        }
+									} else {
+										setTimer(ei.getRef());
+
+										ei.setChannel(f.channel());
+										ei.setActive(true);
+										activeOutboundEdges++;
+									}
+								}
+							});
+
+							// Wait until the connection is closed.
+							// f.channel().closeFuture().sync();
+						} catch (Exception e) {
+							e.printStackTrace();
+							// workerGroup.shutdownGracefully();
+						}
 
 					}
 				}
@@ -341,35 +339,36 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			if(true){
- 				
- 				EventLoopGroup workerGroup = new NioEventLoopGroup();
- 
- 		        try {
- 		        	String host=state.getLocalhostJedis().get(Constants.nextClusterId+"").split(":")[0];
- 					int port=Integer.parseInt(state.getLocalhostJedis().get(Constants.nextClusterId+"").split(":")[1]);
- 		            Bootstrap b = new Bootstrap(); // (1)
- 		            b.group(workerGroup); // (2)
- 		            b.channel(NioSocketChannel.class); // (3)
- 		            b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
- 		            b.handler(new WorkInit(state,false));
- 
- 		            // Start the client.
- 		            //System.out.println("Connect to a node.");
- 
- 		             ChannelFuture cha = b.connect(host, port).sync();
- 		             state.setNext(cha.channel());
- 		            /*ei.setChannel(f.channel());
- 		            ei.setActive(true);
- 		            activeOutboundEdges;*/
- 		             
- 		        }catch(Exception e){
- 		        	System.out.println("Failed to connect to next cluster");
- 		        }
- 			}
-			
-			
+
+			if (true) {
+
+				EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+				try {
+					String host = state.getLocalhostJedis().get(Constants.nextClusterId + "").split(":")[0];
+					int port = Integer
+							.parseInt(state.getLocalhostJedis().get(Constants.nextClusterId + "").split(":")[1]);
+					Bootstrap b = new Bootstrap(); // (1)
+					b.group(workerGroup); // (2)
+					b.channel(NioSocketChannel.class); // (3)
+					b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+					b.handler(new WorkInit(state, false));
+
+					// Start the client.
+					// System.out.println("Connect to a node.");
+
+					ChannelFuture cha = b.connect(host, port).sync();
+					state.setNext(cha.channel());
+					/*
+					 * ei.setChannel(f.channel()); ei.setActive(true);
+					 * activeOutboundEdges;
+					 */
+
+				} catch (Exception e) {
+					System.out.println("Failed to connect to next cluster");
+				}
+			}
+
 		}
 	}
 
@@ -385,12 +384,12 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		@Override
 		public void run() {
 			// System.out.println("Node "+nodeId+"dead");
-			//outboundEdges.map.get(nodeId).setChannel(null);
+			// outboundEdges.map.get(nodeId).setChannel(null);
 			outboundEdges.map.get(nodeId).setActive(false);
-			//outboundEdges.map.remove(nodeId);
-			//state.delRedis(nodeId);
-			//activeOutboundEdges--;
-			//nodeCount--;
+			// outboundEdges.map.remove(nodeId);
+			// state.delRedis(nodeId);
+			// activeOutboundEdges--;
+			// nodeCount--;
 			this.cancel();
 		}
 	}

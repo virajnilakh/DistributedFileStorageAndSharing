@@ -43,26 +43,26 @@ public class InboundCommandMessageQueueHandler implements Runnable {
 
 			CommandMessage msg = cch.getMsg();
 			Channel channel = cch.getChannel();
-			if (ServerState.isStealReq() && msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
+			if (ServerState.isStealReq() && msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE) {
 				// convert to command first
 				WorkMessage wmsg = convertStealToWork(msg);
 				EdgeMonitor.sendToNode(wmsg, ServerState.getStealNode());
 				ServerState.setStealNode(0);
 				ServerState.setStealReq(false);
 			} else {
-				if (msg.getReq().getRrb().getFilename().equals("*")) {
+				if (msg.getRequest().getRrb().getFilename().equals("*")) {
 					// readFileNamesCmd(msg, channel);
 				} else {
 					DBHandler mysql_db = new DBHandler();
-					String fileId = Utility.getHashFileName(msg.getReq().getRrb().getFilename());
+					String fileId = Utility.getHashFileName(msg.getRequest().getRrb().getFilename());
 
 					if (mysql_db.checkFileExists(fileId)) {
 						readFileCmd(msg, channel);
 
-					}else{
+					} else {
 						ServerState.getNext().writeAndFlush(msg);
 					}
-					
+
 					/*
 					 * EventLoopGroup workerGroup = new NioEventLoopGroup();
 					 * 
@@ -99,8 +99,8 @@ public class InboundCommandMessageQueueHandler implements Runnable {
 		header.setDestination(-1);
 
 		ReadBody.Builder body = ReadBody.newBuilder();
-		body.setClientAddress(msg.getReq().getRrb().getClientAddress());
-		body.setFilename(msg.getReq().getRrb().getFilename());
+		// body.setClientAddress(msg.getRequest().getClient().getHost()+":"+msg.getRequest().getClient().getPort());
+		body.setFilename(msg.getRequest().getRrb().getFilename());
 		LeaderStatus.Builder leaderStatus = LeaderStatus.newBuilder();
 		leaderStatus.setState(LeaderState.LEADERKNOWN);
 
@@ -123,7 +123,7 @@ public class InboundCommandMessageQueueHandler implements Runnable {
 		// TODO Auto-generated method stub
 
 		// Read a specific file
-		String fileName = msg.getReq().getRrb().getFilename();
+		String fileName = msg.getRequest().getRrb().getFilename();
 		// long filesize = msg.getReqMsg().getRrb().getFil
 		long filesize = 0; // TODO: update this
 		String fileId = Utility.getHashFileName(fileName);

@@ -83,7 +83,7 @@ public class ServerState {
 		this.elecHandler = elecHandler;
 	}
 
-	private Jedis localhostJedis = new Jedis("localhost", 6379);
+	private Jedis localhostJedis = new Jedis("192.168.1.40", 6379);
 
 	public Jedis getLocalhostJedis() {
 		return localhostJedis;

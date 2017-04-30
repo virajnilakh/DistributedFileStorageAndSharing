@@ -29,14 +29,14 @@ public class WorkMessageCreator {
 		header.setDestination(-1);
 
 		Chunk.Builder chunk = Chunk.newBuilder();
-		chunk.setChunkId(msg.getReq().getRwb().getChunk().getChunkId());
-		chunk.setChunkData(msg.getReq().getRwb().getChunk().getChunkData());
+		chunk.setChunkId(msg.getRequest().getRwb().getChunk().getChunkId());
+		chunk.setChunkData(msg.getRequest().getRwb().getChunk().getChunkData());
 
 		WriteBody.Builder body = WriteBody.newBuilder();
-		body.setFilename(msg.getReq().getRwb().getFilename());
+		body.setFilename(msg.getRequest().getRwb().getFilename());
 		// File Id is the MD5 hash in string format of the file name
-		body.setFileId(msg.getReq().getRwb().getFileId());
-		body.setNumOfChunks(msg.getReq().getRwb().getNumOfChunks());
+		body.setFileId(msg.getRequest().getRwb().getFileId());
+		body.setNumOfChunks(msg.getRequest().getRwb().getNumOfChunks());
 		body.setChunk(chunk);
 
 		Request.Builder req = Request.newBuilder();
@@ -86,7 +86,7 @@ public class WorkMessageCreator {
 		res.setReadResponse(body);
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
-		comm.setResp(res);
+		comm.setResponse(res);
 		return comm.build();
 		// return fileName;
 	}
@@ -112,7 +112,7 @@ public class WorkMessageCreator {
 
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
-		comm.setResp(res);
+		comm.setResponse(res);
 		return comm.build();
 	}
 
