@@ -18,6 +18,9 @@ import io.netty.channel.Channel;
 import pipe.common.Common.Header;
 import routing.Pipe.CommandMessage;
 
+/*
+ * Author: Ashutosh Singh
+ * */
 public class MessageSender {
 	static Channel channel = CommConnection.getInstance().connect();
 

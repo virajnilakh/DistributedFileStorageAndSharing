@@ -5,6 +5,10 @@ import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
 
+/**
+ * Author: Ashutosh Singh
+ * Hack: Added condition to restrict IP range to check
+ * **/
 public class LocalAddress {
 	/**
 	 * Returns an <code>InetAddress</code> object encapsulating what is most
@@ -47,6 +51,9 @@ public class LocalAddress {
 				for (Enumeration inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements();) {
 					InetAddress inetAddr = (InetAddress) inetAddrs.nextElement();
 					if (!inetAddr.isLoopbackAddress()) {
+						
+						//ToDO: Remove this condition
+						//Hack: Added optimization since entire class has changed IP Address range.
 						if (inetAddr .getHostAddress().startsWith("169.")
 								//|| inetAddr .getHostAddress().startsWith("10.")
 								) {

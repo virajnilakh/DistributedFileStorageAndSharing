@@ -34,7 +34,7 @@ import routing.Pipe.CommandMessage;
 /**
  * provides an abstraction of the communication to the remote server.
  * 
- * @author gash
+ * @author gash,ashutosh
  * 
  */
 public class CommConnection {

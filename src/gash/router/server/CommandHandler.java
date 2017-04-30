@@ -70,7 +70,7 @@ import routing.Pipe.CommandMessage;
  * 
  * TODO replace println with logging!
  * 
- * @author gash
+ * @author gash,ashutosh
  * 
  */
 public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> {
@@ -107,8 +107,6 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 			return;
 		}
 		if (msg.hasPing()) {
-			// System.out.println("Received ping from cluster 1");
-			// ServerState.getNext().writeAndFlush(msg);
 			if (msg.getHeader().getMaxHops() == 0) {
 				System.out.println("Ping received from cluster 1");
 			} else if (msg.getHeader().getNodeId() / 10 == Constants.clusterId) {
@@ -142,6 +140,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				// ServerState.getNext().writeAndFlush(ping);
 			}
 		}
+		// ToDO: What has been done here ?? Why is ping condition checked twice?
 		if (msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE) {
 			QueueHandler.enqueueInboundCommandAndChannel(msg, channel);
 		} else if (msg.getPing()) {

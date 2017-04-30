@@ -52,7 +52,6 @@ public class ElectionHandler {
 	}
 
 	public static WorkMessage buildLeaderResponse(int nodeId, int currentTerm) {
-		// TODO Auto-generated method stub
 		WorkMessage.Builder workMessage = WorkMessage.newBuilder();
 		Header.Builder header = Header.newBuilder();
 		ElectionMessage.Builder electionMessage = ElectionMessage.newBuilder();
@@ -63,7 +62,7 @@ public class ElectionHandler {
 		status.setLeaderId(nodeId);
 		status.setLeaderHost(state.getIpAddress());
 		header.setElection(true);
-		
+
 		header.setNodeId(state.getConf().getNodeId());
 		header.setTime(System.currentTimeMillis());
 
@@ -82,7 +81,6 @@ public class ElectionHandler {
 	}
 
 	public boolean checkIfLeader(WorkMessage wm) {
-		// TODO Auto-generated method stub
 		if (voteCount >= state.getEmon().getOutboundEdges().size() / 2 + 1) {
 			return true;
 		} else {
@@ -164,7 +162,8 @@ public class ElectionHandler {
 
 		@Override
 		public void run() {
-
+			
+			//ToDO: Uncomment after testing
 			/*
 			 * if(getHasVoted()){ timer.cancel(); }
 			 */
@@ -174,7 +173,7 @@ public class ElectionHandler {
 				state.setCurrentTerm(state.getCurrentTerm() - 1);
 
 			}
-			
+
 			if (state.isFollower()) {
 				try {
 					System.out.println("---Timer timed out---");

@@ -1,6 +1,5 @@
 package database;
 
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,20 +7,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.google.protobuf.ByteString;
-
+//ToDO: Add Log Handler
 //import gash.router.server.LogHandler;
 
 public class DBHandler {
 
 	private Connection conn;
-
+	
 	public DBHandler() {
 		conn = makeConn();
 	}
 
 	public Connection makeConn() {
 		try {
+			//ToDO: Remove password to a config
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db", "root", "admin");
 			System.out.println("Successfully connected");
 

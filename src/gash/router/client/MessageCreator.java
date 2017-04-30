@@ -15,6 +15,9 @@ import pipe.common.Common.TaskType;
 import pipe.common.Common.WriteBody;
 import routing.Pipe.CommandMessage;
 
+/*
+ * Author: Ashutosh Singh
+ * */
 public class MessageCreator {
 
 	public static CommandMessage CreateReadAllMessage() {
@@ -48,13 +51,13 @@ public class MessageCreator {
 
 		ReadBody.Builder body = ReadBody.newBuilder();
 		body.setFilename(fileName);
-		
-		//body.setClientAddress(LocalAddress.getLocalHostLANAddress().getHostAddress()+":"+Constants.clientPort);
+
+		// body.setClientAddress(LocalAddress.getLocalHostLANAddress().getHostAddress()+":"+Constants.clientPort);
 		Request.Builder req = Request.newBuilder();
-		// req.setRequestType(Request.RequestType.READFILE);
+
 		req.setRequestType(TaskType.REQUESTREADFILE);
 		req.setRrb(body);
-		Node.Builder node=Node.newBuilder();
+		Node.Builder node = Node.newBuilder();
 		node.setNodeId(0);
 		node.setHost(LocalAddress.getLocalHostLANAddress().getHostAddress());
 		node.setPort(Constants.clientPort);
@@ -85,11 +88,11 @@ public class MessageCreator {
 		body.setFilename(fileName);
 		// File Id is the MD5 hash in string format of the file name
 		body.setFileId(hash);
-		
+
 		body.setNumOfChunks(chunkCount);
 		body.setChunk(chunk);
-		//body.setFileSize(filesize);
-		
+		body.setFileSize(filesize);
+
 		Request.Builder req = Request.newBuilder();
 		req.setRequestType(TaskType.REQUESTWRITEFILE);
 		req.setRwb(body);

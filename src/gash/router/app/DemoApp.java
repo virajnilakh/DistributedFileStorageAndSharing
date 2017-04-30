@@ -200,16 +200,9 @@ public class DemoApp implements CommListener {
 					 */
 					break;
 				case 1:
-					// For testing writes
-					// String path = runWriteTest();
-
 					System.out.println("Please enter directory (path) to upload:");
 
 					path = reader.nextLine();
-					// path = "C:\\Songs\\1.mp4";
-					// path = "C:\\JS\\test\\test.js";
-					// path = "C:\\Songs\\2.mp4";
-
 					System.in.read();
 
 					System.out.println("You entered" + path);
@@ -274,7 +267,7 @@ public class DemoApp implements CommListener {
 					break;
 				case 4:
 					MessageSender.createCommandPing(Constants.clusterId);
-					// channel.writeAndFlush(msg);
+
 					break;
 				case 5:
 					System.out.println("Please enter names of file to fetch seperated by comma");
@@ -290,23 +283,12 @@ public class DemoApp implements CommListener {
 			} while (true);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			System.out.println("Error occurred...");
-			// Thread.sleep(10 * 1000);
+			System.out.println("Error occurred at client...");
 			e.printStackTrace();
 		} finally {
 			System.out.println("Exiting...");
-			// Thread.sleep(10 * 1000);
 
 		}
-
-		// System.out.println("\n** exiting in 10 seconds. **");
-		// System.out.flush();
-		// Thread.sleep(10 * 1000);
-	}
-
-	private static String runWriteTest() {
-		String path = "C:\\1\\Natrang.avi";
-		return path;
 	}
 
 	public static void clientAcceptConnections() {
@@ -329,13 +311,6 @@ public class DemoApp implements CommListener {
 	}
 
 	private static void sendFile(File file, Channel channel) {
-		// TODO Auto-generated method stub
-
-		/*
-		 * Task 1: Send Read Command Task 2: Receive Ack Task 3: Split into
-		 * chunks Task 4: Send chunks Task 5: Recv Ack Task 6: Resend chunks not
-		 * ack
-		 */
 
 		MessageSender.sendReadCommand(file);
 

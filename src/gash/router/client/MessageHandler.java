@@ -12,7 +12,9 @@ import com.google.protobuf.ByteString;
 
 import global.Constants;
 import routing.Pipe.CommandMessage;
-
+/*
+ * Author: Ashutosh Singh
+ * */
 public class MessageHandler {
 
 	protected static ArrayList<CommandMessage> lstMsg = new ArrayList<CommandMessage>();
@@ -55,9 +57,6 @@ public class MessageHandler {
 				File directory = new File(Constants.clientDir);
 				if (!directory.exists()) {
 					directory.mkdir();
-					// If you require it to make the entire directory path
-					// including parents,
-					// use directory.mkdirs(); here instead.
 				}
 
 				File file = new File(Constants.clientDir + msg.getRequest().getRwb().getFilename());
@@ -78,7 +77,6 @@ public class MessageHandler {
 
 				System.out.println("New chunkedFile size:" + chunkedFile.size());
 				System.out.println("New lstMsg size:" + lstMsg.size());
-				// futuresList = new ArrayList<WriteChannel>();
 
 			}
 		}
