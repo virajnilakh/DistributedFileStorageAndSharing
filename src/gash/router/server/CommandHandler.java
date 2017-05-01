@@ -101,75 +101,79 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	 * @throws Exception
 	 */
 	public void handleMessage(CommandMessage msg, Channel channel) throws Exception {
+		try{
+			System.out.println("Message recieved");
 
-		System.out.println("Message recieved");
+			if (msg == null) {
+				System.out.println("ERROR: Unexpected content - " + msg);
+				return;
+			}
+			if (msg.hasPing()) {
+				if (msg.getHeader().getMaxHops() == 0) {
+					System.out.println("Ping received from cluster 1");
+				} else if (msg.getHeader().getNodeId() / 10 == Constants.clusterId) {
+					clientChannel = channel;
+					System.out.println("Ping received from client");
 
-		if (msg == null) {
-			System.out.println("ERROR: Unexpected content - " + msg);
-			return;
-		}
-		if (msg.hasPing()) {
-			if (msg.getHeader().getMaxHops() == 0) {
-				System.out.println("Ping received from cluster 1");
-			} else if (msg.getHeader().getNodeId() / 10 == Constants.clusterId) {
-				clientChannel = channel;
-				System.out.println("Ping received from client");
+					CommandMessage ping = decHopPing(msg);
+					ServerState.getNext().writeAndFlush(ping);
+				} else if (msg.getHeader().getDestination() == Constants.clusterId) {
+					System.out.println("Ping received from cluster 1");
+					CommandMessage ping = invertPing(msg);
+					ServerState.getNext().writeAndFlush(ping);
+				} else if (msg.getHeader().getDestination() / 10 != 0
+						&& msg.getHeader().getDestination() % 10 == Constants.clusterId) {
+					System.out.println("Ping received from cluster 1");
+					clientChannel.writeAndFlush(msg);
+				} else {
+					System.out.println("Ping received from cluster 1");
+					
+					CommandMessage ping = decHopPing(msg);
+					ServerState.getNext().writeAndFlush(ping);
 
-				CommandMessage ping = decHopPing(msg);
-				ServerState.getNext().writeAndFlush(ping);
-			} else if (msg.getHeader().getDestination() == Constants.clusterId) {
-				System.out.println("Ping received from cluster 1");
-				CommandMessage ping = invertPing(msg);
-				ServerState.getNext().writeAndFlush(ping);
-			} else if (msg.getHeader().getDestination() / 10 != 0
-					&& msg.getHeader().getDestination() % 10 == Constants.clusterId) {
-				System.out.println("Ping received from cluster 1");
-				clientChannel.writeAndFlush(msg);
-			} else {
-				System.out.println("Ping received from cluster 1");
+					/*System.out.println("Hack");
+					// Hack
+					EventLoopGroup workerGroup = new NioEventLoopGroup();
+					Bootstrap b = new Bootstrap(); // (1)
+					b.group(workerGroup); // (2)
+					b.channel(NioSocketChannel.class); // (3)
+					b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
+					b.handler(new CommandInit(null, false));
+					ChannelFuture cha = b.connect("192.168.1.30", 4168).sync();
+					cha.channel().writeAndFlush(ping);
+					// ServerState.getNext().writeAndFlush(ping);*/
+				}
+			}
+			// ToDO: What has been done here ?? Why is ping condition checked twice?
+			if (!msg.hasPing() && msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE ) {
+				if (msg.getRequest().getRrb().getFilename().equals("*")) {
+					readFileNamesCmd(msg, channel);
+				}else{
+				QueueHandler.enqueueInboundCommandAndChannel(msg, channel);
+				}
+			} 
+
+			/*if (msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE) {
+				if (msg.getRequest().getRrb().getFilename().equals("*")) {
+					readFileNamesCmd(msg, channel);
+				} else {
+
+					readFileCmd(msg, channel);
+				}
+			}*/
+
+			if (!msg.hasPing() && msg.getRequest().getRequestType() == TaskType.REQUESTWRITEFILE) {
 				
-				CommandMessage ping = decHopPing(msg);
-				ServerState.getNext().writeAndFlush(ping);
-
-				/*System.out.println("Hack");
-				// Hack
-				EventLoopGroup workerGroup = new NioEventLoopGroup();
-				Bootstrap b = new Bootstrap(); // (1)
-				b.group(workerGroup); // (2)
-				b.channel(NioSocketChannel.class); // (3)
-				b.option(ChannelOption.SO_KEEPALIVE, true); // (4)
-				b.handler(new CommandInit(null, false));
-				ChannelFuture cha = b.connect("192.168.1.30", 4168).sync();
-				cha.channel().writeAndFlush(ping);
-				// ServerState.getNext().writeAndFlush(ping);*/
+				writeFileCmd(msg, channel);
 			}
+
+			//pingCmd(msg, channel);
+
+			//System.out.flush();
+		}catch(Exception e){
+			e.printStackTrace();
 		}
-		// ToDO: What has been done here ?? Why is ping condition checked twice?
-		if (msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE && !msg.hasPing()) {
-			if (msg.getRequest().getRrb().getFilename().equals("*")) {
-				readFileNamesCmd(msg, channel);
-			}else{
-			QueueHandler.enqueueInboundCommandAndChannel(msg, channel);
-			}
-		} 
-
-		/*if (msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE) {
-			if (msg.getRequest().getRrb().getFilename().equals("*")) {
-				readFileNamesCmd(msg, channel);
-			} else {
-
-				readFileCmd(msg, channel);
-			}
-		}*/
-
-		if (msg.getRequest().getRequestType() == TaskType.REQUESTWRITEFILE) {
-			
-			writeFileCmd(msg, channel);
-		}
-
-		//pingCmd(msg, channel);
-
-		//System.out.flush();
+		
 
 	}
 

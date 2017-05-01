@@ -97,180 +97,185 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 	 * @throws IOException
 	 */
 	public void handleMessage(WorkMessage msg, Channel channel) throws IOException {
-		if (msg == null) {
-			// TODO add logging
-			System.out.println("ERROR: Unexpected content  - " + msg);
-			return;
-		}
-		if (!state.isStealReq() && !msg.hasBeat() && msg.getHeader().getSteal()) {
-			state.setStealNode(msg.getHeader().getNodeId());
-			state.setStealReq(true);
-		}
-		if (!msg.hasBeat() && msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
-			QueueHandler.enqueueInboundWorkAndChannel(msg, channel);
-		} else if (msg.getReq().getRequestType() == TaskType.REQUESTWRITEFILE) {
-
-			String file_id = msg.getReq().getRwb().getFileId();
-			String file_name = msg.getReq().getRwb().getFilename();
-			String file_ext = msg.getReq().getRwb().getFileExt();
-			long file_size = getFileSize(msg);
-
-			int chunk_id = msg.getReq().getRwb().getChunk().getChunkId();
-			int num_of_chunks = msg.getReq().getRwb().getNumOfChunks();
-			byte[] chunk_data = msg.getReq().getRwb().getChunk().getChunkData().toByteArray();
-			int chunk_size = msg.getReq().getRwb().getChunk().getChunkSize();
-
-			// Pushing chunks to Mysql DB
-			DBHandler mysql_db = new DBHandler();
-			mysql_db.addChunk(file_id, chunk_id, chunk_data, chunk_size, num_of_chunks);
-			mysql_db.closeConn();
-
-			System.out.println("Message received :" + msg.getReq().getRwb().getChunk().getChunkId());
-
-			lstMsg.add(msg);
-
-			System.out.println("List size is: ");
-			System.out.println(lstMsg.size());
-			String storeStr = new String(msg.getReq().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
-			System.out.println("No. of chunks" + String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
-			// storeRedisData(msg);
-
-			if (lstMsg.size() == msg.getReq().getRwb().getNumOfChunks()) {
-
-				System.out.println("Checking if chunks exist");
-				try {
-					if (!jedisHandler1.exists(file_id)) {
-						// return null;
-						System.out.println("Does not exists");
-					}
-					System.out.println("Printing map");
-
-					Map<String, String> map1 = jedisHandler1.hgetAll(file_id);
-
-					System.out.println(new PrettyPrintingMap<String, String>(map1));
-
-				} catch (JedisConnectionException exception) {
-					// Do stuff
-				} finally {
-					// Clean up
-				}
-
-				System.out.println("All chunks received");
-				// Sorting
-				Collections.sort(lstMsg, new Comparator<WorkMessage>() {
-					@Override
-					public int compare(WorkMessage msg1, WorkMessage msg2) {
-						return Integer.compare(msg1.getReq().getRwb().getChunk().getChunkId(),
-								msg2.getReq().getRwb().getChunk().getChunkId());
-					}
-				});
-
-				System.out.println("All chunks sorted");
-				for (WorkMessage message : lstMsg) {
-					chunkedFile.add(message.getReq().getRwb().getChunk().getChunkData());
-				}
-				System.out.println("Chunked file created");
-
-				File directory = new File(Constants.dataDir);
-				if (!directory.exists()) {
-					directory.mkdir();
-					File logFile = new File(Constants.logFile);
-					logFile.createNewFile(); // Create log File
-
-				}
-
-				File file = new File(Constants.dataDir + msg.getReq().getRwb().getFilename());
-				file.createNewFile();
-				System.out.println("File created in Gossamer dir");
-				FileOutputStream outputStream = new FileOutputStream(file);
-				ByteString bs = ByteString.copyFrom(chunkedFile);
-				outputStream.write(bs.toByteArray());
-				outputStream.flush();
-				outputStream.close();
-				System.out.println("File created");
-				long end = System.currentTimeMillis();
-				System.out.println("End time");
-				System.out.println(end);
-
-				// Pushing file to Mysql DB
-				DBHandler mysql_db2 = new DBHandler();
-				mysql_db2.addFile(file_id, file_name, file_ext, num_of_chunks, file_size);
-				mysql_db2.closeConn();
-
-				// Send acks
-				// List<Future<Long>> futures = service.invokeAll(futuresList);
-				// service.shutdown();
-
-				// Cleanup
-				chunkedFile = new ArrayList<ByteString>();
-				lstMsg = new ArrayList<WorkMessage>();
-				futuresList = new ArrayList<WriteChannel>();
-
+		try{
+			if (msg == null) {
+				// TODO add logging
+				System.out.println("ERROR: Unexpected content  - " + msg);
+				return;
 			}
-		}
+			if (!state.isStealReq() && !msg.hasBeat() && msg.getHeader().getSteal()) {
+				state.setStealNode(msg.getHeader().getNodeId());
+				state.setStealReq(true);
+			}
+			if (!msg.getHeader().getSteal() && !msg.hasBeat() && msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
+				QueueHandler.enqueueInboundWorkAndChannel(msg, channel);
+			} else if (!msg.getHeader().getSteal() && !msg.hasBeat() && msg.getReq().getRequestType() == TaskType.REQUESTWRITEFILE) {
 
-		if (debug)
-			PrintUtil.printWork(msg);
+				String file_id = msg.getReq().getRwb().getFileId();
+				String file_name = msg.getReq().getRwb().getFilename();
+				String file_ext = msg.getReq().getRwb().getFileExt();
+				long file_size = getFileSize(msg);
 
-		// TODO How can you implement this without if-else statements?
-		try {
-			if (msg.getHeader().hasElection()) {
-				System.out.println("Processing the message:");
-				state.handleMessage(channel, msg);
-			} else if (msg.getLeaderStatus().getState() == LeaderState.LEADERALIVE) {
-				System.out.println(
-						"Heartbeat from leader " + msg.getLeaderStatus().getLeaderId() + "...Resetting the timmer:");
-				state.getElecHandler().getTimer().cancel();
-				state.getElecHandler().setTimer();
-				try {
-					state.getLocalhostJedis().select(0);
-					state.getLocalhostJedis().set(Constants.clusterId + "",
-							msg.getLeaderStatus().getLeaderHost() + ":4568");
-					System.out.println("---Redis updated---");
+				int chunk_id = msg.getReq().getRwb().getChunk().getChunkId();
+				int num_of_chunks = msg.getReq().getRwb().getNumOfChunks();
+				byte[] chunk_data = msg.getReq().getRwb().getChunk().getChunkData().toByteArray();
+				int chunk_size = msg.getReq().getRwb().getChunk().getChunkSize();
 
-				} catch (Exception e) {
-					System.out.println("---Problem with redis at voteReceived in WorkHandler---");
+				// Pushing chunks to Mysql DB
+				DBHandler mysql_db = new DBHandler();
+				mysql_db.addChunk(file_id, chunk_id, chunk_data, chunk_size, num_of_chunks);
+				mysql_db.closeConn();
+
+				System.out.println("Message received :" + msg.getReq().getRwb().getChunk().getChunkId());
+
+				lstMsg.add(msg);
+
+				System.out.println("List size is: ");
+				System.out.println(lstMsg.size());
+				String storeStr = new String(msg.getReq().getRwb().getChunk().getChunkData().toByteArray(), "ASCII");
+				System.out.println("No. of chunks" + String.valueOf(msg.getReq().getRwb().getNumOfChunks()));
+				// storeRedisData(msg);
+
+				if (lstMsg.size() == msg.getReq().getRwb().getNumOfChunks()) {
+
+					System.out.println("Checking if chunks exist");
+					try {
+						if (!jedisHandler1.exists(file_id)) {
+							// return null;
+							System.out.println("Does not exists");
+						}
+						System.out.println("Printing map");
+
+						Map<String, String> map1 = jedisHandler1.hgetAll(file_id);
+
+						System.out.println(new PrettyPrintingMap<String, String>(map1));
+
+					} catch (JedisConnectionException exception) {
+						// Do stuff
+					} finally {
+						// Clean up
+					}
+
+					System.out.println("All chunks received");
+					// Sorting
+					Collections.sort(lstMsg, new Comparator<WorkMessage>() {
+						@Override
+						public int compare(WorkMessage msg1, WorkMessage msg2) {
+							return Integer.compare(msg1.getReq().getRwb().getChunk().getChunkId(),
+									msg2.getReq().getRwb().getChunk().getChunkId());
+						}
+					});
+
+					System.out.println("All chunks sorted");
+					for (WorkMessage message : lstMsg) {
+						chunkedFile.add(message.getReq().getRwb().getChunk().getChunkData());
+					}
+					System.out.println("Chunked file created");
+
+					File directory = new File(Constants.dataDir);
+					if (!directory.exists()) {
+						directory.mkdir();
+						File logFile = new File(Constants.logFile);
+						logFile.createNewFile(); // Create log File
+
+					}
+
+					File file = new File(Constants.dataDir + msg.getReq().getRwb().getFilename());
+					file.createNewFile();
+					System.out.println("File created in Gossamer dir");
+					FileOutputStream outputStream = new FileOutputStream(file);
+					ByteString bs = ByteString.copyFrom(chunkedFile);
+					outputStream.write(bs.toByteArray());
+					outputStream.flush();
+					outputStream.close();
+					System.out.println("File created");
+					long end = System.currentTimeMillis();
+					System.out.println("End time");
+					System.out.println(end);
+
+					// Pushing file to Mysql DB
+					DBHandler mysql_db2 = new DBHandler();
+					mysql_db2.addFile(file_id, file_name, file_ext, num_of_chunks, file_size);
+					mysql_db2.closeConn();
+
+					// Send acks
+					// List<Future<Long>> futures = service.invokeAll(futuresList);
+					// service.shutdown();
+
+					// Cleanup
+					chunkedFile = new ArrayList<ByteString>();
+					lstMsg = new ArrayList<WorkMessage>();
+					futuresList = new ArrayList<WriteChannel>();
+
 				}
-				state.setLeaderId(msg.getLeaderStatus().getLeaderId());
-				state.setLeaderAddress(msg.getLeaderStatus().getLeaderHost());
-				state.becomeFollower();
-				state.setTimeout(0);
-			} else if (msg.hasBeat()) {
-				Heartbeat hb = msg.getBeat();
-				logger.info("heartbeat from " + msg.getHeader().getNodeId());
-				Timer t = state.getEmon().getTimer(msg.getHeader().getNodeId());
-				if (t != null) {
-					t.cancel();
-					t = null;
+			}
+
+			if (debug)
+				PrintUtil.printWork(msg);
+
+			// TODO How can you implement this without if-else statements?
+			try {
+				if (msg.getHeader().hasElection()) {
+					System.out.println("Processing the message:");
+					state.handleMessage(channel, msg);
+				} else if (msg.getLeaderStatus().getState() == LeaderState.LEADERALIVE) {
+					System.out.println(
+							"Heartbeat from leader " + msg.getLeaderStatus().getLeaderId() + "...Resetting the timmer:");
+					state.getElecHandler().getTimer().cancel();
+					state.getElecHandler().setTimer();
+					try {
+						state.getLocalhostJedis().select(0);
+						state.getLocalhostJedis().set(Constants.clusterId + "",
+								msg.getLeaderStatus().getLeaderHost() + ":4568");
+						System.out.println("---Redis updated---");
+
+					} catch (Exception e) {
+						System.out.println("---Problem with redis at voteReceived in WorkHandler---");
+					}
+					state.setLeaderId(msg.getLeaderStatus().getLeaderId());
+					state.setLeaderAddress(msg.getLeaderStatus().getLeaderHost());
+					state.becomeFollower();
+					state.setTimeout(0);
+				} else if (msg.hasBeat()) {
+					Heartbeat hb = msg.getBeat();
+					logger.info("heartbeat from " + msg.getHeader().getNodeId());
+					Timer t = state.getEmon().getTimer(msg.getHeader().getNodeId());
+					if (t != null) {
+						t.cancel();
+						t = null;
+					}
+					state.getEmon().setTimer(msg.getHeader().getNodeId());
+				} else if (msg.hasPing()) {
+					logger.info("ping from " + msg.getHeader().getNodeId());
+					boolean p = msg.getPing();
+					WorkMessage.Builder rb = WorkMessage.newBuilder();
+					rb.setPing(true);
+					channel.write(rb.build());
+				} else if (msg.hasErr()) {
+					Failure err = msg.getErr();
+					logger.error("failure from " + msg.getHeader().getNodeId());
+					// PrintUtil.printFailure(err);
+				} else if (msg.hasTask()) {
+					Task t = msg.getTask();
+				} else if (msg.hasState()) {
+					WorkState s = msg.getState();
 				}
-				state.getEmon().setTimer(msg.getHeader().getNodeId());
-			} else if (msg.hasPing()) {
-				logger.info("ping from " + msg.getHeader().getNodeId());
-				boolean p = msg.getPing();
-				WorkMessage.Builder rb = WorkMessage.newBuilder();
-				rb.setPing(true);
+			} catch (Exception e) {
+				// TODO add logging
+				Failure.Builder eb = Failure.newBuilder();
+				eb.setId(state.getConf().getNodeId());
+				eb.setRefId(msg.getHeader().getNodeId());
+				eb.setMessage(e.getMessage());
+				WorkMessage.Builder rb = WorkMessage.newBuilder(msg);
+				rb.setErr(eb);
 				channel.write(rb.build());
-			} else if (msg.hasErr()) {
-				Failure err = msg.getErr();
-				logger.error("failure from " + msg.getHeader().getNodeId());
-				// PrintUtil.printFailure(err);
-			} else if (msg.hasTask()) {
-				Task t = msg.getTask();
-			} else if (msg.hasState()) {
-				WorkState s = msg.getState();
 			}
-		} catch (Exception e) {
-			// TODO add logging
-			Failure.Builder eb = Failure.newBuilder();
-			eb.setId(state.getConf().getNodeId());
-			eb.setRefId(msg.getHeader().getNodeId());
-			eb.setMessage(e.getMessage());
-			WorkMessage.Builder rb = WorkMessage.newBuilder(msg);
-			rb.setErr(eb);
-			channel.write(rb.build());
-		}
 
-		System.out.flush();
+			System.out.flush();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
 
 	}
 
