@@ -247,8 +247,8 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 					nodeCount++;
 				 }
 			}
-			state.getAnyJedis().select(1);
-			if (state.getAnyJedis().dbSize() == 1) {
+			state.getLocalhostJedis().select(1);
+			if (state.getLocalhostJedis().dbSize() == 1) {
 			//if (1 == 1) {
 				state.becomeLeader();
 				state.setLeaderAddress(state.getIpAddress());

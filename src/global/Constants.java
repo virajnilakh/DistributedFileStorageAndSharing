@@ -7,7 +7,7 @@ public class Constants {
 	public static String clientDir = "C:\\ClientStuff\\";
 	public static String logFile = "Log.txt";
 
-	public static String jedis1 = "169.254.214.175";
+	public static String jedis1 = "192.168.1.20";
 	public static String jedis2 = "169.254.56.202";
 	public static String jedis3 = "169.254.80.87";
 
@@ -15,7 +15,7 @@ public class Constants {
 	// public static String jedis2 = "10.250.47.208";
 	// public static String jedis3 = "10.250.175.205";
 	public static int clusterId = 2;
-	public static int nextClusterId = 1;
+	public static int nextClusterId = 6;
 	public static int whomToConnect = 2;
 
 	public static int redisPort = 6379;

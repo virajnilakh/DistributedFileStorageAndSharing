@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	private static Jedis jedisHandler1 = new Jedis("localhost", 6379);
 	List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
 	ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	private HashMap<String,ArrayList<Integer>> fileCheck=new HashMap<String,ArrayList<Integer>>();
 	private Channel clientChannel = null;
 
 	public CommandHandler(RoutingConf conf) {
@@ -125,9 +127,11 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				clientChannel.writeAndFlush(msg);
 			} else {
 				System.out.println("Ping received from cluster 1");
-
+				
 				CommandMessage ping = decHopPing(msg);
-				System.out.println("Hack");
+				ServerState.getNext().writeAndFlush(ping);
+
+				/*System.out.println("Hack");
 				// Hack
 				EventLoopGroup workerGroup = new NioEventLoopGroup();
 				Bootstrap b = new Bootstrap(); // (1)
@@ -137,49 +141,35 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				b.handler(new CommandInit(null, false));
 				ChannelFuture cha = b.connect("192.168.1.30", 4168).sync();
 				cha.channel().writeAndFlush(ping);
-				// ServerState.getNext().writeAndFlush(ping);
+				// ServerState.getNext().writeAndFlush(ping);*/
 			}
 		}
 		// ToDO: What has been done here ?? Why is ping condition checked twice?
-		if (msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE) {
+		if (msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE && !msg.hasPing()) {
+			if (msg.getRequest().getRrb().getFilename().equals("*")) {
+				readFileNamesCmd(msg, channel);
+			}else{
 			QueueHandler.enqueueInboundCommandAndChannel(msg, channel);
-		} else if (msg.getPing()) {
-			System.out.println("Received ping from cluster 1");
-			ServerState.getNext().writeAndFlush(msg);
-			/*
-			 * if (!ServerState.isRoundTrip() &&
-			 * msg.getHeader().getDestination() == Constants.clusterId) {
-			 * ServerState.setRoundTrip(true); CommandMessage ping =
-			 * createCommandPing(msg.getHeader().getDestination());
-			 * ServerState.getNext().writeAndFlush(ping); } else if
-			 * (ServerState.isRoundTrip() && msg.getHeader().getDestination() ==
-			 * Constants.clusterId) { ServerState.setRoundTrip(false);
-			 * System.out.
-			 * println("***Got the ping back by going through the ring across all clusters***"
-			 * ); channel.writeAndFlush(msg); } else { CommandMessage ping =
-			 * createCommandPing(msg.getHeader().getDestination());
-			 * ServerState.getNext().writeAndFlush(ping); }
-			 */
+			}
+		} 
 
-		}
-
-		if (msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE) {
+		/*if (msg.getRequest().getRequestType() == TaskType.REQUESTREADFILE) {
 			if (msg.getRequest().getRrb().getFilename().equals("*")) {
 				readFileNamesCmd(msg, channel);
 			} else {
 
 				readFileCmd(msg, channel);
 			}
-		}
+		}*/
 
 		if (msg.getRequest().getRequestType() == TaskType.REQUESTWRITEFILE) {
-
+			
 			writeFileCmd(msg, channel);
 		}
 
-		pingCmd(msg, channel);
+		//pingCmd(msg, channel);
 
-		System.out.flush();
+		//System.out.flush();
 
 	}
 
@@ -360,7 +350,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	 */
 	private void writeFileCmd(CommandMessage msg, Channel channel)
 			throws UnsupportedEncodingException, Exception, IOException, FileNotFoundException, InterruptedException {
-
+		ServerState.getNext().writeAndFlush(msg);
 		String file_id = msg.getRequest().getRwb().getFileId();
 		String file_name = msg.getRequest().getRwb().getFilename();
 		String file_ext = msg.getRequest().getRwb().getFileExt();
