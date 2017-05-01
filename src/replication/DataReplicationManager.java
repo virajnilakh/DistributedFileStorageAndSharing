@@ -21,8 +21,7 @@ import routing.Pipe.CommandMessage;
 
 public class DataReplicationManager {
 
-	public void replicateToNewNode() {
-		Channel channel = null;
+	public void replicateToNewNode(Channel channel) {
 		replicate(channel);
 	}
 
