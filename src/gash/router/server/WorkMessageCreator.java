@@ -2,6 +2,7 @@ package gash.router.server;
 
 import java.util.ArrayList;
 
+import com.google.protobuf.ByteString;
 import com.mysql.fabric.Server;
 
 import pipe.common.Common.Chunk;
@@ -113,6 +114,40 @@ public class WorkMessageCreator {
 		CommandMessage.Builder comm = CommandMessage.newBuilder();
 		comm.setHeader(header);
 		comm.setResponse(res);
+		return comm.build();
+	}
+
+	public static WorkMessage createWriteRequest(ByteString chunkData, String chunkFileId, String fileName,
+			int numChunks, int chunkId, int chunkSize) {
+		Header.Builder header = Header.newBuilder();
+
+		header.setNodeId(ServerState.getConf().getNodeId());
+		header.setTime(System.currentTimeMillis());
+		header.setDestination(-1);
+
+		Chunk.Builder chunk = Chunk.newBuilder();
+		chunk.setChunkId(chunkId);
+		chunk.setChunkData(chunkData);
+
+		WriteBody.Builder body = WriteBody.newBuilder();
+		body.setFilename(fileName);
+		// File Id is the MD5 hash in string format of the file name
+		body.setFileId(chunkFileId);
+		body.setNumOfChunks(numChunks);
+		body.setChunk(chunk);
+
+		Request.Builder req = Request.newBuilder();
+		req.setRequestType(TaskType.REQUESTWRITEFILE);
+		req.setRwb(body);
+
+		LeaderStatus.Builder status = LeaderStatus.newBuilder();
+		status.setState(LeaderState.LEADERALIVE);
+
+		WorkMessage.Builder comm = WorkMessage.newBuilder();
+		comm.setHeader(header);
+		comm.setSecret(0);
+		comm.setLeaderStatus(status);
+		comm.setReq(req);
 		return comm.build();
 	}
 

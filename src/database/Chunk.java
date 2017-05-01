@@ -4,6 +4,7 @@ public class Chunk {
 	private int chunkId;
 	private byte[] chunkData;
 	private int chunkSize;
+	private String fileId;
 
 	public int getChunkId() {
 		return chunkId;
@@ -29,4 +30,19 @@ public class Chunk {
 		this.chunkSize = chunkSize;
 	}
 
+	public String getFileName(String FileId, DBHandler handler) {
+
+		return handler.getFileName(fileId);
+
+	}
+
+	public void setChunkFileId(String fileId) {
+
+		this.fileId = fileId;
+	}
+
+	public String getChunkFileId() {
+
+		return fileId;
+	}
 }
