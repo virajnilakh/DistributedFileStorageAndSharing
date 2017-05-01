@@ -13,14 +13,14 @@ import java.util.ArrayList;
 public class DBHandler {
 
 	private Connection conn;
-	
+
 	public DBHandler() {
 		conn = makeConn();
 	}
 
 	public Connection makeConn() {
 		try {
-			//ToDO: Remove password to a config
+			// ToDO: Remove password to a config
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/cmpe275db", "root", "admin");
 			System.out.println("Successfully connected");
 
@@ -147,6 +147,33 @@ public class DBHandler {
 		}
 	}
 
+	public ArrayList<Chunk> getChunks() {
+		/* DBManager entireRow = new DBManager(); */
+		ArrayList<Chunk> allChunks = new ArrayList<Chunk>();
+
+		try {
+			String query = "select * from chunkData";
+			PreparedStatement preparedStatement = conn.prepareStatement(query);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			System.out.println("All Files being retreived from db");
+			while (resultSet.next()) {
+				Chunk eachChunk = new Chunk();
+				eachChunk.setChunkId(resultSet.getInt("chunk_id"));
+				System.out.println("Chunk" + resultSet.getInt("chunk_id") + "being retreived from db");
+				// int eachChunk =
+				// ByteString.copyFrom(resultSet.getBytes("chunk_data"));
+				eachChunk.setChunkData(resultSet.getBytes("chunk_data"));
+				eachChunk.setChunkSize(resultSet.getInt("chunk_size"));
+				eachChunk.setChunkFileId(resultSet.getString("file_id"));
+				allChunks.add(eachChunk);
+			}
+			preparedStatement.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return allChunks;
+	}
+
 	public ArrayList<Chunk> getChunks(String fileid) {
 		/* DBManager entireRow = new DBManager(); */
 		ArrayList<Chunk> allChunks = new ArrayList<Chunk>();
@@ -165,6 +192,7 @@ public class DBHandler {
 				// ByteString.copyFrom(resultSet.getBytes("chunk_data"));
 				eachChunk.setChunkData(resultSet.getBytes("chunk_data"));
 				eachChunk.setChunkSize(resultSet.getInt("chunk_size"));
+				eachChunk.setChunkFileId(resultSet.getString("file_id"));
 				allChunks.add(eachChunk);
 			}
 			preparedStatement.close();
@@ -183,5 +211,21 @@ public class DBHandler {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String getFileName(String fileId) {
+		try {
+			String existsQuery = "select * from filedata where file_id =?";
+			PreparedStatement preparedStatement;
+			preparedStatement = conn.prepareStatement(existsQuery);
+			preparedStatement.setString(1, fileId);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			if (resultSet.first()) {
+				return resultSet.getString("file_name");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
