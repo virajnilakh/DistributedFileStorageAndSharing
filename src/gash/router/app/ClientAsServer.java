@@ -18,7 +18,7 @@ public class ClientAsServer implements Runnable{
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+
 		EventLoopGroup bossGroup = new NioEventLoopGroup();
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 

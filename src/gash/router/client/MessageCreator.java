@@ -17,11 +17,13 @@ import routing.Pipe.CommandMessage;
 
 /*
  * Author: Ashutosh Singh
+ * 
+ * Helper class to create messages, hence static
  * */
 public class MessageCreator {
 
 	public static CommandMessage CreateReadAllMessage() {
-		// TODO Auto-generated method stub
+	
 		Header.Builder header = Header.newBuilder();
 		header.setNodeId(99);
 		header.setTime(System.currentTimeMillis());
@@ -31,7 +33,7 @@ public class MessageCreator {
 		body.setFilename("*");
 
 		Request.Builder req = Request.newBuilder();
-		// req.setRequestType(TaskType.REQUESTREADALLFILEDETAILS);
+	
 		req.setRequestType(TaskType.REQUESTREADFILE);
 		req.setRrb(body);
 
@@ -43,7 +45,7 @@ public class MessageCreator {
 	}
 
 	public static CommandMessage createReadMessage(String fileName) throws UnknownHostException {
-		// TODO Auto-generated method stub
+	
 		Header.Builder header = Header.newBuilder();
 		header.setNodeId(99);
 		header.setTime(System.currentTimeMillis());
@@ -51,7 +53,7 @@ public class MessageCreator {
 
 		ReadBody.Builder body = ReadBody.newBuilder();
 		body.setFilename(fileName);
-
+		//ToDO: Check if it is still needed
 		// body.setClientAddress(LocalAddress.getLocalHostLANAddress().getHostAddress()+":"+Constants.clientPort);
 		Request.Builder req = Request.newBuilder();
 

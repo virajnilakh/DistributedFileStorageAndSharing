@@ -16,8 +16,7 @@ public class WriteChannel implements Callable<Long> {
 		message = msg;
 		this.channel = channel;
 	}
-
-	/* Needs refactoring */
+	
 	@Override
 	public Long call() {
 

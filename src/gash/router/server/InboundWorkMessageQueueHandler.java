@@ -12,7 +12,6 @@ import database.Chunk;
 import database.DBHandler;
 import gash.router.client.MessageCreator;
 import gash.router.client.WriteChannel;
-import gash.router.server.edges.EdgeMonitor;
 import global.Constants;
 import global.Utility;
 import io.netty.bootstrap.Bootstrap;

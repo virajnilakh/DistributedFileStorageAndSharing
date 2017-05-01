@@ -16,7 +16,6 @@
 package gash.router.app;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Scanner;
 
 import gash.router.client.CommConnection;
@@ -27,17 +26,6 @@ import global.Constants;
 import io.netty.channel.Channel;
 import redis.clients.jedis.Jedis;
 import routing.Pipe.CommandMessage;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import pipe.common.Common.Header;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.bootstrap.ServerBootstrap;
-import gash.router.server.CommandInit;
-import gash.router.client.CommInit;
-import java.util.HashMap;
 
 public class DemoApp implements CommListener {
 	private static MessageClient mc;
@@ -60,24 +48,6 @@ public class DemoApp implements CommListener {
 		this.mc.addListener(this);
 	}
 
-	private void ping(int N) {
-		// test round-trip overhead (note overhead for initial connection)
-		final int maxN = 10;
-		long[] dt = new long[N];
-		long st = System.currentTimeMillis(), ft = 0;
-		for (int n = 0; n < N; n++) {
-			mc.ping();
-			ft = System.currentTimeMillis();
-			dt[n] = ft - st;
-			st = ft;
-		}
-
-		System.out.println("Round-trip ping times (msec)");
-		for (int n = 0; n < N; n++)
-			System.out.print(dt[n] + " ");
-		System.out.println("");
-	}
-
 	@Override
 	public String getListenerID() {
 		return "demo";
@@ -98,8 +68,6 @@ public class DemoApp implements CommListener {
 		// String host = "169.254.214.175";
 		int port = Constants.workPort;
 
-		Boolean affirm = true;
-		Boolean mainAffirm = true;
 		Scanner reader = new Scanner(System.in);
 		try {
 
@@ -160,19 +128,15 @@ public class DemoApp implements CommListener {
 				} catch (Exception e) {
 					option = 0;
 					// TODO Auto-generated catch block
-					// e.printStackTrace();
+					e.printStackTrace();
 				}
-				// option = 2;
-				// reader.nextLine();
 				System.out.println("You entered " + option);
 				CommConnection.getInstance().clearQueue();
 				System.out.println("Queue size is " + CommConnection.getInstance().outboundWriteQueue.size());
 				System.out.println("Press Y to continue or any other key to cancel");
 				String ans = "";
 				ans = reader.nextLine();
-				// ans = "Y";
 				if (ans.equals("Y")) {
-					mainAffirm = false;
 				}
 				String path = "";
 				switch (option) {
@@ -208,12 +172,10 @@ public class DemoApp implements CommListener {
 					System.out.println("You entered" + path);
 
 					System.out.println("Press Y to continue or any other key to cancel");
-					affirm = false;
 					String ans2 = "";
 					ans2 = reader.next();
 					ans2 = "Y";
 					if (ans2.equals("Y")) {
-						affirm = true;
 					}
 					// reader.close();
 					File file = new File(path);
@@ -242,14 +204,10 @@ public class DemoApp implements CommListener {
 					File file1 = null;
 					String ans3 = "";
 					while (j < paths.length) {
-						affirm = false;
-
 						ans3 = reader.next();
 						ans3 = "Y";
 						if (ans3.equals("Y")) {
-							affirm = true;
 						}
-						// reader.close();
 						file1 = new File(path);
 						if (path.trim().equals("") || file1 == null) {
 							break;
@@ -282,7 +240,7 @@ public class DemoApp implements CommListener {
 				}
 			} while (true);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			reader.close();
 			System.out.println("Error occurred at client...");
 			e.printStackTrace();
 		} finally {
@@ -291,29 +249,8 @@ public class DemoApp implements CommListener {
 		}
 	}
 
-	public static void clientAcceptConnections() {
-
-	}
-
-	private CommandMessage createCommandPing(int clusterId) {
-		// TODO Auto-generated method stub
-		CommandMessage.Builder command = CommandMessage.newBuilder();
-		Boolean ping = true;
-		command.setPing(ping);
-
-		Header.Builder header = Header.newBuilder();
-		header.setNodeId(2);
-		header.setTime(System.currentTimeMillis());
-		header.setDestination(Constants.whomToConnect);
-		command.setHeader(header);
-
-		return command.build();
-	}
-
 	private static void sendFile(File file, Channel channel) {
-
 		MessageSender.sendReadCommand(file);
-
 	}
 
 }

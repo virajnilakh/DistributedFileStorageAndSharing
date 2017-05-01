@@ -4,7 +4,6 @@ import gash.router.server.edges.EdgeMonitor;
 import pipe.common.Common.Header;
 import pipe.election.Election.LeaderStatus;
 import pipe.election.Election.LeaderStatus.LeaderState;
-import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkState;
 

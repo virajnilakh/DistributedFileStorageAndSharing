@@ -1,23 +1,14 @@
 package replication;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import com.google.protobuf.ByteString;
 
 import database.Chunk;
 import database.DBHandler;
-import gash.router.client.CommConnection;
-import gash.router.client.MessageCreator;
-import gash.router.client.WriteChannel;
 import gash.router.server.QueueHandler;
 import gash.router.server.WorkMessageCreator;
 import io.netty.channel.Channel;
 import pipe.work.Work.WorkMessage;
-import routing.Pipe.CommandMessage;
 
 public class DataReplicationManager {
 

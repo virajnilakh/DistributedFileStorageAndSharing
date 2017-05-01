@@ -3,6 +3,7 @@ package gash.router.client;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,19 +21,19 @@ import routing.Pipe.CommandMessage;
 
 /*
  * Author: Ashutosh Singh
+ * 
  * */
 public class MessageSender {
 	static Channel channel = CommConnection.getInstance().connect();
 
 	public static void SendReadRequest(String fileName) throws UnknownHostException {
-		// TODO Auto-generated method stub
 		CommandMessage msg = MessageCreator.createReadMessage(fileName);
 		channel.writeAndFlush(msg);
 		System.out.println("Read request sent");
 
 	}
+
 	public static void createCommandPing(int clusterId) {
-		// TODO Auto-generated method stub
 		CommandMessage.Builder command = CommandMessage.newBuilder();
 		Boolean ping = true;
 		command.setPing(ping);
@@ -44,29 +45,24 @@ public class MessageSender {
 		header.setMaxHops(10);
 		command.setHeader(header);
 
-		 channel.writeAndFlush(command.build());
+		channel.writeAndFlush(command.build());
 	}
+
 	public static void SendReadAllFileInfo() {
-		// TODO Auto-generated method stub
-		// Channel channel = CommConnection.getInstance().connect();
-		List<String> response = null;
 		CommandMessage msg = MessageCreator.CreateReadAllMessage();
 		channel.writeAndFlush(msg);
 		System.out.println("Read all files request sent");
 	}
 
-	public static void sendReadCommand(File file) {
-		// TODO Auto-generated method stub
-		// Channel channel = CommConnection.getInstance().connect();
+	public static void sendReadCommand(File file) throws IOException {
 		ArrayList<ByteString> chunksFile = new ArrayList<ByteString>();
 		ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
 		double sizeChunks = Constants.sizeOfChunk;
 		int numChunks = 0;
 		byte[] buffer = new byte[(int) sizeChunks];
-
+		BufferedInputStream bis = null;
 		try {
-			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+			bis = new BufferedInputStream(new FileInputStream(file));
 			String name = file.getName();
 			long filesize = file.length();
 			String hash = Utility.getHashFileName(name);
@@ -87,27 +83,22 @@ public class MessageSender {
 
 				WriteChannel myCallable = new WriteChannel(commMsg, channel);
 				CommConnection.getInstance().enqueueWrite(myCallable);
-				// futuresList.add(myCallable);
 			}
-
-			// System.out.println("No. of chunks: " + futuresList.size());
 
 			long start = System.currentTimeMillis();
 			System.out.print(start);
 			System.out.println("Start send");
 
-			try {
-				List<Future<Long>> futures = service.invokeAll(CommConnection.getInstance().outboundWriteQueue);
-			} catch (NullPointerException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
-
-			}
+			@SuppressWarnings("unused")
+			List<Future<Long>> futures = service.invokeAll(CommConnection.getInstance().outboundWriteQueue);
 			System.out.println("Completed tasks");
 			service.shutdown();
 
+		} catch (NullPointerException e) {
+			e.printStackTrace();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			bis.close();
 		}
 
 	}
