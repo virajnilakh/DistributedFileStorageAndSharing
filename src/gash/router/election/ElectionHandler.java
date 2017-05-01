@@ -143,7 +143,7 @@ public class ElectionHandler {
 	}
 
 	public synchronized void initElection() {
-		int randomTimeout = (2000 + (new Random()).nextInt(3500)) * state.getConf().getNodeId();
+		int randomTimeout = (2000 + (new Random()).nextInt(3500)) * 8;
 		timer.schedule(new ElectionTimer(), (long) randomTimeout, (long) randomTimeout);
 	}
 
@@ -154,7 +154,7 @@ public class ElectionHandler {
 	public static void setTimer() {
 		timer = null;
 		timer = new Timer();
-		int randomTimeout = (2000 + (new Random()).nextInt(3500)) * (state.getConf().getNodeId() + 2);
+		int randomTimeout = (2000 + (new Random()).nextInt(3500)) * 8;
 		timer.schedule(new ElectionTimer(), (long) randomTimeout, (long) randomTimeout);
 	}
 
@@ -162,8 +162,8 @@ public class ElectionHandler {
 
 		@Override
 		public void run() {
-			
-			//ToDO: Uncomment after testing
+
+			// ToDO: Uncomment after testing
 			/*
 			 * if(getHasVoted()){ timer.cancel(); }
 			 */

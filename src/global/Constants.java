@@ -8,8 +8,8 @@ public class Constants {
 	public static String logFile = "Log.txt";
 
 	public static String jedis1 = "192.168.1.20";
-	public static String jedis2 = "169.254.56.202";
-	public static String jedis3 = "169.254.80.87";
+	public static String jedis2 = "192.168.1.21";
+	public static String jedis3 = "192.168.1.22";
 
 	// public static String jedis1 = "10.250.129.206";
 	// public static String jedis2 = "10.250.47.208";
@@ -22,5 +22,5 @@ public class Constants {
 	public static int workPort = 4568;
 	public static int clientPort = 4569;
 	public static String localhost = "127.0.0.1";
-	public static String next = "169.254.214.175";
+	//public static String next = "169.254.214.175";
 }

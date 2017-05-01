@@ -117,7 +117,7 @@ public class ServerState {
 		reqVote = new HandleVoteRequestState(this);
 		resLeader = new HandleLeaderResponseState(this);
 		voteReceived = new HandleVoteReceivedState(this);
-		nextJedis = new Jedis(Constants.next, Constants.redisPort);
+		//nextJedis = new Jedis(Constants.next, Constants.redisPort);
 		jedisHandler1 = new Jedis(Constants.jedis1, Constants.redisPort);
 		jedisHandler2 = new Jedis(Constants.jedis2, Constants.redisPort);
 		jedisHandler3 = new Jedis(Constants.jedis3, Constants.redisPort);
