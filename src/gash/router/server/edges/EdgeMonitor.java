@@ -49,6 +49,7 @@ import pipe.work.Work.Heartbeat;
 import pipe.work.Work.WorkMessage;
 import pipe.work.Work.WorkState;
 import redis.clients.jedis.Jedis;
+import replication.DataReplicationManager;
 import routing.Pipe.CommandMessage;
 
 public class EdgeMonitor implements EdgeListener, Runnable {
@@ -325,6 +326,9 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 										ei.setChannel(f.channel());
 										ei.setActive(true);
 										activeOutboundEdges++;
+										// Start replication
+										DataReplicationManager replication = new DataReplicationManager();
+										replication.replicateToNewNode(ei.getChannel());
 									}
 								}
 							});
