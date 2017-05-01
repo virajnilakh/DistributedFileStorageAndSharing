@@ -106,7 +106,7 @@ public class WorkHandler extends SimpleChannelInboundHandler<WorkMessage> {
 			state.setStealNode(msg.getHeader().getNodeId());
 			state.setStealReq(true);
 		}
-		if (msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
+		if (!msg.hasBeat() && msg.getReq().getRequestType() == TaskType.REQUESTREADFILE) {
 			QueueHandler.enqueueInboundWorkAndChannel(msg, channel);
 		} else if (msg.getReq().getRequestType() == TaskType.REQUESTWRITEFILE) {
 

@@ -327,8 +327,8 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 										ei.setActive(true);
 										activeOutboundEdges++;
 										// Start replication
-										DataReplicationManager replication = new DataReplicationManager();
-										replication.replicateToNewNode(ei.getChannel());
+										//DataReplicationManager replication = new DataReplicationManager();
+										//replication.replicateToNewNode(ei.getChannel());
 									}
 								}
 							});
@@ -393,12 +393,12 @@ public class EdgeMonitor implements EdgeListener, Runnable {
 		@Override
 		public void run() {
 			//System.out.println("Node " + nodeId + "dead");
-			outboundEdges.map.get(nodeId).setChannel(null);
+			//outboundEdges.map.get(nodeId).setChannel(null);
 			outboundEdges.map.get(nodeId).setActive(false);
-			outboundEdges.map.remove(nodeId);
-			state.delRedis(nodeId);
-			activeOutboundEdges--;
-			nodeCount--;
+			//outboundEdges.map.remove(nodeId);
+			//state.delRedis(nodeId);
+			//activeOutboundEdges--;
+			//nodeCount--;
 			this.cancel();
 		}
 	}

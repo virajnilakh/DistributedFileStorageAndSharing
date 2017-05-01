@@ -101,7 +101,7 @@ public class InboundWorkMessageQueueHandler implements Runnable {
 	 		             ChannelFuture cha = b.connect(host, port).sync();
 	 		            readFileCmd(msg, cha.channel());
 	 		        }catch(Exception e){
-	 		        	System.out.println("Problem to connecting to client on steal node");
+	 		        	System.out.println("Problem to connecting to send read back to leader");
 	 		        }
 				}
 				
