@@ -16,6 +16,7 @@
 package gash.router.app;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
 import gash.router.client.CommConnection;
@@ -250,7 +251,12 @@ public class DemoApp implements CommListener {
 	}
 
 	private static void sendFile(File file, Channel channel) {
-		MessageSender.sendReadCommand(file);
+		try {
+			MessageSender.sendReadCommand(file);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
