@@ -41,7 +41,7 @@ public class MessageSender {
 		Header.Builder header = Header.newBuilder();
 		header.setNodeId(22);
 		header.setTime(System.currentTimeMillis());
-		header.setDestination(5);
+		header.setDestination(3);
 		header.setMaxHops(10);
 		command.setHeader(header);
 

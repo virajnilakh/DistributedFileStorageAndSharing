@@ -45,7 +45,7 @@ public class WorkMessageCreator {
 		req.setRwb(body);
 
 		LeaderStatus.Builder status = LeaderStatus.newBuilder();
-		status.setState(LeaderState.LEADERALIVE);
+		status.setState(LeaderState.LEADERKNOWN);
 
 		WorkMessage.Builder comm = WorkMessage.newBuilder();
 		comm.setHeader(header);

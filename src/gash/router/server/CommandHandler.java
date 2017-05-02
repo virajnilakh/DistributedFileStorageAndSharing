@@ -82,7 +82,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 	private static Jedis jedisHandler1 = new Jedis("localhost", 6379);
 	List<WriteChannel> futuresList = new ArrayList<WriteChannel>();
 	ExecutorService service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-	private HashMap<String,ArrayList<Integer>> fileCheck=new HashMap<String,ArrayList<Integer>>();
+	Map<String, ArrayList<CommandMessage>> fileChunkMap= new HashMap<String, ArrayList<CommandMessage>>();
 	private Channel clientChannel = null;
 
 	public CommandHandler(RoutingConf conf) {
@@ -121,10 +121,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 					System.out.println("Ping received from cluster 1");
 					CommandMessage ping = invertPing(msg);
 					ServerState.getNext().writeAndFlush(ping);
-				} else if (msg.getHeader().getDestination() / 10 != 0
-						&& msg.getHeader().getDestination() % 10 == Constants.clusterId) {
-					System.out.println("Ping received from cluster 1");
-					clientChannel.writeAndFlush(msg);
+				} else if (msg.getHeader().getDestination()==22) {
+					System.out.println("Ping received from cluster 1 sending to client");
+					//clientChannel.writeAndFlush(msg);
 				} else {
 					System.out.println("Ping received from cluster 1");
 					
@@ -149,7 +148,8 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				if (msg.getRequest().getRrb().getFilename().equals("*")) {
 					readFileNamesCmd(msg, channel);
 				}else{
-				QueueHandler.enqueueInboundCommandAndChannel(msg, channel);
+					readFileCmd(msg, channel);
+				//QueueHandler.enqueueInboundCommandAndChannel(msg, channel);
 				}
 			} 
 
@@ -161,15 +161,35 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 					readFileCmd(msg, channel);
 				}
 			}*/
-
+			
 			if (!msg.hasPing() && msg.getRequest().getRequestType() == TaskType.REQUESTWRITEFILE) {
+				System.out.println("has write request");
+				//writeFileCmd(msg, channel);
+
+				//ServerState.getNext().writeAndFlush(msg);
+				if (!fileChunkMap.containsKey(msg.getRequest().getRwb().getFilename())) {
+					  fileChunkMap.put(msg.getRequest().getRwb().getFilename(), new ArrayList<CommandMessage>());		            
+			        }
+				fileChunkMap.get(msg.getRequest().getRwb().getFilename()).add(msg);
 				
-				writeFileCmd(msg, channel);
+				
+				if(fileChunkMap.get(msg.getRequest().getRwb().getFilename()).size()<=msg.getRequest().getRwb().getNumOfChunks()){
+					/*if(msg.getHeader().getNodeId()==55){
+						writeChannelMap.put(msg.getHeader().getNodeId(),channel);
+						writeFileCmd(msg, channel);
+
+					}				
+					else{
+					}*/
+					writeFileCmd(msg, channel);
+					ServerState.getNext().writeAndFlush(msg);
+
 			}
 
 			//pingCmd(msg, channel);
 
 			//System.out.flush();
+		}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
