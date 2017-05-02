@@ -75,9 +75,9 @@ public class MessageCreator {
 			int chunkId, long filesize) throws Exception {
 
 		Header.Builder header = Header.newBuilder();
-		header.setNodeId(99);
+		header.setNodeId(22);
 		header.setTime(System.currentTimeMillis());
-		header.setDestination(-1);
+		//header.setDestination(-1);
 
 		Chunk.Builder chunk = Chunk.newBuilder();
 		System.out.println("Chunk Id while creating:" + chunkId);
