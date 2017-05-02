@@ -148,8 +148,8 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				if (msg.getRequest().getRrb().getFilename().equals("*")) {
 					readFileNamesCmd(msg, channel);
 				}else{
-					readFileCmd(msg, channel);
-				//QueueHandler.enqueueInboundCommandAndChannel(msg, channel);
+					//readFileCmd(msg, channel);
+				QueueHandler.enqueueInboundCommandAndChannel(msg, channel);
 				}
 			} 
 
