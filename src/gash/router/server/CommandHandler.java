@@ -174,15 +174,15 @@ public class CommandHandler extends SimpleChannelInboundHandler<CommandMessage> 
 				
 				
 				if(fileChunkMap.get(msg.getRequest().getRwb().getFilename()).size()<=msg.getRequest().getRwb().getNumOfChunks()){
-					/*if(msg.getHeader().getNodeId()==55){
-						writeChannelMap.put(msg.getHeader().getNodeId(),channel);
+					if(msg.getHeader().getNodeId()==22){
+						clientChannel=channel;
 						writeFileCmd(msg, channel);
 
 					}				
 					else{
-					}*/
-					writeFileCmd(msg, channel);
 					ServerState.getNext().writeAndFlush(msg);
+					}
+					
 
 			}
 
