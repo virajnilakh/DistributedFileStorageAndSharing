@@ -10,10 +10,10 @@
 
 • Global	(a.k.a.	Class)	Proof	(gosh-my-grade-would-love-to-have-this)
 - [x] Ping	round	trip	– ground	truth	that	the	global	communication	is	working
-- [ ] Write	injection	– Single	file,	Multiple	files,	really-really-big-files
-- [ ] Read	a	local	file	(read	your	own	writes)
+- [x] Write	injection	– Single	file,	Multiple	files,	really-really-big-files
+- [x] Read	a	local	file	(read	your	own	writes)
 - [ ] Read	remote	file	(not	on	your	cluster)
-- [ ] Any	client	can	connect	to	any	cluster
+- [x] Any	client	can	connect	to	any	cluster
 - [ ] Unknown	requirements	and	expectations
 
 
